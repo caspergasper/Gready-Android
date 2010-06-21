@@ -1,0 +1,61 @@
+package com.caspergasper.android.goodreads;
+
+import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import android.util.Log;
+
+class UserData {
+
+	String username;
+	int num_of_friends;
+//	int currentBook;
+	int endBook;
+	int totalBooks;
+	int bookPage;
+	List <Update> updates;
+	List <Shelf> shelves;
+	List <Book> books;
+	String shelf_to_get;
+	
+	private SAXParserFactory factory;
+	private SAXParser parser;
+	private SaxHandler handler;
+	
+	UserData() {
+		bookPage = 0;
+		updates = new ArrayList<Update>();
+		shelves = new ArrayList<Shelf>();
+		books = new ArrayList<Book>();
+		factory = SAXParserFactory.newInstance();
+        try {
+            parser = factory.newSAXParser();
+            handler = new SaxHandler(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } 
+
+	}
+	
+	void getSAXUpdates(InputStream is) {
+		try {
+			Log.d(TAG, "Start parsing.");
+			parser.parse(is, handler);
+			Log.d(TAG, "End parsing.");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+            return;
+	}
+		
+
+	
+
+
+	
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:padding="8px" android:layout_height="fill_parent" android:layout_width="fill_parent"
+   android:orientation="vertical">
+<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" 
+android:id="@+id/gr_bookshelf" android:src="@drawable/gr_bookshelf" android:layout_centerHorizontal="true">
+</ImageView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" 
+android:id="@+id/enterid_feedback_label" android:text="@string/getting_authentication" 
+android:visibility="visible"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" 
+android:id="@+id/delete_prefs" android:text="@string/delete_prefs" 
+android:visibility="invisible"></TextView>
+
+
+</LinearLayout>
+
