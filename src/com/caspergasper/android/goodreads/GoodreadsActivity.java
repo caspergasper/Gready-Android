@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -24,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 
 public class GoodreadsActivity extends Activity {
@@ -33,6 +35,7 @@ public class GoodreadsActivity extends Activity {
 	private static final int TOTAL_BOOKS_TO_DOWNLOAD = 100;  // arbitrary limit, need to fix properly
 	
 	public void onResume() {
+//		Log.d(TAG, "Entering onResume() in GoodreadsActivity");
 		super.onResume();
 		if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
         	Log.d(TAG, "Missing accessTokens, retrieving...");
@@ -42,6 +45,7 @@ public class GoodreadsActivity extends Activity {
 		if(myApp.userID == 0) {
 			myApp.oauth.goodreads_url = OAuth_interface.GET_USER_ID; 
 			myApp.oauth.getXMLFile();
+			return;     
 		} else {
 			if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0) {
 				// Got valid tokens and a userid, let's go get some data...
@@ -85,16 +89,16 @@ public class GoodreadsActivity extends Activity {
         sub.setIcon(android.R.drawable.ic_menu_view);
         
         if(myApp.userData.shelves.size() == 0) {
-			Toast toast = Toast.makeText(getApplicationContext(), R.string.build_menu, Toast.LENGTH_LONG);
-			toast.show();
+        	toastMe(R.string.build_menu);
 //			myApp.oauth.goodreads_url = OAuth_interface.GET_SHELVES;
 //			myApp.oauth.getXMLFile();	
 			return false;
         } else {
+        	Log.d(TAG, "Populating shelves");
         	int shelf_length = myApp.userData.shelves.size();
         	for(int i=0; i<shelf_length && myApp.userData.shelves.get(i) != null; i++) {
-        		sub.add(SUBMENU_GROUPID, i, Menu.NONE, myApp.userData.shelves.get(i).title + 
-        				" (" + myApp.userData.shelves.get(i).total + ")");
+        		sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
+        	    " (" + myApp.userData.shelves.get(i).total + ") " + myApp.userData.shelves.get(i).title);
         	}
         }
         return true;
@@ -140,6 +144,7 @@ public class GoodreadsActivity extends Activity {
 			if(myApp.userData.updates.size() > 0) {
 			    lv = (ListView) findViewById(R.id.updates_listview);
 				lv.setOnItemClickListener(null);
+				lv.setOnItemLongClickListener(null);
 			    ArrayAdapter<Update> adapter = new 
 				ArrayAdapter<Update> (this, R.layout.updateitem,
 						myApp.userData.updates);
@@ -187,16 +192,33 @@ public class GoodreadsActivity extends Activity {
 					}
 				});
 				
+				lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+					@Override
+					public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
+						if(myApp.userData.books.get(_index).bookLink != null) {
+							Uri uri = Uri.parse(OAuth_interface.URL_ADDRESS +
+									OAuth_interface.BOOKPAGE_PATH + myApp.userData.books.get(_index).bookLink);
+				    		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+				    		startActivity(intent);
+						} else {
+							toastMe(R.string.no_book_page);
+						}
+						return true;
+					}
+				});
+				
 				if(myApp.userData.endBook < myApp.userData.totalBooks &&
 						myApp.userData.endBook < TOTAL_BOOKS_TO_DOWNLOAD) {
 	        		// Need to query extra pages in the background
 					Log.d(TAG, "Getting extra page of books...");
 					myApp.oauth.getXMLFile();
+//					lv.setVisibility(View.GONE);  // Fix for updating user interface in background thread.
 	        	}
 			}
 		break;
 		case OAuth_interface.GET_USER_ID:
 			// Let's get the updates
+			Log.d(TAG, "Getting friend updates for first time");
 			myApp.oauth.goodreads_url = OAuth_interface.GET_FRIEND_UPDATES;
 			myApp.oauth.getXMLFile();
 		break;
@@ -216,6 +238,10 @@ public class GoodreadsActivity extends Activity {
 		ad.show();
 	}
 
+	private void toastMe(int msgid) {
+		Toast toast = Toast.makeText(getApplicationContext(), msgid, Toast.LENGTH_SHORT);
+		toast.show();
+	}
 }
 
 

@@ -56,6 +56,7 @@ public final class R {
         public static final int hello=0x7f05000e;
         public static final int hi_user=0x7f050010;
         public static final int internet_access=0x7f050008;
+        public static final int no_book_page=0x7f050015;
         public static final int reviews_label=0x7f050004;
         public static final int status=0x7f050006;
         public static final int stored_id_user=0x7f050001;

@@ -24,4 +24,5 @@
 <string name="getting_authentication">Getting authentication, please wait...</string>
 <string name="auth_successful">Authentication successful.</string>
 <string name="delete_prefs">Delete saved preferences</string>
+<string name="no_book_page">Sorry, there isn\'t a book page for this one.</string>
 </resources>

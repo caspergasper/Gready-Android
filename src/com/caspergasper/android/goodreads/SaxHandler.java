@@ -12,9 +12,7 @@ import android.util.Log;
 class SaxHandler extends DefaultHandler {
     private StringBuilder builder;
 //    private final static String FRIENDS_COUNT = "friends_count";
-    private final static String USER = "user";
     private final static String NAME = "name";
-    private final static String ID = "id";
     private final static String ACTION_TEXT = "action_text";
 //    private final static String SHELVES = "shelves";
     private final static String BOOK_COUNT = "book_count";
@@ -30,8 +28,8 @@ class SaxHandler extends DefaultHandler {
     private final static String TOTAL = "total";
     private final static String AVERAGE_RATING = "average_rating";
 //    private final static String SMALL_IMG_URL = "small_image_url";
+    private final static String LINK = "link";
     
-    private GoodReadsApp appRef;
     private UserData userdata;
     
     private boolean inShelves = false;
@@ -39,7 +37,6 @@ class SaxHandler extends DefaultHandler {
     private boolean inUpdates = false;
      
     SaxHandler(UserData ud) {
-    	appRef = GoodReadsApp.getInstance();
     	userdata = ud;
     	builder = new StringBuilder();
     }
@@ -54,7 +51,7 @@ class SaxHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String name)
             throws SAXException {
-        super.endElement(uri, localName, name);
+    	super.endElement(uri, localName, name);
         if(localName.equalsIgnoreCase(USER_SHELF)) {
         	inShelves = false;
         } else if(localName.equalsIgnoreCase(BOOK_COUNT)) {
@@ -75,6 +72,13 @@ class SaxHandler extends DefaultHandler {
 //            	Log.d(TAG, "value I'm printing: " + builder.toString().trim());
         } else if(localName.equalsIgnoreCase(UPDATES)) {
         	inUpdates = false;
+        } else if(localName.equalsIgnoreCase(LINK)) {
+        	// Eww, this is disgusting!  *MUST* create a different SAX handler for different
+        	// XML files.  
+        	if(inShelves == false && inAuthor == false && inUpdates == false &&  
+        			userdata.books.get(userdata.books.size() - 1).bookLink == null) {
+        		userdata.books.get(userdata.books.size() - 1).setBookLink(builder.toString().trim());
+        	}
         } else if(localName.equalsIgnoreCase(NAME)) {
         	if(inShelves) {
         		userdata.shelves.get(userdata.shelves.size() - 1).title 
@@ -107,12 +111,9 @@ class SaxHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String name,
             Attributes attributes) throws SAXException {
-        super.startElement(uri, localName, name, attributes);
-       
-        if(localName.equalsIgnoreCase(USER)) {
-        	// Get attribute id for user
-        	appRef.userID = Integer.parseInt(attributes.getValue(ID));
-        } else if(localName.equalsIgnoreCase(AUTHOR)){
+    	super.startElement(uri, localName, name, attributes);
+//       Log.d(TAG, "Start tag: " + localName);
+       if(localName.equalsIgnoreCase(AUTHOR)){
         	inAuthor = true;
         } else if(localName.equalsIgnoreCase(USER_SHELF)){
         	inShelves = true;
@@ -126,7 +127,7 @@ class SaxHandler extends DefaultHandler {
 //        else if(localName.equalsIgnoreCase(REVIEW)){
 //        	userdata.currentBook++;
 //        }
-        	
+   
     }
 
 }

@@ -16,13 +16,14 @@ public class OAuth_interface {
 	
 	private static final String CONSUMER_KEY = "UvPjrkah6sJXg88qs75xRA";
 	private static final String CONSUMER_SECRET = "4yFWaSYwjGdzoQ3dVTsv9O3CMMEPIYBuDw6v15rRao";
-	private static final String URL_ADDRESS = "http://www.goodreads.com/";
+	static final String URL_ADDRESS = "http://www.goodreads.com/";
 	private static final String REQUEST_TOKEN_ENDPOINT_URL = "oauth/request_token";
 	private static final String ACCESS_TOKEN_ENDPOINT_URL = "oauth/access_token";
 	private static final String AUTHORIZE_WEBSITE_URL = "oauth/authorize";
 	
 	static final String GET_USER_ID_PATH = "api/auth_user";
 	static final String USER_INFO_URL_PATH = "user/show/";
+	static final String BOOKPAGE_PATH = "m/book"; // mobile site -- main one is "book/show";
 	static final String SHELF_URL_PATH = "review/list/";
 	static final String SHELVES_URL_PATH ="shelf/list?format=xml&key=" + CONSUMER_KEY;
 	static final String UPDATES_URL_PATH = "updates/friends.xml";
@@ -111,7 +112,6 @@ public class OAuth_interface {
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
     		".xml?v=2&key=" + CONSUMER_KEY + "&shelf=" + myApp.userData.shelf_to_get +
     		"&page=" + ++myApp.userData.bookPage;
-    		
     		break;
     	case GET_SHELVES:
     		url_string = URL_ADDRESS + SHELVES_URL_PATH + "&user_id=" + myApp.userID;

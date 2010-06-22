@@ -1,6 +1,7 @@
 package com.caspergasper.android.goodreads;
 
 import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +9,14 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.SAXException;
+
 import android.util.Log;
 
 class UserData {
 
 	String username;
 	int num_of_friends;
-//	int currentBook;
 	int endBook;
 	int totalBooks;
 	int bookPage;
@@ -47,12 +49,27 @@ class UserData {
 			Log.d(TAG, "Start parsing.");
 			parser.parse(is, handler);
 			Log.d(TAG, "End parsing.");
+		} catch (SAXException e) {
+			// XML not well-formed -- ignore.
+			Log.e(TAG, "SAXException: " + e.toString());	
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
             return;
 	}
 		
+	void getSAXUserid(InputStream is) {
+		try {
+			UserSAXHandler saxHandler = new UserSAXHandler();
+			parser.parse(is, saxHandler);
+		} catch (SAXException e) {
+			// XML not well-formed -- ignore.
+			Log.e(TAG, "SAXException: " + e.toString());	
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+            return;
+	}
 
 	
 

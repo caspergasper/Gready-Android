@@ -31,13 +31,10 @@ public class SettingsActivity extends Activity {
 		Uri uri = this.getIntent().getData();  
 		if (uri != null && uri.toString().startsWith(CALLBACK_URL)) {  
 			// Callback from getAuthorization() 
-//		    Log.d(TAG, "looks like it works! " + uri.toString());
 			String verifier = uri.getQueryParameter(OAuth_interface.OAUTH_VERIFIER);
 			if(myApp.oauth.getAccessToken(verifier)) {
 				TextView fl = (TextView) findViewById(R.id.enterid_feedback_label);
 				fl.setText(R.string.auth_successful);
-				myApp.oauth.goodreads_url = OAuth_interface.GET_USER_ID;
-				myApp.oauth.getXMLFile();
 				startActivity(new Intent(SettingsActivity.this, GoodreadsActivity.class));
 			} else {
 				showErrorDialog();

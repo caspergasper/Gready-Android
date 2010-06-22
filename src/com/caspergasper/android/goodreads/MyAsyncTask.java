@@ -5,7 +5,6 @@ import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 import java.io.InputStream;
 
 import org.apache.http.HttpResponse;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -24,15 +23,21 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    // send the request
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(request[0]);
-	    Log.d(TAG, response.getStatusLine().toString());
+        Log.d(TAG, response.getStatusLine().toString());
+	    if(response.getStatusLine().getStatusCode() != 200) {
+	    	myApp.errMessage = "I/O ERROR!  Cannot download " + response.getStatusLine() + 
+	    		" " + response.getStatusLine().getStatusCode();
+	    	return 1;
+	    }
 	    InputStream is = response.getEntity().getContent();
 	    
 	    Log.d(TAG, "End downloading.");
+	    
 	    switch(myApp.oauth.goodreads_url) {
 	    case OAuth_interface.GET_USER_ID: 
 	    	// Get the ID and add to saved prefs.
 	    	Log.d(TAG, "Getting userid");
-	    	myApp.userData.getSAXUpdates(is);
+	    	myApp.userData.getSAXUserid(is);
 	    	myApp.addTokenToPrefs(GoodReadsApp.USER_ID, 
 	    			myApp.userID);
 	    	break;
@@ -42,6 +47,7 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    case OAuth_interface.GET_FRIEND_UPDATES:
 	    case OAuth_interface.GET_SHELVES:
 	    case OAuth_interface.GET_SHELF:
+	    	Log.d(TAG, "Getting data updates");
 	    	myApp.userData.getSAXUpdates(is);
 	    	break;
 	    } 
