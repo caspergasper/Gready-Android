@@ -170,7 +170,7 @@ public class GoodreadsActivity extends Activity {
 				lv.setVisibility(View.VISIBLE);
 				findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 				lv.setOnItemClickListener(new OnItemClickListener() {
-					@Override
+					//@Override   // msr comment
 					public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 						Dialog d = new Dialog(GoodreadsActivity.this);
 						Window window = d.getWindow();
@@ -193,7 +193,7 @@ public class GoodreadsActivity extends Activity {
 				});
 				
 				lv.setOnItemLongClickListener(new OnItemLongClickListener() {
-					@Override
+					//@Override   // msr comment
 					public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 						if(myApp.userData.books.get(_index).bookLink != null) {
 							Uri uri = Uri.parse(OAuth_interface.URL_ADDRESS +
