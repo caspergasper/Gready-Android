@@ -25,4 +25,10 @@
 <string name="auth_successful">Authentication successful.</string>
 <string name="delete_prefs">Delete saved preferences</string>
 <string name="no_book_page">Sorry, there isn\'t a book page for this one.</string>
+<color name="background_color">#FFFFFF</color>
+<color name="text_color">#000000</color>
+<string name="title_default">Book Title</string>
+<string name="author_default">Author</string>
+<string name="description_default">Description</string>
+<string name="avgrating_default">Average rating: 0.0</string>
 </resources>

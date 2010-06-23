@@ -10,6 +10,7 @@ public class Book {
 	String description = "";
 	int id;
 	String author = "";
+	Float user_rating;
 
 	Book(String str) {
 		title = str;

@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -171,8 +172,24 @@ public class GoodreadsActivity extends Activity {
 				findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 				lv.setOnItemClickListener(new OnItemClickListener() {
 					//@Override   // msr comment
-					public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-						Dialog d = new Dialog(GoodreadsActivity.this);
+					public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {	
+						setContentView(R.layout.book_view);
+						TextView Title = (TextView) findViewById(R.id.Title);
+						Title.setText(myApp.userData.books.get(_index).title);
+						TextView Author = (TextView) findViewById(R.id.Author);
+						Author.setText(myApp.userData.books.get(_index).author);
+						TextView avgrating = (TextView) findViewById(R.id.avgrating);
+						avgrating.setText("Average rating: " + myApp.userData.books.get(_index).average_rating);
+						TextView Description = (TextView) findViewById(R.id.Description);
+						Description.setText(Html.fromHtml(myApp.userData.books.get(_index).description));
+						RatingBar UserRating = (RatingBar) findViewById(R.id.UserRating);
+						// will need to get actual user ratings and fill stars 
+						UserRating.setRating(0);
+						
+//						RadioButton celsiusButton = (RadioButton) findViewById(R.id.RadioButton01);
+						
+						
+						/* Dialog d = new Dialog(GoodreadsActivity.this);
 						Window window = d.getWindow();
 						window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
 								WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
@@ -188,7 +205,7 @@ public class GoodreadsActivity extends Activity {
 						textview.setText(
 								Html.fromHtml(myApp.userData.books.get(_index).description));
 						d.show();
-						
+						*/
 					}
 				});
 				

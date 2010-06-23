@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:id="@+id/LinearLayout" android:background="@color/background_color" android:isScrollContainer="true" android:scrollbars="vertical">
+<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/gr_bookshelf" android:id="@+id/gr_bookshelf"></ImageView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/Title" android:textColor="@color/text_color" android:text="@string/title_default" android:textStyle="bold"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/Author" android:textColor="@color/text_color" android:text="@string/author_default"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/avgrating" android:text="@string/avgrating_default" android:textColor="@color/text_color"></TextView>
+<RatingBar android:layout_height="wrap_content" android:background="@color/background_color" android:id="@+id/UserRating" android:stepSize="1.0" android:layout_width="wrap_content" android:numStars="5" android:rating="0" android:isIndicator="true"></RatingBar>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/Description" android:textColor="@color/text_color" android:text="@string/description_default"></TextView>
+</LinearLayout>
