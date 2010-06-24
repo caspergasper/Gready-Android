@@ -28,7 +28,7 @@ public class OAuth_interface {
 	static final String SHELVES_URL_PATH ="shelf/list?format=xml&key=" + CONSUMER_KEY;
 	static final String UPDATES_URL_PATH = "updates/friends.xml";
 	
-	static final String CALLBACK_URL = "GoodreadsActivity://token";
+	static final String CALLBACK_URL = "goodreadsactivity://token";
 	static final String OAUTH_VERIFIER = "oauth_token";
 	
 	// More efficient to use these than enum
