@@ -27,7 +27,8 @@ public class OAuth_interface {
 	static final String SHELF_URL_PATH = "review/list/";
 	static final String SHELVES_URL_PATH ="shelf/list?format=xml&key=" + CONSUMER_KEY;
 	static final String UPDATES_URL_PATH = "updates/friends.xml";
-	
+	static final String GET_USER_BOOK_PATH = "review/show_by_user_and_book?format=xml&key="; // msr
+
 	static final String CALLBACK_URL = "GoodreadsActivity://token";
 	static final String OAUTH_VERIFIER = "oauth_token";
 	
@@ -37,6 +38,7 @@ public class OAuth_interface {
 	public static final int GET_SHELF = 2;
 	public static final int GET_FRIEND_UPDATES = 3;
 	public static final int GET_SHELVES = 4;
+	public static final int GET_USER_BOOK = 5; // msr
 	
 	int goodreads_url;
 	private OAuthConsumer consumer;
@@ -122,6 +124,10 @@ public class OAuth_interface {
     	case GET_FRIEND_UPDATES:
     		url_string = URL_ADDRESS + UPDATES_URL_PATH;
     		break;
+    	case GET_USER_BOOK: // msr
+    		url_string = URL_ADDRESS + CONSUMER_KEY + "&book_id=" + myApp.userData.book_to_get + "&user_id=" + myApp.userID;
+    		break;
+    		
     	default: 
     		url_string = "";
     	

@@ -10,7 +10,7 @@ public class Book {
 	String description = "";
 	int id;
 	String author = "";
-	Float user_rating;
+	String user_rating; // msr
 
 	Book(String str) {
 		title = str;

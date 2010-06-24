@@ -28,6 +28,7 @@ class SaxHandler extends DefaultHandler {
     private final static String TOTAL = "total";
     private final static String AVERAGE_RATING = "average_rating";
 //    private final static String SMALL_IMG_URL = "small_image_url";
+    private final static String RATING = "rating";  // msr
     private final static String LINK = "link";
     
     private UserData userdata;
@@ -96,6 +97,9 @@ class SaxHandler extends DefaultHandler {
 //        } else if(localName.equalsIgnoreCase(SMALL_IMG_URL)) {
 //        	userdata.books.get(userdata.books.size() - 1).small_image_url =
 //        		builder.toString().trim();
+        } else if(localName.equalsIgnoreCase(RATING)) { // msr
+            userdata.books.get(userdata.books.size() - 1).user_rating = builder.toString().trim();
+            	
         } else {
 //            	Log.d(TAG, "tag: " + localName);
 //            	Log.d(TAG, "value: " + builder.toString().trim());

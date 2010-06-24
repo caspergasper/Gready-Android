@@ -24,6 +24,7 @@ class UserData {
 	List <Shelf> shelves;
 	List <Book> books;
 	String shelf_to_get;
+	int book_to_get; // MSR
 	
 	private SAXParserFactory factory;
 	private SAXParser parser;

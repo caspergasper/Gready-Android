@@ -11,6 +11,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -172,7 +173,7 @@ public class GoodreadsActivity extends Activity {
 				findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 				lv.setOnItemClickListener(new OnItemClickListener() {
 					//@Override   // msr comment
-					public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {	
+					public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {							
 						setContentView(R.layout.book_view);
 						TextView Title = (TextView) findViewById(R.id.Title);
 						Title.setText(myApp.userData.books.get(_index).title);
@@ -182,12 +183,18 @@ public class GoodreadsActivity extends Activity {
 						avgrating.setText("Average rating: " + myApp.userData.books.get(_index).average_rating);
 						TextView Description = (TextView) findViewById(R.id.Description);
 						Description.setText(Html.fromHtml(myApp.userData.books.get(_index).description));
+						Description.setMovementMethod(new ScrollingMovementMethod()); 
 						RatingBar UserRating = (RatingBar) findViewById(R.id.UserRating);
 						// will need to get actual user ratings and fill stars 
-						UserRating.setRating(0);
-						
-//						RadioButton celsiusButton = (RadioButton) findViewById(R.id.RadioButton01);
-						
+						/*
+						myApp.userData.books.clear();
+						myApp.userData.book_to_get = myApp.userData.shelves.get(item.getItemId()).title;
+						findViewById(R.id.status_label).setVisibility(View.VISIBLE);
+						myApp.oauth.goodreads_url = OAuth_interface.GET_USER_BOOK; 
+						myApp.userData.bookPage = 0;
+						myApp.oauth.getXMLFile();
+						*/
+						UserRating.setRating(0);						
 						
 						/* Dialog d = new Dialog(GoodreadsActivity.this);
 						Window window = d.getWindow();
