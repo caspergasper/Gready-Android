@@ -20,29 +20,39 @@ public class SettingsActivity extends Activity {
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.userprefs);
-        myApp = GoodReadsApp.getInstance();
+        try {
+        		super.onCreate(savedInstanceState);
+        		setContentView(R.layout.userprefs);
+        		myApp = GoodReadsApp.getInstance();
+    		} catch(Exception e) {
+    			myApp.errMessage =  "onCreate " + e.toString();
+    			showErrorDialog();
+    		}	
 	}
 	
 	public void onResume() {
-		super.onResume();
-		
-		Uri uri = this.getIntent().getData();  
-		if (uri != null && uri.toString().startsWith(CALLBACK_URL)) {  
-			// Callback from getAuthorization() 
-			String verifier = uri.getQueryParameter(OAuth_interface.OAUTH_VERIFIER);
-			if(myApp.oauth.getAccessToken(verifier)) {
-				TextView fl = (TextView) findViewById(R.id.enterid_feedback_label);
-				fl.setText(R.string.auth_successful);
-				startActivity(new Intent(SettingsActivity.this, GoodreadsActivity.class));
-			} else {
-				showErrorDialog();
-				return;
+	try {
+			super.onResume();
+			
+			Uri uri = this.getIntent().getData();  
+			if (uri != null && uri.toString().startsWith(CALLBACK_URL)) {  
+				// Callback from getAuthorization() 
+				String verifier = uri.getQueryParameter(OAuth_interface.OAUTH_VERIFIER);
+				if(myApp.oauth.getAccessToken(verifier)) {
+					TextView fl = (TextView) findViewById(R.id.enterid_feedback_label);
+					fl.setText(R.string.auth_successful);
+					startActivity(new Intent(SettingsActivity.this, GoodreadsActivity.class));
+				} else {
+					showErrorDialog();
+					return;
+				}
+			} 
+			if(myApp.accessToken == null || myApp.accessTokenSecret == null) {
+				getAuthorization();
 			}
-		} 
-		if(myApp.accessToken == null || myApp.accessTokenSecret == null) {
-			getAuthorization();
+		} catch(Exception e) {
+			myApp.errMessage = "onResume " + e.toString();
+			showErrorDialog();
 		}
 	}
 	
