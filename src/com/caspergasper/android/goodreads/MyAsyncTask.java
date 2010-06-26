@@ -19,11 +19,11 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 		myApp = GoodReadsApp.getInstance();
 		
 	    try {
-	    Log.d(TAG, "Start downloading.");
+	    Log.d(TAG, request[0].getRequestLine().toString());
 	    // send the request
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(request[0]);
-        Log.d(TAG, response.getStatusLine().toString());
+//        Log.d(TAG, response.getStatusLine().toString());
 	    if(response.getStatusLine().getStatusCode() != 200) {
 	    	myApp.errMessage = "I/O ERROR!  Cannot download " + response.getStatusLine() + 
 	    		" " + response.getStatusLine().getStatusCode();

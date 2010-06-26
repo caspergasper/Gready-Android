@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,14 +27,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
 
-public class GoodreadsActivity extends Activity {
+public class GoodreadsActivity extends Activity implements OnItemLongClickListener, OnItemClickListener {
 	
 	private GoodReadsApp myApp;
 	static final int SUBMENU_GROUPID = 1;
 	private static final int TOTAL_BOOKS_TO_DOWNLOAD = 100;  // arbitrary limit, need to fix properly
 	
 	public void onResume() {
-//		Log.d(TAG, "Entering onResume() in GoodreadsActivity");
 		try {
 			super.onResume();
 			if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
@@ -96,17 +94,15 @@ public class GoodreadsActivity extends Activity {
         sub.setHeaderIcon(android.R.drawable.ic_menu_view);
         sub.setIcon(android.R.drawable.ic_menu_view);
         
-        if(myApp.userData.shelves.size() == 0) {
+        if(myApp.userData.shelves.size() == 0 || myApp.userData.endShelf < myApp.userData.totalShelves) {
         	toastMe(R.string.build_menu);
-//			myApp.oauth.goodreads_url = OAuth_interface.GET_SHELVES;
-//			myApp.oauth.getXMLFile();	
 			return false;
         } else {
         	Log.d(TAG, "Populating shelves");
         	int shelf_length = myApp.userData.shelves.size();
         	for(int i=0; i<shelf_length && myApp.userData.shelves.get(i) != null; i++) {
         		sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
-        	    "(" + myApp.userData.shelves.get(i).total + ") " + myApp.userData.shelves.get(i).title);
+        	     "(" + myApp.userData.shelves.get(i).total + ") " + myApp.userData.shelves.get(i).title);
         	}
         }
         return true;
@@ -153,8 +149,8 @@ public class GoodreadsActivity extends Activity {
 			    lv = (ListView) findViewById(R.id.updates_listview);
 				lv.setOnItemClickListener(null);
 				lv.setOnItemLongClickListener(null);
-			    ArrayAdapter<Update> adapter = new 
-				ArrayAdapter<Update> (this, R.layout.updateitem,
+			    UpdateAdapter adapter = new 
+				UpdateAdapter(this, R.layout.updateitem,
 						myApp.userData.updates);
 				lv.setAdapter(adapter);
 				lv.setVisibility(View.VISIBLE);
@@ -168,61 +164,27 @@ public class GoodreadsActivity extends Activity {
 			}
 		break;
 		case OAuth_interface.GET_SHELF:
-			if(myApp.userData.books.size() > 0) {
+			if(myApp.userData.temp_books.size() > 0) {
 				lv = (ListView) findViewById(R.id.updates_listview);
 				ShelfAdapter adapter = new 
 				ShelfAdapter(this, R.layout.updateitem, myApp.userData.books);
 				lv.setAdapter(adapter);	
+				addExtraBooks();
+				lv.setOnItemClickListener(this);
+				lv.setOnItemLongClickListener(this);
 				tv = (TextView) findViewById(R.id.updates_label);
 				tv.setText(myApp.userData.shelf_to_get);
 				lv.setVisibility(View.VISIBLE);
 				findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
-				lv.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-						Dialog d = new Dialog(GoodreadsActivity.this);
-						Window window = d.getWindow();
-						window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
-								WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-						
-						d.setContentView(R.layout.book_dialog);
-						d.setTitle(myApp.userData.books.get(_index).title);
-						TextView textview = (TextView) d.findViewById(R.id.author);
-						textview.setText(myApp.userData.books.get(_index).author);
-						textview = (TextView) d.findViewById(R.id.avg_rating);
-						textview.setText("Average rating: " + 
-								myApp.userData.books.get(_index).average_rating);
-						textview = (TextView) d.findViewById(R.id.description);
-						textview.setText(
-								Html.fromHtml(myApp.userData.books.get(_index).description));
-						d.show();
-						
-					}
-				});
 				
-				lv.setOnItemLongClickListener(new OnItemLongClickListener() {
-					@Override
-					public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-						if(myApp.userData.books.get(_index).bookLink != null) {
-							Uri uri = Uri.parse(OAuth_interface.URL_ADDRESS +
-									OAuth_interface.BOOKPAGE_PATH + myApp.userData.books.get(_index).bookLink);
-				    		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-				    		startActivity(intent);
-						} else {
-							toastMe(R.string.no_book_page);
-						}
-						return true;
-					}
-				});
-				
-				if(myApp.userData.endBook < myApp.userData.totalBooks &&
-						myApp.userData.endBook < TOTAL_BOOKS_TO_DOWNLOAD) {
-	        		// Need to query extra pages in the background
-					Log.d(TAG, "Getting extra page of books...");
-					myApp.oauth.getXMLFile();
-//					lv.setVisibility(View.GONE);  // Fix for updating user interface in background thread.
-	        	}
-			}
+			}	
+			if(myApp.userData.endBook < myApp.userData.totalBooks &&
+					myApp.userData.endBook < TOTAL_BOOKS_TO_DOWNLOAD) {
+        		// Need to query extra pages in the background
+				Log.d(TAG, "Getting extra page of books...");
+				myApp.oauth.getXMLFile();
+        	}
+		
 		break;
 		case OAuth_interface.GET_USER_ID:
 			// Let's get the updates
@@ -230,8 +192,14 @@ public class GoodreadsActivity extends Activity {
 			myApp.oauth.goodreads_url = OAuth_interface.GET_FRIEND_UPDATES;
 			myApp.oauth.getXMLFile();
 		break;
-		}
-    	
+    	case OAuth_interface.GET_SHELVES:
+    		// We need to cater for users with > 100 bookshelves like Cait :-)
+    		if(myApp.userData.endShelf < myApp.userData.totalShelves) {
+    			Log.d(TAG, "Getting extra shelf for some user that reads too much...");
+    			myApp.oauth.getXMLFile();
+    		}
+    	break;
+    	}
     }
     
 	private void showErrorDialog() {
@@ -249,6 +217,51 @@ public class GoodreadsActivity extends Activity {
 	private void toastMe(int msgid) {
 		Toast toast = Toast.makeText(getApplicationContext(), msgid, Toast.LENGTH_SHORT);
 		toast.show();
+	}
+	
+	private void addExtraBooks() {
+		// Updating the ListView array directly triggers an exception,
+		// hence the need for this.
+		ListView lv = (ListView) findViewById(R.id.updates_listview);
+		ShelfAdapter shelf = (ShelfAdapter) lv.getAdapter();
+		for(Book b : myApp.userData.temp_books) {
+			shelf.add(b);
+		}
+		myApp.userData.temp_books.clear();
+	}
+	
+	@Override
+	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
+		if(myApp.userData.books.get(_index).bookLink != null) {
+			Uri uri = Uri.parse(OAuth_interface.URL_ADDRESS +
+					OAuth_interface.BOOKPAGE_PATH + myApp.userData.books.get(_index).bookLink);
+    		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+    		startActivity(intent);
+		} else {
+			toastMe(R.string.no_book_page);
+		}
+		return true;
+	}
+	
+	@Override
+	public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
+		Dialog d = new Dialog(GoodreadsActivity.this);
+		Window window = d.getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
+				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+		
+		d.setContentView(R.layout.book_dialog);
+		d.setTitle(myApp.userData.books.get(_index).title);
+		TextView textview = (TextView) d.findViewById(R.id.author);
+		textview.setText(myApp.userData.books.get(_index).author);
+		textview = (TextView) d.findViewById(R.id.avg_rating);
+		textview.setText("Average rating: " + 
+				myApp.userData.books.get(_index).average_rating);
+		textview = (TextView) d.findViewById(R.id.description);
+		textview.setText(
+				Html.fromHtml(myApp.userData.books.get(_index).description));
+		d.show();
+		
 	}
 }
 

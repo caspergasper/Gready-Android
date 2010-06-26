@@ -1,7 +1,6 @@
 package com.caspergasper.android.goodreads;
 
 import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -14,7 +13,7 @@ class SaxHandler extends DefaultHandler {
 //    private final static String FRIENDS_COUNT = "friends_count";
     private final static String NAME = "name";
     private final static String ACTION_TEXT = "action_text";
-//    private final static String SHELVES = "shelves";
+    private final static String SHELVES = "shelves";
     private final static String BOOK_COUNT = "book_count";
     private final static String TITLE = "title";
     private final static String DESCRIPTION = "description";
@@ -29,6 +28,7 @@ class SaxHandler extends DefaultHandler {
     private final static String AVERAGE_RATING = "average_rating";
 //    private final static String SMALL_IMG_URL = "small_image_url";
     private final static String LINK = "link";
+    private final static String BODY = "body";
     
     private UserData userdata;
     
@@ -59,16 +59,16 @@ class SaxHandler extends DefaultHandler {
         	userdata.shelves.get(userdata.shelves.size() - 1).total = 
         	Integer.parseInt(builder.toString().trim());    	
         } else if(localName.equalsIgnoreCase(TITLE)) {
-        	userdata.books.add(new Book(builder.toString().trim()));
+        	userdata.temp_books.add(new Book(builder.toString().trim()));
         } else if(localName.equalsIgnoreCase(AUTHOR)) {
         	inAuthor = false;
         } else if(localName.equalsIgnoreCase(DESCRIPTION)) {
         	if(inShelves == false) {
-        		userdata.books.get(userdata.books.size() - 1).description 
+        		userdata.temp_books.get(userdata.temp_books.size() - 1).description 
         		= builder.toString().trim();
         	}
         } else if(localName.equalsIgnoreCase(ACTION_TEXT)) {
-        	userdata.updates.add(new Update(builder.toString().trim().replaceAll("<[^>]+>", "")));
+        	userdata.updates.add(new Update(builder.toString().trim().replaceAll("</?a[^>]+>", "")));
 //            	Log.d(TAG, "value I'm printing: " + builder.toString().trim());
         } else if(localName.equalsIgnoreCase(UPDATES)) {
         	inUpdates = false;
@@ -76,26 +76,31 @@ class SaxHandler extends DefaultHandler {
         	// Eww, this is disgusting!  *MUST* create a different SAX handler for different
         	// XML files.  
         	if(inShelves == false && inAuthor == false && inUpdates == false &&  
-        			userdata.books.get(userdata.books.size() - 1).bookLink == null) {
-        		userdata.books.get(userdata.books.size() - 1).setBookLink(builder.toString().trim());
+        			userdata.temp_books.get(userdata.temp_books.size() - 1).bookLink == null) {
+        		userdata.temp_books.get(userdata.temp_books.size() - 1).setBookLink(builder.toString().trim());
         	}
         } else if(localName.equalsIgnoreCase(NAME)) {
         	if(inShelves) {
         		userdata.shelves.get(userdata.shelves.size() - 1).title 
         		= builder.toString().trim();
         	} else if(inAuthor) {
-        		userdata.books.get(userdata.books.size() -1).author += 
+        		userdata.temp_books.get(userdata.temp_books.size() -1).author += 
         			builder.toString().trim() + " ";
         	} else if(inUpdates) {
         		userdata.updates.get(userdata.updates.size() -1).username = 
         			builder.toString().trim();
         	}
         } else if(localName.equalsIgnoreCase(AVERAGE_RATING)) {
-        	userdata.books.get(userdata.books.size() - 1).average_rating = 
+        	userdata.temp_books.get(userdata.temp_books.size() - 1).average_rating = 
         		builder.toString().trim();
 //        } else if(localName.equalsIgnoreCase(SMALL_IMG_URL)) {
 //        	userdata.books.get(userdata.books.size() - 1).small_image_url =
 //        		builder.toString().trim();
+        }  else if(localName.equalsIgnoreCase(BODY)) {
+        	if(inUpdates) {
+        		userdata.updates.get(userdata.updates.size() - 1).body = builder.toString().trim();
+        	}
+        	
         } else {
 //            	Log.d(TAG, "tag: " + localName);
 //            	Log.d(TAG, "value: " + builder.toString().trim());
@@ -122,7 +127,11 @@ class SaxHandler extends DefaultHandler {
         } else if(localName.equalsIgnoreCase(REVIEWS)){
         	userdata.endBook = Integer.parseInt(attributes.getValue(END));
         	userdata.totalBooks = Integer.parseInt(attributes.getValue(TOTAL));
-//        	userdata.books.clear();
+        }  else if(localName.equalsIgnoreCase(SHELVES)){
+        	if(inShelves) {
+        		userdata.endShelf = Integer.parseInt(attributes.getValue(END));
+        		userdata.totalShelves = Integer.parseInt(attributes.getValue(TOTAL));
+        	}
         }
 //        else if(localName.equalsIgnoreCase(REVIEW)){
 //        	userdata.currentBook++;

@@ -22,10 +22,14 @@ class UserData {
 	int num_of_friends;
 	int endBook;
 	int totalBooks;
+	int endShelf;
+	int totalShelves;
 	int bookPage;
+	int shelfPage;
 	List <Update> updates;
 	List <Shelf> shelves;
 	List <Book> books;
+	List <Book> temp_books;
 	String shelf_to_get;
 	
 	private SAXParserFactory factory;
@@ -37,6 +41,7 @@ class UserData {
 		updates = new ArrayList<Update>();
 		shelves = new ArrayList<Shelf>();
 		books = new ArrayList<Book>();
+		temp_books = new ArrayList<Book>();
 		factory = SAXParserFactory.newInstance();
         try {
             parser = factory.newSAXParser();

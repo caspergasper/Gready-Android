@@ -114,7 +114,9 @@ public class OAuth_interface {
     		"&page=" + ++myApp.userData.bookPage;
     		break;
     	case GET_SHELVES:
-    		url_string = URL_ADDRESS + SHELVES_URL_PATH + "&user_id=" + myApp.userID;
+    		url_string = URL_ADDRESS + SHELVES_URL_PATH + "&user_id=" + myApp.userID + 
+    		"&page=" + ++myApp.userData.shelfPage;
+//    		url_string ="http://www.goodreads.com/shelf/list?format=xml&key=UvPjrkah6sJXg88qs75xRA&user_id=1005037&page=" + ++myApp.userData.shelfPage;
     		break;
     	case GET_USER_ID:
     		url_string = URL_ADDRESS + GET_USER_ID_PATH;
