@@ -36,27 +36,31 @@ public class GoodreadsActivity extends Activity {
 	
 	public void onResume() {
 //		Log.d(TAG, "Entering onResume() in GoodreadsActivity");
-		super.onResume();
-		if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
-        	Log.d(TAG, "Missing accessTokens, retrieving...");
-        	startActivity(new Intent(GoodreadsActivity.this, SettingsActivity.class));
-        	return;
-        } 
-		if(myApp.userID == 0) {
-			myApp.oauth.goodreads_url = OAuth_interface.GET_USER_ID; 
-			myApp.oauth.getXMLFile();
-			return;     
-		} else {
-			if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0) {
-				// Got valid tokens and a userid, let's go get some data...
-				Log.d(TAG, "Getting updates now...");
-				myApp.oauth.goodreads_url = OAuth_interface.GET_FRIEND_UPDATES;
+		try {
+			super.onResume();
+			if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
+	        	Log.d(TAG, "Missing accessTokens, retrieving...");
+	        	startActivity(new Intent(GoodreadsActivity.this, SettingsActivity.class));
+	        	return;
+	        } 
+			if(myApp.userID == 0) {
+				myApp.oauth.goodreads_url = OAuth_interface.GET_USER_ID; 
 				myApp.oauth.getXMLFile();
+				return;     
 			} else {
-				updateMainScreenForUser(0);
+				if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0) {
+					// Got valid tokens and a userid, let's go get some data...
+					Log.d(TAG, "Getting updates now...");
+					myApp.oauth.goodreads_url = OAuth_interface.GET_FRIEND_UPDATES;
+					myApp.oauth.getXMLFile();
+				} else {
+					updateMainScreenForUser(0);
+				}
 			}
+		} catch(Exception e) {
+			myApp.errMessage = "GoodreadsActivity onResume " + e.toString();
+			showErrorDialog();
 		}
-
 	}
 	
 	public void onPause() {
@@ -67,12 +71,16 @@ public class GoodreadsActivity extends Activity {
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        myApp = GoodReadsApp.getInstance();
-        myApp.goodreads_activity = this;
-
+        try{
+	    	super.onCreate(savedInstanceState);
+	        setContentView(R.layout.main);
+	        
+	        myApp = GoodReadsApp.getInstance();
+	        myApp.goodreads_activity = this;
+    	} catch(Exception e) {
+			myApp.errMessage = "GoodreadsActivity onCreate " + e.toString();
+			showErrorDialog();
+		}
     }    
 	
 	@Override
@@ -98,7 +106,7 @@ public class GoodreadsActivity extends Activity {
         	int shelf_length = myApp.userData.shelves.size();
         	for(int i=0; i<shelf_length && myApp.userData.shelves.get(i) != null; i++) {
         		sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
-        	    " (" + myApp.userData.shelves.get(i).total + ") " + myApp.userData.shelves.get(i).title);
+        	    "(" + myApp.userData.shelves.get(i).total + ") " + myApp.userData.shelves.get(i).title);
         	}
         }
         return true;
