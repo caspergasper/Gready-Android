@@ -19,13 +19,11 @@ import android.util.Log;
 class UserData {
 
 	String username;
-//	int num_of_friends;
 	int startBook;
 	int endBook;
 	int totalBooks;
 	int endShelf;
 	int totalShelves;
-	int xmlPage;
 	List <Update> updates;
 	List <Update> tempUpdates;
 	List <Shelf> shelves;
@@ -33,7 +31,6 @@ class UserData {
 	List <Book> tempBooks;
 	String shelfToGet;
 	boolean booksRemovedFromFront = false;
-//	boolean booklistEndTruncated = false;
 	private SAXParserFactory factory;
 	private SAXParser parser;
 	
@@ -124,10 +121,5 @@ class UserData {
             return;
 	}
 	
-//	void resetBooklist() {
-//		booksRemovedFromFront = false;
-//		booklistEndTruncated = false;
-//		books.clear();
-//	}
 	
 }

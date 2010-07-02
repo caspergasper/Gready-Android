@@ -46,8 +46,6 @@ public class OAuthInterface {
 	private OAuthConsumer consumer;
 	private OAuthProvider provider;
 	private GoodReadsApp myApp;
-	boolean goingForward = true;
-	
 	OAuthInterface() {
 		// create a consumer object and configure it with the access
         // token and token secret obtained from the service provider
@@ -105,7 +103,7 @@ public class OAuthInterface {
 	}
 	
 	
-	void getXMLFile() {
+	void getXMLFile(int xmlPage) {
 		// create an HTTP request to a protected resource
         String url_string;
 		
@@ -116,13 +114,13 @@ public class OAuthInterface {
     	case GET_SHELF:
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
     		".xml?v=2&key=" + CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
-    		"&shelf=" + myApp.userData.shelfToGet + "&page=" + myApp.userData.xmlPage;
+    		"&shelf=" + myApp.userData.shelfToGet + "&page=" + xmlPage;
 //    		(goingForward ? ++myApp.userData.xmlPage : --myApp.userData.xmlPage);
 //    		url_string = "http://www.goodreads.com/review/list/3074479.xml?key=UvPjrkah6sJXg88qs75xRA&v=2&page=" + ++myApp.userData.bookPage; 
     		break;
     	case GET_SHELVES:
     		url_string = URL_ADDRESS + SHELVES_URL_PATH + "&user_id=" + myApp.userID + 
-    		"&page=" + myApp.userData.xmlPage;
+    		"&page=" + xmlPage;
 //    		url_string ="http://www.goodreads.com/shelf/list?format=xml&key=UvPjrkah6sJXg88qs75xRA&user_id=1005037&page=" + ++myApp.userData.shelfPage;
     		break;
     	case GET_USER_ID:

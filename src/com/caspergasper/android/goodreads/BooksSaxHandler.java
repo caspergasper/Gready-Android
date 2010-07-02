@@ -1,11 +1,8 @@
 package com.caspergasper.android.goodreads;
 
-import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
 
 
 class BooksSaxHandler extends DefaultHandler {

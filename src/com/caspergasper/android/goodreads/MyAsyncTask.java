@@ -57,7 +57,6 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    } 
 	    } catch(Exception e) { 
 	    	Log.e(TAG, "ERROR! " + e.toString());
-//	    	throw new RuntimeException(e.toString());
 	    	myApp.errMessage = e.toString();
 	    	return 1;
 	    }

@@ -1,12 +1,8 @@
 package com.caspergasper.android.goodreads;
 
-import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import android.util.Log;
-
 
 class ShelvesSaxHandler extends DefaultHandler {
     private StringBuilder builder;
@@ -14,7 +10,6 @@ class ShelvesSaxHandler extends DefaultHandler {
     private final static String NAME = "name";
     private final static String SHELVES = "shelves";
     private final static String BOOK_COUNT = "book_count";
-//    private final static String REVIEW = "review";
     private final static String END = "end";
     private final static String TOTAL = "total";
 
@@ -60,15 +55,10 @@ class ShelvesSaxHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String name,
             Attributes attributes) throws SAXException {
     	super.startElement(uri, localName, name, attributes);
-//       Log.d(TAG, "Start tag: " + localName);
         if(localName.equalsIgnoreCase(SHELVES)){
     		userdata.endShelf = Integer.parseInt(attributes.getValue(END));
     		userdata.totalShelves = Integer.parseInt(attributes.getValue(TOTAL));
         }
-//        else if(localName.equalsIgnoreCase(REVIEW)){
-//        	userdata.currentBook++;
-//        }
-   
     }
 
 }
