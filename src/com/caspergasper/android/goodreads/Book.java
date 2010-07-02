@@ -8,7 +8,7 @@ public class Book {
 //	String small_image_url;
 	String average_rating;
 	String description = "";
-	int id;
+//	int id;
 	String author = "";
 
 	Book(String str) {
