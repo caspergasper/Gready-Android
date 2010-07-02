@@ -19,54 +19,56 @@ import android.util.Log;
 class UserData {
 
 	String username;
-	int num_of_friends;
+//	int num_of_friends;
+	int startBook;
 	int endBook;
 	int totalBooks;
 	int endShelf;
 	int totalShelves;
-	int bookPage;
-	int shelfPage;
+	int xmlPage;
 	List <Update> updates;
+	List <Update> tempUpdates;
 	List <Shelf> shelves;
 	List <Book> books;
-	List <Book> temp_books;
-	String shelf_to_get;
-	
+	List <Book> tempBooks;
+	String shelfToGet;
+	boolean booksRemovedFromFront = false;
+//	boolean booklistEndTruncated = false;
 	private SAXParserFactory factory;
 	private SAXParser parser;
-	private SaxHandler handler;
 	
 	UserData() {
-		bookPage = 0;
 		updates = new ArrayList<Update>();
+		tempUpdates = new ArrayList<Update>();
 		shelves = new ArrayList<Shelf>();
 		books = new ArrayList<Book>();
-		temp_books = new ArrayList<Book>();
+		tempBooks = new ArrayList<Book>();
 		factory = SAXParserFactory.newInstance();
         try {
             parser = factory.newSAXParser();
-            handler = new SaxHandler(this);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } 
 
 	}
 	
-	void getSAXUpdates(InputStream is) {
+	void getSAXBooks(InputStream is) {
 		Reader reader;
 		InputSource source;
+		BooksSaxHandler handler;
 		try {
-			Log.d(TAG, "Start parsing.");
+			Log.d(TAG, "Start parsing books.");
 			// Have to strip off non-UTF-8 characters  -
 			// sadly there's a few of those in the XML :-( 
 			reader = new InputStreamReader(is, "UTF-8");
 			source = new InputSource(reader);
+			handler = new BooksSaxHandler(this);
 			parser.parse(source, handler);				
-			Log.d(TAG, "End parsing.");
+			Log.d(TAG, "End parsing books.");
 			
 		} catch (SAXException e) {
 			// XML not well-formed -- abort but carry on reading next XML file.
-			Log.e(TAG, "SAXException in getSAXUpdates: " + e.toString());
+			Log.e(TAG, "SAXException in getSAXBooks: " + e.toString());
 			if(books.size() != 0) {
 				Log.e(TAG, books.get(books.size() - 1).title);
 			}
@@ -88,5 +90,44 @@ class UserData {
 		}
             return;
 	}
+	
+	void getSAXUpdates(InputStream is) {
+		UpdatesSaxHandler handler;
+		try {
+			Log.d(TAG, "Start parsing updates.");
+			handler = new UpdatesSaxHandler(this);
+			parser.parse(is, handler);				
+			Log.d(TAG, "End parsing updates.");
+			
+		} catch (SAXException e) {
+			// XML not well-formed -- abort but carry on reading next XML file.
+			Log.e(TAG, "SAXException in getSAXUpdates: " + e.toString());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+            return;
+	}
+	
+	void getSAXShelves(InputStream is) {
+		ShelvesSaxHandler handler;
+		try {
+			Log.d(TAG, "Start parsing shelves.");
+			handler = new ShelvesSaxHandler(this);
+			parser.parse(is, handler);				
+			Log.d(TAG, "End parsing shelves.");
+		} catch (SAXException e) {
+			// XML not well-formed -- abort but carry on reading next XML file.
+			Log.e(TAG, "SAXException in getSAXShelves: " + e.toString());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+            return;
+	}
+	
+//	void resetBooklist() {
+//		booksRemovedFromFront = false;
+//		booklistEndTruncated = false;
+//		books.clear();
+//	}
 	
 }

@@ -17,7 +17,7 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	@Override
 	protected Integer doInBackground(HttpGet... request) {	
 		myApp = GoodReadsApp.getInstance();
-		
+		myApp.threadLock = true;
 	    try {
 	    Log.d(TAG, request[0].getRequestLine().toString());
 	    // send the request
@@ -34,7 +34,7 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    Log.d(TAG, "End downloading.");
 	    
 	    switch(myApp.oauth.goodreads_url) {
-	    case OAuth_interface.GET_USER_ID: 
+	    case OAuthInterface.GET_USER_ID: 
 	    	// Get the ID and add to saved prefs.
 	    	Log.d(TAG, "Getting userid");
 	    	myApp.userData.getSAXUserid(is);
@@ -44,15 +44,19 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 //	    case OAuth_interface.GET_USER_INFO: 
 ////	    	myApp.userData.getUpdates(is);
 //	    	break;
-	    case OAuth_interface.GET_FRIEND_UPDATES:
-	    case OAuth_interface.GET_SHELVES:
-	    case OAuth_interface.GET_SHELF:
-	    	Log.d(TAG, "Getting data updates");
+	    case OAuthInterface.GET_FRIEND_UPDATES:
 	    	myApp.userData.getSAXUpdates(is);
+	    	break;
+	    case OAuthInterface.GET_SHELVES:
+	    	myApp.userData.getSAXShelves(is);
+	    	break;
+	    case OAuthInterface.GET_SHELF:
+	    	Log.d(TAG, "Getting data updates");
+	    	myApp.userData.getSAXBooks(is);
 	    	break;
 	    } 
 	    } catch(Exception e) { 
-	    	Log.d(TAG, "ERROR! " + e.toString());
+	    	Log.e(TAG, "ERROR! " + e.toString());
 //	    	throw new RuntimeException(e.toString());
 	    	myApp.errMessage = e.toString();
 	    	return 1;
@@ -67,7 +71,8 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 
 	@Override
 	protected void onPostExecute(Integer result) {
-	    super.onPostExecute(result);     
+	    super.onPostExecute(result);   
+	    myApp.threadLock = false;
 	    myApp.goodreads_activity.updateMainScreenForUser(result);
 	}
 

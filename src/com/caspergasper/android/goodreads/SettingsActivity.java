@@ -1,6 +1,6 @@
 package com.caspergasper.android.goodreads;
 
-import static com.caspergasper.android.goodreads.OAuth_interface.CALLBACK_URL;
+import static com.caspergasper.android.goodreads.OAuthInterface.CALLBACK_URL;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -37,7 +37,7 @@ public class SettingsActivity extends Activity {
 			Uri uri = this.getIntent().getData();  
 			if (uri != null && uri.toString().startsWith(CALLBACK_URL)) {  
 				// Callback from getAuthorization() 
-				String verifier = uri.getQueryParameter(OAuth_interface.OAUTH_VERIFIER);
+				String verifier = uri.getQueryParameter(OAuthInterface.OAUTH_VERIFIER);
 				if(myApp.oauth.getAccessToken(verifier)) {
 					TextView fl = (TextView) findViewById(R.id.enterid_feedback_label);
 					fl.setText(R.string.auth_successful);

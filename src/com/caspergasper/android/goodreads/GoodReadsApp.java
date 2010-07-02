@@ -7,7 +7,7 @@ import android.content.SharedPreferences.Editor;
 public class GoodReadsApp extends Application {
 	
 	private static GoodReadsApp singleton;
-	OAuth_interface oauth;
+	OAuthInterface oauth;
 	String accessToken;
 	String accessTokenSecret;
 	String errMessage;
@@ -20,6 +20,7 @@ public class GoodReadsApp extends Application {
 	static final String ACCESS_TOKEN_SECRET = "access_token_secret";
 	static final String USER_ID = "user_id"; 
 	GoodreadsActivity goodreads_activity;
+	boolean threadLock = false;
 	
 	public static GoodReadsApp getInstance() {
 		return singleton;
@@ -29,7 +30,7 @@ public class GoodReadsApp extends Application {
 	public final void onCreate() {
 		super.onCreate();
 		singleton = this;
-		oauth = new OAuth_interface();
+		oauth = new OAuthInterface();
 		userData = new UserData();
 		settings = getSharedPreferences(GOODREADS_PREFS, 0);
 		accessToken = settings.getString(ACCESS_TOKEN, null);
