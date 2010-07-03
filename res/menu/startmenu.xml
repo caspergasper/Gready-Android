@@ -7,4 +7,6 @@
 android:id="@+id/updates" android:icon="@android:drawable/ic_menu_info_details"></item>
 <!--<item android:titleCondensed="@string/bookshelves_label" android:title="@string/bookshelves_label" -->
 <!--android:id="@+id/booklist" android:icon="@android:drawable/ic_menu_view"></item>-->
+<item android:titleCondensed="@string/search" android:title="@string/search" 
+android:id="@+id/search" android:icon="@android:drawable/ic_menu_search"></item>
 </menu>

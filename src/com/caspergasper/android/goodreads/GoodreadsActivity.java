@@ -144,14 +144,23 @@ OnScrollListener {
 			xmlPage = 1;
 			myApp.oauth.getXMLFile(xmlPage);
 			return true;
-		} else {
-			if(item.getItemId() == R.id.updates) {
+		} else if(item.getItemId() == R.id.updates) {
 				findViewById(R.id.status_label).setVisibility(View.VISIBLE);
 				myApp.oauth.goodreads_url = OAuthInterface.GET_FRIEND_UPDATES;
 				myApp.oauth.getXMLFile(xmlPage);
 				return true;
-			}
+		} else if(item.getItemId() == R.id.search) {
+			Dialog d = new Dialog(GoodreadsActivity.this);
+			Window window = d.getWindow();
+			window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
+					WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+			
+			d.setContentView(R.layout.booksearch_dialog);
+			d.setTitle("Book Search");
+			d.show();
+			
 		}
+		
 	
 			return false;	
 	}
