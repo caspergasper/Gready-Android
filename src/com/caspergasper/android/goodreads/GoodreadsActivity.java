@@ -261,7 +261,6 @@ OnScrollListener {
 		int i;
 		if(deleteAllBooks) {
 			shelf.clear();
-			deleteAllBooks = false;
 		}
 		
 		if(goingForward) {
@@ -308,6 +307,10 @@ OnScrollListener {
 			
 		}
 		ud.tempBooks.clear();
+		if(deleteAllBooks) {
+			lv.setSelection(0);
+			deleteAllBooks = false;
+		}
 		gettingScrollData = false;
 	}
 	
