@@ -103,16 +103,15 @@ OnScrollListener {
 //        item.setIntent(new Intent(GoodreadsActivity.this, SettingsActivity.class));
 //        MenuItem item = menu.findItem(R.id.updates);
 //        item.setIntent(new Intent(GoodreadsActivity.this, About.class));
-        
         SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, R.string.bookshelves_label);
-        sub.setHeaderIcon(android.R.drawable.ic_menu_view);
-        sub.setIcon(android.R.drawable.ic_menu_view);
-        List<Shelf> tempShelves = myApp.userData.shelves;
+    	sub.setHeaderIcon(android.R.drawable.ic_menu_view);
+    	sub.setIcon(android.R.drawable.ic_menu_view);
+    	List<Shelf> tempShelves = myApp.userData.shelves;
         if(tempShelves.size() == 0 || myApp.userData.endShelf < myApp.userData.totalShelves) {
         	toastMe(R.string.build_menu);
 			return false;
         } else {
-        	Log.d(TAG, "Populating shelves");
+        	
         	int shelf_length = tempShelves.size();
         	int totalBooks = 0;
         	int currentShelfBooks = 0;
@@ -128,7 +127,7 @@ OnScrollListener {
         }
         return true;
     }
-	
+		
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
@@ -139,7 +138,6 @@ OnScrollListener {
 			} else {
 				myApp.userData.shelfToGet = myApp.userData.shelves.get(item.getItemId()).title;
 			}
-			
 			findViewById(R.id.status_label).setVisibility(View.VISIBLE);
 			myApp.oauth.goodreads_url = OAuthInterface.GET_SHELF; 
 			deleteAllBooks = true;
@@ -188,9 +186,11 @@ OnScrollListener {
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			tv = (TextView) findViewById(R.id.updates_label);
 			tv.setText(R.string.updates_label);
-			myApp.oauth.goodreads_url = OAuthInterface.GET_SHELVES;
-			xmlPage = 1;
-			myApp.oauth.getXMLFile(xmlPage);
+			if(myApp.userData.shelves.size() == 0) {
+				myApp.oauth.goodreads_url = OAuthInterface.GET_SHELVES;
+				xmlPage = 1;
+				myApp.oauth.getXMLFile(xmlPage);
+			}
 			ud.books.clear();
 		break;
 		case OAuthInterface.GET_SHELF:
@@ -266,7 +266,6 @@ OnScrollListener {
 		
 		if(goingForward) {
 			for(Book b : ud.tempBooks) {
-//				Log.d(TAG, "Adding book " + b.title + " to end");
 				shelf.add(b);
 			} 
 		} else {
@@ -274,7 +273,7 @@ OnScrollListener {
 			// just delete the difference and reload them.
 			for(i = booksToDelete - 1; i >= 0; i--) {
 				book = ud.books.get(0);
-				Log.d(TAG, "Deleting book "  + book.title + " from start.");
+//				Log.d(TAG, "Deleting book "  + book.title + " from start.");
 				shelf.remove(book);		
 			}
 			for(i = OAuthInterface.ITEMS_TO_DOWNLOAD - 1; i >= 0; i--) {
