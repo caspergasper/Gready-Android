@@ -151,6 +151,10 @@ OnScrollListener {
 				myApp.oauth.getXMLFile(xmlPage);
 				return true;
 			}
+			else if(item.getItemId() == R.id.scanbook) {
+				IntentIntegrator.initiateScan(GoodreadsActivity.this,IntentIntegrator.DEFAULT_TITLE,IntentIntegrator.DEFAULT_MESSAGE,IntentIntegrator.DEFAULT_YES,IntentIntegrator.DEFAULT_NO,IntentIntegrator.PRODUCT_CODE_TYPES);
+				return true;
+			}
 		}
 	
 			return false;	
@@ -408,6 +412,19 @@ OnScrollListener {
 	public void onScrollStateChanged(AbsListView arg0, int arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+	//activity result for the barcode scanner intent.
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+		if (scanResult != null) {
+		// handle scan result
+			String barcode = scanResult.getContents();
+			Log.d(TAG, "scanned:" + barcode);
+		}
+
+		Log.d(TAG, "scanner done");
+		// else continue with any other code you need in the method
+				    
 	}
 }
 
