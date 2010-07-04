@@ -9,4 +9,6 @@ android:id="@+id/updates" android:icon="@android:drawable/ic_menu_info_details">
 <!--android:id="@+id/booklist" android:icon="@android:drawable/ic_menu_view"></item>-->
 <item android:titleCondensed="@string/scanbook_label" android:title="@string/scanbook_label" 
 android:id="@+id/scanbook" android:icon="@android:drawable/ic_menu_info_details"></item>
+<item android:titleCondensed="@string/search" android:title="@string/search" 
+android:id="@+id/search" android:icon="@android:drawable/ic_menu_search"></item>
 </menu>
