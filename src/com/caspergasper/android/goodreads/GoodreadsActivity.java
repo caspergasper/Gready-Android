@@ -417,13 +417,13 @@ OnScrollListener {
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
 		if (scanResult != null) {
-		// handle scan result
+			// handle scan result
 			String barcode = scanResult.getContents();
 			Log.d(TAG, "scanned:" + barcode);
+			// TODO add code for converting barcode to ISBN
 		}
 
 		Log.d(TAG, "scanner done");
-		// else continue with any other code you need in the method
 				    
 	}
 }
