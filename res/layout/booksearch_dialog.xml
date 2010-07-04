@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/layout_root"
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:padding="1dp"
+              android:padding="10dp"
               >
-<!--    <ImageView android:id="@+id/image"-->
-<!--               android:layout_width="wrap_content"-->
-<!--               android:layout_height="fill_parent"-->
-<!--               android:layout_marginRight="10dp"-->
-<!--               />-->
+    <ImageView android:id="@+id/bookSearchImage"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="4dp"
+               android:src="@drawable/icon"
+               
+               />
     <EditText android:id="@+id/searchbox"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:textColor="#000"
               android:inputType="textShortMessage"
+           	  android:layout_toRightOf="@+id/bookSearchImage"
               />
 <RadioGroup android:id="@+id/RadioGroup" 
 android:layout_width="wrap_content" android:layout_height="wrap_content"
-android:checkedButton="@+id/RadioButtonSearchShelves">
+android:checkedButton="@+id/RadioButtonSearchShelves" android:layout_below="@+id/searchbox" >
 <RadioButton android:text="@string/searchShelves" android:id="@+id/RadioButtonSearchShelves" 
-android:layout_width="wrap_content" android:layout_height="wrap_content"></RadioButton>
+android:layout_width="wrap_content" android:layout_height="wrap_content" 
+android:layout_below="@+id/searchbox"></RadioButton>
 <RadioButton android:text="@string/searchSite" android:id="@+id/RadioButtonSearchSite" 
-android:layout_width="wrap_content" android:layout_height="wrap_content"></RadioButton>
+android:layout_width="wrap_content" android:layout_height="wrap_content" 
+android:layout_below="@+id/RadioButtonSearchShelves"></RadioButton>
 </RadioGroup>
 <Button android:id="@+id/searchbutton"
   android:text="@string/search"
-  android:layout_width="wrap_content" android:layout_height="wrap_content"	/>
-</LinearLayout>
+  android:layout_width="wrap_content" android:layout_height="wrap_content"
+  android:layout_gravity="center_horizontal" android:layout_below="@+id/RadioGroup"
+  android:layout_centerInParent="true"	/>
+</RelativeLayout>

@@ -26,6 +26,7 @@
 <string name="delete_prefs">Delete saved preferences</string>
 <string name="no_book_page">Sorry, there isn\'t a book page for this one.</string>
 <string name="search">Search</string>
-<string name="searchShelves">Search Shelves</string>
-<string name="searchSite">Search site</string>
+<string name="searchShelves">Search my bookshelves</string>
+<string name="searchSite">Search Goodreads site</string>
+<string name="searchResults">Search Results</string>
 </resources>

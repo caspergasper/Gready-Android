@@ -42,11 +42,14 @@ public class OAuthInterface {
 	public static final int GET_SHELF = 2;
 	public static final int GET_FRIEND_UPDATES = 3;
 	public static final int GET_SHELVES = 4;
+	public static final int SEARCH_SHELVES = 5;
 	
 	int goodreads_url;
 	private OAuthConsumer consumer;
 	private OAuthProvider provider;
 	private GoodReadsApp myApp;
+	String searchQuery;
+	
 	OAuthInterface() {
 		// create a consumer object and configure it with the access
         // token and token secret obtained from the service provider
@@ -123,6 +126,11 @@ public class OAuthInterface {
     		url_string = URL_ADDRESS + SHELVES_URL_PATH + "&user_id=" + myApp.userID + 
     		"&page=" + xmlPage;
 //    		url_string ="http://www.goodreads.com/shelf/list?format=xml&key=UvPjrkah6sJXg88qs75xRA&user_id=1005037&page=" + ++myApp.userData.shelfPage;
+    		break;
+    	case SEARCH_SHELVES:
+    		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
+    		".xml?v=2&key=" + CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
+    		"&page=" + xmlPage + "&search[query]=" + searchQuery;
     		break;
     	case GET_USER_ID:
     		url_string = URL_ADDRESS + GET_USER_ID_PATH;

@@ -143,8 +143,7 @@ OnScrollListener {
 			}
 			findViewById(R.id.status_label).setVisibility(View.VISIBLE);
 			myApp.oauth.goodreads_url = OAuthInterface.GET_SHELF; 
-			deleteAllBooks = true;
-			xmlPage = 1;
+			newQuery();
 			myApp.oauth.getXMLFile(xmlPage);
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
@@ -169,8 +168,7 @@ OnScrollListener {
 		d.setTitle("Book Search");
 		
 		final Button b = (Button) d.findViewById(R.id.searchbutton);
-		b.setOnClickListener(
-		new View.OnClickListener() {
+		b.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				// do nothing
 				EditText et = (EditText) d.findViewById(R.id.searchbox);
@@ -182,14 +180,24 @@ OnScrollListener {
 				if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchSite) {
 				gotoWebURL(OAuthInterface.URL_ADDRESS +
 						OAuthInterface.BOOKPAGE_SEARCH + et.getText().toString());
-				} else {
-					
+				} else if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchShelves) {
+					myApp.oauth.searchQuery = Uri.encode(text);
+					myApp.userData.shelfToGet = d.getContext().getString(R.string.searchResults); 
+					newQuery();
+					myApp.oauth.goodreads_url = OAuthInterface.SEARCH_SHELVES;
+					findViewById(R.id.status_label).setVisibility(View.VISIBLE);
+					myApp.oauth.getXMLFile(xmlPage);
 				}
 				d.hide();
 			}
 		});
 		d.show();
 	
+	}
+	
+	private void newQuery() {
+		deleteAllBooks = true;
+		xmlPage = 1;
 	}
 	
     void updateMainScreenForUser(int result) {
@@ -229,6 +237,7 @@ OnScrollListener {
 			}
 			ud.books.clear();
 		break;
+		case OAuthInterface.SEARCH_SHELVES:
 		case OAuthInterface.GET_SHELF:
 			ShelfAdapter shelfAdapter;
 			lv = (ListView) findViewById(R.id.updates_listview);
