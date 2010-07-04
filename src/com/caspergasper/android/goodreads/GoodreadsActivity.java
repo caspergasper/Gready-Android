@@ -173,8 +173,7 @@ OnScrollListener {
 				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
 		
 		d.setContentView(R.layout.booksearch_dialog);
-		d.setTitle("Book Search");
-		
+		d.setTitle(R.string.searchTitle);
 		final Button b = (Button) d.findViewById(R.id.searchbutton);
 		b.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {

@@ -4,31 +4,32 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:padding="10dp"
+              android:padding="8dp"
+              android:background="#ffffff"
+              android:textColor="#000000"
               >
     <ImageView android:id="@+id/bookSearchImage"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:layout_marginRight="4dp"
                android:src="@drawable/icon"
-               
                />
     <EditText android:id="@+id/searchbox"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
-              android:textColor="#000"
               android:inputType="textShortMessage"
            	  android:layout_toRightOf="@+id/bookSearchImage"
               />
 <RadioGroup android:id="@+id/RadioGroup" 
 android:layout_width="wrap_content" android:layout_height="wrap_content"
-android:checkedButton="@+id/RadioButtonSearchShelves" android:layout_below="@+id/searchbox" >
+android:checkedButton="@+id/RadioButtonSearchShelves" android:layout_below="@+id/searchbox" 
+ >
 <RadioButton android:text="@string/searchShelves" android:id="@+id/RadioButtonSearchShelves" 
 android:layout_width="wrap_content" android:layout_height="wrap_content" 
-android:layout_below="@+id/searchbox"></RadioButton>
+  android:layout_below="@+id/searchbox" android:textColor="#000000"></RadioButton>
 <RadioButton android:text="@string/searchSite" android:id="@+id/RadioButtonSearchSite" 
 android:layout_width="wrap_content" android:layout_height="wrap_content" 
-android:layout_below="@+id/RadioButtonSearchShelves"></RadioButton>
+ android:layout_below="@+id/RadioButtonSearchShelves" android:textColor="#000000"></RadioButton>
 </RadioGroup>
 <Button android:id="@+id/searchbutton"
   android:text="@string/search"
