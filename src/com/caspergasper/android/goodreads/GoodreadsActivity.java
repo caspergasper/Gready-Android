@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -96,7 +97,14 @@ OnScrollListener {
 			myApp.errMessage = "GoodreadsActivity onCreate " + e.toString();
 			showErrorDialog();
 		}
-    }    
+    }
+    
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+    	super.onConfigurationChanged(newConfig);
+    	// I'm supposed to re-initialize views here when screen is rotated, 
+    	// but so far I haven't found I need to.
+    }
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -306,7 +314,6 @@ OnScrollListener {
 		int i;
 		if(deleteAllBooks) {
 			shelf.clear();
-			deleteAllBooks = false;
 		}
 		
 		if(goingForward) {
@@ -353,6 +360,10 @@ OnScrollListener {
 			
 		}
 		ud.tempBooks.clear();
+		if(deleteAllBooks) {
+			lv.setSelection(0);
+			deleteAllBooks = false;
+		}
 		gettingScrollData = false;
 	}
 	
