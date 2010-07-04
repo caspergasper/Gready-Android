@@ -17,8 +17,15 @@
               android:textColor="#000"
               android:inputType="textShortMessage"
               />
-              <Button android:id="@+id/searchSite"
-              android:text="@string/searchSite"
-       			/>
-              <Button android:id="@+id/searchShelves" android:text="@string/searchShelves" />
+<RadioGroup android:id="@+id/RadioGroup" 
+android:layout_width="wrap_content" android:layout_height="wrap_content"
+android:checkedButton="@+id/RadioButtonSearchShelves">
+<RadioButton android:text="@string/searchShelves" android:id="@+id/RadioButtonSearchShelves" 
+android:layout_width="wrap_content" android:layout_height="wrap_content"></RadioButton>
+<RadioButton android:text="@string/searchSite" android:id="@+id/RadioButtonSearchSite" 
+android:layout_width="wrap_content" android:layout_height="wrap_content"></RadioButton>
+</RadioGroup>
+<Button android:id="@+id/searchbutton"
+  android:text="@string/search"
+  android:layout_width="wrap_content" android:layout_height="wrap_content"	/>
 </LinearLayout>

@@ -24,7 +24,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AbsListView.OnScrollListener;
@@ -150,19 +153,43 @@ OnScrollListener {
 				myApp.oauth.getXMLFile(xmlPage);
 				return true;
 		} else if(item.getItemId() == R.id.search) {
-			Dialog d = new Dialog(GoodreadsActivity.this);
-			Window window = d.getWindow();
-			window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
-					WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-			
-			d.setContentView(R.layout.booksearch_dialog);
-			d.setTitle("Book Search");
-			d.show();
-			
+			showSearchDialog();
+			return true;
 		}
-		
-	
 			return false;	
+	}
+	
+	void showSearchDialog() {
+		final Dialog d = new Dialog(GoodreadsActivity.this);
+		Window window = d.getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
+				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+		
+		d.setContentView(R.layout.booksearch_dialog);
+		d.setTitle("Book Search");
+		
+		final Button b = (Button) d.findViewById(R.id.searchbutton);
+		b.setOnClickListener(
+		new View.OnClickListener() {
+			public void onClick(View view) {
+				// do nothing
+				EditText et = (EditText) d.findViewById(R.id.searchbox);
+				String text = et.getText().toString(); 
+				if(text == null || text.length() < 1) {
+					return;
+				}
+				RadioGroup radioGroup = (RadioGroup) d.findViewById(R.id.RadioGroup);
+				if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchSite) {
+				gotoWebURL(OAuthInterface.URL_ADDRESS +
+						OAuthInterface.BOOKPAGE_SEARCH + et.getText().toString());
+				} else {
+					
+				}
+				d.hide();
+			}
+		});
+		d.show();
+	
 	}
 	
     void updateMainScreenForUser(int result) {
@@ -320,13 +347,18 @@ OnScrollListener {
 		gettingScrollData = false;
 	}
 	
+	private void gotoWebURL(String path) {
+		Uri uri = Uri.parse(path);
+		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		startActivity(intent);
+	}
+	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-		if(myApp.userData.books.get(_index).bookLink != null) {
-			Uri uri = Uri.parse(OAuthInterface.URL_ADDRESS +
-					OAuthInterface.BOOKPAGE_PATH + myApp.userData.books.get(_index).bookLink);
-    		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-    		startActivity(intent);
+		String bookLink = myApp.userData.books.get(_index).bookLink; 
+		if(bookLink != null) {
+			gotoWebURL(OAuthInterface.URL_ADDRESS +
+				OAuthInterface.BOOKPAGE_PATH + bookLink);
 		} else {
 			toastMe(R.string.no_book_page);
 		}
