@@ -25,7 +25,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AbsListView.OnScrollListener;
@@ -33,22 +36,45 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GoodreadsActivity.
+ */
 public class GoodreadsActivity extends Activity implements OnItemLongClickListener, OnItemClickListener,
 OnScrollListener {
 	
+	/** The my app. */
 	private GoodReadsApp myApp;
+	
+	/** The Constant SUBMENU_GROUPID. */
 	private static final int SUBMENU_GROUPID = 1;
 	
 	// arbitrary limit, may need tweaking but should be 
 	// a multiple of OAuthInterface.ITEMS_TO_DOWNLOAD
+	/** The Constant TOTAL_BOOKS_TO_KEEP_IN_MEMORY. */
 	private static final int TOTAL_BOOKS_TO_KEEP_IN_MEMORY = 60;  
+	
+	/** The Constant PAGES_TO_MOVE_BY. */
 	private static final int PAGES_TO_MOVE_BY = TOTAL_BOOKS_TO_KEEP_IN_MEMORY / OAuthInterface.ITEMS_TO_DOWNLOAD;
+	
+	/** The getting scroll data. */
 	private boolean gettingScrollData = false;
+	
+	/** The going forward. */
 	private boolean goingForward = true;
+	
+	/** The delete all books. */
 	private boolean deleteAllBooks = false;
+	
+	/** The books to delete. */
 	private int booksToDelete;
+	
+	/** The xml page. */
 	private int xmlPage = 1;
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
 	public void onResume() {
 		try {
 			super.onResume();
@@ -76,12 +102,19 @@ OnScrollListener {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onPause()
+	 */
 	public void onPause() {
 		super.onPause();
 	}
 	
 
-	/** Called when the activity is first created. */
+	/**
+	 * Called when the activity is first created.
+	 *
+	 * @param savedInstanceState the saved instance state
+	 */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         try{
@@ -103,6 +136,9 @@ OnScrollListener {
     	// but so far I haven't found I need to.
     }
 	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+	 */
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -136,6 +172,9 @@ OnScrollListener {
         return true;
     }
 		
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
@@ -152,18 +191,64 @@ OnScrollListener {
 			xmlPage = 1;
 			myApp.oauth.getXMLFile(xmlPage);
 			return true;
-		} else {
-			if(item.getItemId() == R.id.updates) {
+		} else if(item.getItemId() == R.id.updates) {
 				findViewById(R.id.status_label).setVisibility(View.VISIBLE);
 				myApp.oauth.goodreads_url = OAuthInterface.GET_FRIEND_UPDATES;
 				myApp.oauth.getXMLFile(xmlPage);
 				return true;
-			}
 		}
-	
+		else if(item.getItemId() == R.id.scanbook) {
+			IntentIntegrator.initiateScan(GoodreadsActivity.this,IntentIntegrator.DEFAULT_TITLE,IntentIntegrator.DEFAULT_MESSAGE,IntentIntegrator.DEFAULT_YES,IntentIntegrator.DEFAULT_NO,IntentIntegrator.PRODUCT_CODE_TYPES);
+			return true;
+		}
+ 		else if(item.getItemId() == R.id.search) {
+			showSearchDialog();
+			return true;
+		}
 			return false;	
 	}
 	
+	/**
+	 * Show search dialog.
+	 */
+	void showSearchDialog() {
+		final Dialog d = new Dialog(GoodreadsActivity.this);
+		Window window = d.getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
+				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+		
+		d.setContentView(R.layout.booksearch_dialog);
+		d.setTitle("Book Search");
+		
+		final Button b = (Button) d.findViewById(R.id.searchbutton);
+		b.setOnClickListener(
+		new View.OnClickListener() {
+			public void onClick(View view) {
+				// do nothing
+				EditText et = (EditText) d.findViewById(R.id.searchbox);
+				String text = et.getText().toString(); 
+				if(text == null || text.length() < 1) {
+					return;
+				}
+				RadioGroup radioGroup = (RadioGroup) d.findViewById(R.id.RadioGroup);
+				if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchSite) {
+				gotoWebURL(OAuthInterface.URL_ADDRESS +
+						OAuthInterface.BOOKPAGE_SEARCH + et.getText().toString());
+				} else {
+					
+				}
+				d.hide();
+			}
+		});
+		d.show();
+	
+	}
+	
+    /**
+     * Update main screen for user.
+     *
+     * @param result the result
+     */
     void updateMainScreenForUser(int result) {
     	Log.d(TAG, "updateMainScreenForUser");
     	TextView tv;
@@ -237,6 +322,9 @@ OnScrollListener {
     	}
     }
     
+	/**
+	 * Show error dialog.
+	 */
 	private void showErrorDialog() {
 		AlertDialog.Builder ad = new AlertDialog.Builder(GoodreadsActivity.this);
 		ad.setTitle("ERROR!");
@@ -249,11 +337,21 @@ OnScrollListener {
 		ad.show();
 	}
 
+	/**
+	 * Toast me.
+	 *
+	 * @param msgid the msgid
+	 */
 	private void toastMe(int msgid) {
 		Toast toast = Toast.makeText(getApplicationContext(), msgid, Toast.LENGTH_SHORT);
 		toast.show();
 	}
 	
+	/**
+	 * Adds the updates to list view.
+	 *
+	 * @param updateAdapter the update adapter
+	 */
 	private void addUpdatesToListView(UpdateAdapter updateAdapter) {
 		for(Update u : myApp.userData.tempUpdates) {
 			updateAdapter.add(u);
@@ -261,6 +359,12 @@ OnScrollListener {
 		myApp.userData.tempUpdates.clear();	
 	}
 	
+	/**
+	 * Adds the books to list view.
+	 *
+	 * @param shelf the shelf
+	 * @param lv the lv
+	 */
 	private void addBooksToListView(ShelfAdapter shelf, ListView lv) {
 		// Updating the ListView array directly triggers an exception,
 		// hence the need for this.
@@ -322,19 +426,35 @@ OnScrollListener {
 		gettingScrollData = false;
 	}
 	
+	/**
+	 * Goto web url.
+	 *
+	 * @param path the path
+	 */
+	private void gotoWebURL(String path) {
+		Uri uri = Uri.parse(path);
+		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		startActivity(intent);
+	}
+	
+	/* (non-Javadoc)
+	 * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView, android.view.View, int, long)
+	 */
 	@Override
 	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-		if(myApp.userData.books.get(_index).bookLink != null) {
-			Uri uri = Uri.parse(OAuthInterface.URL_ADDRESS +
-					OAuthInterface.BOOKPAGE_PATH + myApp.userData.books.get(_index).bookLink);
-    		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-    		startActivity(intent);
+		String bookLink = myApp.userData.books.get(_index).bookLink; 
+		if(bookLink != null) {
+			gotoWebURL(OAuthInterface.URL_ADDRESS +
+				OAuthInterface.BOOKPAGE_PATH + bookLink);
 		} else {
 			toastMe(R.string.no_book_page);
 		}
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
+	 */
 	@Override
 	public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 		List <Book> books = myApp.userData.books;
@@ -357,6 +477,9 @@ OnScrollListener {
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.widget.AbsListView.OnScrollListener#onScroll(android.widget.AbsListView, int, int, int)
+	 */
 	@Override
 	public void onScroll(final AbsListView view, final int first, final int visible, final int total) {
 		// detect if last item is visible
@@ -376,6 +499,9 @@ OnScrollListener {
 //		Log.d(TAG, "first:" + first + " Visible:" + visible + " total:" + total);
 	}
 
+	/**
+	 * On last list item displayed.
+	 */
 	private void onLastListItemDisplayed() {
 		findViewById(R.id.status_label).setVisibility(View.VISIBLE);
 		if(goingForward) {
@@ -387,6 +513,9 @@ OnScrollListener {
 		myApp.oauth.getXMLFile(xmlPage);
 	}
 
+	/**
+	 * On first list item displayed.
+	 */
 	private void onFirstListItemDisplayed() {
 		// Work out which page to get.
 		// Change direction? 
@@ -412,10 +541,30 @@ OnScrollListener {
 		myApp.oauth.getXMLFile(xmlPage);
 	}
 	
+	/* (non-Javadoc)
+	 * @see android.widget.AbsListView.OnScrollListener#onScrollStateChanged(android.widget.AbsListView, int)
+	 */
 	@Override
 	public void onScrollStateChanged(AbsListView arg0, int arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+	//do something when book scanner finishes.
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+		if (scanResult != null) {
+			// handle scan result
+			String barcode = scanResult.getContents();
+			Log.d(TAG, "scanned UPC:" + barcode);
+			String isbn = Utility.ConvertUPCtoISBN(barcode);
+			Log.d(TAG, "converted ISBN:" + isbn);
+			// TODO show book details 
+			myApp.userData.isbnScan = isbn;
+			/*
+			myApp.oauth.goodreads_url = OAuthInterface.GET_BOOKS_BY_ISBN;
+			myApp.oauth.getXMLFile(xmlPage);
+			 */
+		}				    
 	}
 }
 

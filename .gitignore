@@ -1,3 +1,4 @@
 .classpath
 local.properties
 bin/
+gen/com/caspergasper/android/goodreads/R.java

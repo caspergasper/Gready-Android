@@ -13,10 +13,10 @@ public class Update {
 		// Strip off username if it's included in the update.
 		// Can username be null?
 		String response;
-		
-		if(username.compareToIgnoreCase(updateText.substring(0, username.length())) 
+		int usernameLength = username.length();
+		if(username.compareToIgnoreCase(updateText.substring(0, usernameLength)) 
 				== 0) {
-			response = updateText;
+			response = "<b>" + username + "</b> " + updateText.substring(usernameLength);
 		} else {
 			response  = "<b>" + username + "</b> " + updateText;
 		}
