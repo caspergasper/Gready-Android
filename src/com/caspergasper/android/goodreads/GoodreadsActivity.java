@@ -550,7 +550,10 @@ OnScrollListener {
 			Log.d(TAG, "scanned UPC:" + barcode);
 			String isbn = Utility.ConvertUPCtoISBN(barcode);
 			Log.d(TAG, "converted ISBN:" + isbn);
-			// TODO add code for converting barcode to ISBN
+			// TODO look up book show info. 
+			myApp.userData.isbnScan = "0060899220";
+			myApp.oauth.goodreads_url = OAuthInterface.GET_BOOKS_BY_ISBN;
+			myApp.oauth.getXMLFile(xmlPage);
 		}				    
 	}
 }

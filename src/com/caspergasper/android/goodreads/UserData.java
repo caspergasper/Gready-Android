@@ -33,6 +33,7 @@ class UserData {
 	boolean booksRemovedFromFront = false;
 	private SAXParserFactory factory;
 	private SAXParser parser;
+	String isbnScan;
 	
 	UserData() {
 		updates = new ArrayList<Update>();
