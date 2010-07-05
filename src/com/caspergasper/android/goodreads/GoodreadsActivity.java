@@ -541,7 +541,7 @@ OnScrollListener {
 		// TODO Auto-generated method stub
 		
 	}
-	
+	//do something when book scanner finishes.
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
 		if (scanResult != null) {
@@ -550,10 +550,12 @@ OnScrollListener {
 			Log.d(TAG, "scanned UPC:" + barcode);
 			String isbn = Utility.ConvertUPCtoISBN(barcode);
 			Log.d(TAG, "converted ISBN:" + isbn);
-			// TODO look up book show info. 
-			myApp.userData.isbnScan = "0060899220";
+			// TODO show book details 
+			myApp.userData.isbnScan = isbn;
+			/*
 			myApp.oauth.goodreads_url = OAuthInterface.GET_BOOKS_BY_ISBN;
 			myApp.oauth.getXMLFile(xmlPage);
+			 */
 		}				    
 	}
 }
