@@ -3,6 +3,7 @@ package com.caspergasper.android.goodreads;
 
 import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 
+import java.net.URL;
 import java.util.List;
 
 import android.app.Activity;
@@ -12,8 +13,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +31,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -52,6 +57,9 @@ OnScrollListener {
 	private int booksToDelete;
 	private int xmlPage = 1;
 	
+	// Need handler for callbacks to the UI thread
+    final Handler mHandler = new Handler();
+
 	public void onResume() {
 		try {
 			super.onResume();
@@ -250,7 +258,7 @@ OnScrollListener {
 			lv = (ListView) findViewById(R.id.updates_listview);
 			if(ud.books.size() == 0) {					
 				shelfAdapter = new 
-				ShelfAdapter(this, R.layout.updateitem, ud.books);
+				ShelfAdapter(this, R.layout.booklistitem, ud.books);
 				lv.setAdapter(shelfAdapter);
 				lv.setOnItemClickListener(this);
 				lv.setOnItemLongClickListener(this);
@@ -264,6 +272,8 @@ OnScrollListener {
 			addBooksToListView(shelfAdapter, lv);
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			ud.updates.clear();
+			// Load images in background
+			getImages();
 		break;
 		case OAuthInterface.GET_USER_ID:
 			// Let's get the updates
@@ -466,6 +476,56 @@ OnScrollListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	// Create runnable for posting
+    private final Runnable doUpdateGUI = new Runnable() {
+        public void run() {
+            updateResultsInUi();
+        }
+    };
+    
+    protected void getImages() {
+        // Fire off a thread to do some work that we shouldn't do directly in the UI thread
+        Thread t = new Thread(null, doBackgroundThreadProcessing, "Background");
+        t.start();
+    }
+
+    private Runnable doBackgroundThreadProcessing = new Runnable() {
+    	public void run() {
+    		backgroundThreadProcessing();
+    	}
+    };
+    
+    private void backgroundThreadProcessing() {
+    	ListView lv = (ListView) findViewById(R.id.updates_listview);
+    	ShelfAdapter adapter = (ShelfAdapter) lv.getAdapter();
+    	Book b;
+    	for(int i = 0; i < myApp.userData.books.size(); i++) {
+    		b = adapter.getItem(i);
+    		try {
+    			if(b.small_image_url == null) {
+    				continue;
+    			}
+    			URL newurl = new URL(b.small_image_url); 
+    			Log.d(TAG, "Getting " + b.small_image_url);
+    			b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+    			b.small_image_url = null;  // free up some memory.
+    			} catch (Exception e) {
+    				throw new RuntimeException(e);
+    			}
+    	}
+        	
+        
+//    	mHandler.post(doUpdateGUI);
+    	
+    }
+    
+    private void updateResultsInUi() {
+        // Back in the UI thread -- update our UI elements based on the data in mResults
+
+    }
+
+
 }
 
 
