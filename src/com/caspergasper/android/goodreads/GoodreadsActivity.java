@@ -510,19 +510,24 @@ OnScrollListener {
     			Log.d(TAG, "Getting " + b.small_image_url);
     			b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
     			b.small_image_url = null;  // free up some memory.
-    			} catch (Exception e) {
+    			
+    			mHandler.post(doUpdateGUI);	
+    		} catch (Exception e) {
     				throw new RuntimeException(e);
     			}
+    			
     	}
         	
         
-//    	mHandler.post(doUpdateGUI);
+    	
     	
     }
     
     private void updateResultsInUi() {
         // Back in the UI thread -- update our UI elements based on the data in mResults
-
+    	ListView lv = (ListView) findViewById(R.id.updates_listview);
+    	ShelfAdapter adapter = (ShelfAdapter) lv.getAdapter();
+    	adapter.notifyDataSetChanged();
     }
 
 
