@@ -60,12 +60,13 @@ OnScrollListener {
 	        	startActivity(new Intent(GoodreadsActivity.this, SettingsActivity.class));
 	        	return;
 	        } 
-			if(myApp.userID == 0) {
+			if(myApp.userID == 0  && !myApp.threadLock) {
 				myApp.oauth.goodreads_url = OAuthInterface.GET_USER_ID; 
 				myApp.oauth.getXMLFile(xmlPage);
 				return;     
 			} else {
-				if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0) {
+				if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0 
+						&& !myApp.threadLock) {
 					// Got valid tokens and a userid, let's go get some data...
 					Log.d(TAG, "Getting updates now...");
 					myApp.oauth.goodreads_url = OAuthInterface.GET_FRIEND_UPDATES;
