@@ -80,6 +80,9 @@ public class OAuthInterface {
 	        // a url based on AUTHORIZE_WEBSITE_URL and CALLBACK_URL to
 	        // which your app must now send the user 
 	        String url = provider.retrieveRequestToken(consumer, CALLBACK_URL);
+	        myApp.addTokenToPrefs(GoodReadsApp.ACCESS_TOKEN, consumer.getToken());
+	        myApp.addTokenToPrefs(GoodReadsApp.ACCESS_TOKEN_SECRET, 
+					consumer.getTokenSecret());
 	        Log.d(TAG, url);
 	        return url;
 	        
@@ -92,6 +95,12 @@ public class OAuthInterface {
 	
 	boolean getAccessToken(String verificationCode) {
 		try {
+			if(provider == null) {
+				// If app has been removed from memory need to recreate provider
+				provider = new CommonsHttpOAuthProvider(
+		        	URL_ADDRESS + REQUEST_TOKEN_ENDPOINT_URL, URL_ADDRESS + ACCESS_TOKEN_ENDPOINT_URL,
+		        	URL_ADDRESS + AUTHORIZE_WEBSITE_URL);
+			}
 			provider.retrieveAccessToken(consumer, verificationCode);
 			myApp.accessToken = consumer.getToken();
 			myApp.addTokenToPrefs(GoodReadsApp.ACCESS_TOKEN, myApp.accessToken);
