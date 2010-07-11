@@ -2,10 +2,8 @@ package com.caspergasper.android.goodreads;
 
 
 import java.util.List;
-import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 import android.content.Context;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,10 +41,10 @@ public class ShelfAdapter extends ArrayAdapter<Book> {
         ImageView iv = (ImageView)todoView.findViewById(R.id.bookListViewImage);
         if(item.bitmap != null) {
         	iv.setImageBitmap(item.bitmap);
-        	Log.d(TAG, "Setting item " + position + " to image.");
+//        	Log.d(TAG, "Setting item " + position + " to image.");
         } else {
         	iv.setImageResource(R.drawable.icon);
-        	Log.d(TAG, "NOT Setting item " + position + " to image.");
+//        	Log.d(TAG, "NOT Setting item " + position + " to image.");
         }
         return todoView;
     }

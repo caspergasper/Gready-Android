@@ -13,7 +13,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,7 +30,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -56,6 +54,9 @@ OnScrollListener {
 	private boolean deleteAllBooks = false;
 	private int booksToDelete;
 	private int xmlPage = 1;
+	private ListView updatesListView;
+	private ShelfAdapter shelfAdapter;
+	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
 	
 	// Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
@@ -69,17 +70,15 @@ OnScrollListener {
 	        	return;
 	        } 
 			if(myApp.userID == 0  && !myApp.threadLock) {
-				myApp.oauth.goodreads_url = OAuthInterface.GET_USER_ID; 
-				myApp.oauth.getXMLFile(xmlPage);
+				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_USER_ID);
 				return;     
 			} else {
 				if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0 
 						&& !myApp.threadLock) {
 					// Got valid tokens and a userid, let's go get some data...
 					Log.d(TAG, "Getting updates now...");
-					myApp.oauth.goodreads_url = OAuthInterface.GET_FRIEND_UPDATES;
 					xmlPage = 1;
-					myApp.oauth.getXMLFile(xmlPage);
+					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 				} 
 			}
 		} catch(Exception e) {
@@ -102,6 +101,7 @@ OnScrollListener {
 	        
 	        myApp = GoodReadsApp.getInstance();
 	        myApp.goodreads_activity = this;
+	        updatesListView = (ListView) findViewById(R.id.updates_listview);
     	} catch(Exception e) {
 			myApp.errMessage = "GoodreadsActivity onCreate " + e.toString();
 			showErrorDialog();
@@ -131,7 +131,6 @@ OnScrollListener {
         	toastMe(R.string.build_menu);
 			return false;
         } else {
-        	
         	int shelf_length = tempShelves.size();
         	int totalBooks = 0;
         	int currentShelfBooks = 0;
@@ -159,14 +158,12 @@ OnScrollListener {
 				myApp.userData.shelfToGet = myApp.userData.shelves.get(item.getItemId()).title;
 			}
 			findViewById(R.id.status_label).setVisibility(View.VISIBLE);
-			myApp.oauth.goodreads_url = OAuthInterface.GET_SHELF; 
 			newQuery();
-			myApp.oauth.getXMLFile(xmlPage);
+			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
 				findViewById(R.id.status_label).setVisibility(View.VISIBLE);
-				myApp.oauth.goodreads_url = OAuthInterface.GET_FRIEND_UPDATES;
-				myApp.oauth.getXMLFile(xmlPage);
+				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 				return true;
 		} else if(item.getItemId() == R.id.search) {
 			showSearchDialog();
@@ -188,21 +185,20 @@ OnScrollListener {
 			public void onClick(View view) {
 				// do nothing
 				EditText et = (EditText) d.findViewById(R.id.searchbox);
-				String text = et.getText().toString(); 
+				String text = et.getText().toString().trim(); 
 				if(text == null || text.length() < 1) {
 					return;
 				}
 				RadioGroup radioGroup = (RadioGroup) d.findViewById(R.id.RadioGroup);
 				if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchSite) {
 				gotoWebURL(OAuthInterface.URL_ADDRESS +
-						OAuthInterface.BOOKPAGE_SEARCH + et.getText().toString());
+						OAuthInterface.BOOKPAGE_SEARCH + Uri.encode(text));
 				} else if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchShelves) {
 					myApp.oauth.searchQuery = Uri.encode(text);
 					myApp.userData.shelfToGet = d.getContext().getString(R.string.searchResults); 
 					newQuery();
-					myApp.oauth.goodreads_url = OAuthInterface.SEARCH_SHELVES;
 					findViewById(R.id.status_label).setVisibility(View.VISIBLE);
-					myApp.oauth.getXMLFile(xmlPage);
+					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.SEARCH_SHELVES);
 				}
 				d.hide();
 			}
@@ -219,7 +215,6 @@ OnScrollListener {
     void updateMainScreenForUser(int result) {
     	Log.d(TAG, "updateMainScreenForUser");
     	TextView tv;
-    	ListView lv;
     	UserData ud = myApp.userData;
     	
     	if(result != 0) {
@@ -228,49 +223,45 @@ OnScrollListener {
 		}
     	switch (myApp.oauth.goodreads_url) {
 		case OAuthInterface.GET_FRIEND_UPDATES:
-			lv = (ListView) findViewById(R.id.updates_listview);
 			UpdateAdapter updateAdapter;
 			if(ud.updates.size() == 0) {
-				lv.setOnItemClickListener(null);
-				lv.setOnItemLongClickListener(null);
-				lv.setOnScrollListener(null);
+				updatesListView.setOnItemClickListener(null);
+				updatesListView.setOnItemLongClickListener(null);
+				updatesListView.setOnScrollListener(null);
 			    updateAdapter = new UpdateAdapter(this, R.layout.updateitem,
 						ud.updates);
-				lv.setAdapter(updateAdapter);
+			    updatesListView.setAdapter(updateAdapter);
 			} else {
-				updateAdapter = (UpdateAdapter) lv.getAdapter();
+				updateAdapter = (UpdateAdapter) updatesListView.getAdapter();
 				updateAdapter.clear();
 			}
 			addUpdatesToListView(updateAdapter);
-			lv.setVisibility(View.VISIBLE);
+			updatesListView.setVisibility(View.VISIBLE);
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			tv = (TextView) findViewById(R.id.updates_label);
 			tv.setText(R.string.updates_label);
 			if(myApp.userData.shelves.size() == 0) {
-				myApp.oauth.goodreads_url = OAuthInterface.GET_SHELVES;
 				xmlPage = 1;
-				myApp.oauth.getXMLFile(xmlPage);
+				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);
 			}
 			ud.books.clear();
 		break;
 		case OAuthInterface.SEARCH_SHELVES:
 		case OAuthInterface.GET_SHELF:
-			ShelfAdapter shelfAdapter;
-			lv = (ListView) findViewById(R.id.updates_listview);
 			if(ud.books.size() == 0) {					
 				shelfAdapter = new 
 				ShelfAdapter(this, R.layout.booklistitem, ud.books);
-				lv.setAdapter(shelfAdapter);
-				lv.setOnItemClickListener(this);
-				lv.setOnItemLongClickListener(this);
-				lv.setOnScrollListener(this);
+				updatesListView.setAdapter(shelfAdapter);
+				updatesListView.setOnItemClickListener(this);
+				updatesListView.setOnItemLongClickListener(this);
+				updatesListView.setOnScrollListener(this);
 			} else {
-				shelfAdapter = (ShelfAdapter) lv.getAdapter();
+				shelfAdapter = (ShelfAdapter) updatesListView.getAdapter();
 			}
 			tv = (TextView) findViewById(R.id.updates_label);
-			tv.setText(ud.shelfToGet);
-			lv.setVisibility(View.VISIBLE);
-			addBooksToListView(shelfAdapter, lv);
+			tv.setText("(" + ud.totalBooks + ") " + ud.shelfToGet);
+			updatesListView.setVisibility(View.VISIBLE);
+			addBooksToListView();
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			ud.updates.clear();
 			// Load images in background
@@ -279,14 +270,13 @@ OnScrollListener {
 		case OAuthInterface.GET_USER_ID:
 			// Let's get the updates
 			Log.d(TAG, "Getting friend updates for first time");
-			myApp.oauth.goodreads_url = OAuthInterface.GET_FRIEND_UPDATES;
-			myApp.oauth.getXMLFile(xmlPage);
+			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 		break;
     	case OAuthInterface.GET_SHELVES:
     		// We need to cater for users with > 100 bookshelves like Cait :-)
     		if(ud.endShelf < ud.totalShelves) {
     			Log.d(TAG, "Getting extra shelf for some user that reads too much...");
-    			myApp.oauth.getXMLFile(++xmlPage);
+    			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
     		}
     	break;
     	}
@@ -316,19 +306,19 @@ OnScrollListener {
 		myApp.userData.tempUpdates.clear();	
 	}
 	
-	private void addBooksToListView(ShelfAdapter shelf, ListView lv) {
+	private void addBooksToListView() {
 		// Updating the ListView array directly triggers an exception,
 		// hence the need for this.
 		Book book;
 		UserData ud = myApp.userData;
 		int i;
 		if(deleteAllBooks) {
-			shelf.clear();
+			shelfAdapter.clear();
 		}
 		
 		if(goingForward) {
 			for(Book b : ud.tempBooks) {
-				shelf.add(b);
+				shelfAdapter.add(b);
 			} 
 		} else {
 			// If we didn't load all the  books from the last XML file
@@ -336,10 +326,10 @@ OnScrollListener {
 			for(i = booksToDelete - 1; i >= 0; i--) {
 				book = ud.books.get(0);
 //				Log.d(TAG, "Deleting book "  + book.title + " from start.");
-				shelf.remove(book);		
+				shelfAdapter.remove(book);		
 			}
 			for(i = OAuthInterface.ITEMS_TO_DOWNLOAD - 1; i >= 0; i--) {
-				shelf.insert(ud.tempBooks.get(i), 0);
+				shelfAdapter.insert(ud.tempBooks.get(i), 0);
 			}
 			if(xmlPage == 1) {
 				ud.booksRemovedFromFront = false;
@@ -347,31 +337,31 @@ OnScrollListener {
 		}
 		
 		// Free up some memory.
-		int extraBooks = shelf.getCount() - TOTAL_BOOKS_TO_KEEP_IN_MEMORY; 
+		int extraBooks = shelfAdapter.getCount() - TOTAL_BOOKS_TO_KEEP_IN_MEMORY; 
 		if(extraBooks > 0) {
 			Log.d(TAG, "Freeing " + extraBooks + " books from memory.");
 			if(goingForward) {
 				for(i=0; i < extraBooks; i++) {
 //					Log.d(TAG, "Removing " + myApp.userData.books.get(0).title);
-					shelf.remove(ud.books.get(0));
+					shelfAdapter.remove(ud.books.get(0));
 				}
 				ud.booksRemovedFromFront = true;
 				// Scroll back a bit so the screen doesn't jump
 				// Can't get it to align precisely as the items are different size
-				lv.setSelection(lv.getCount() - extraBooks - 7);
+				updatesListView.setSelection(updatesListView.getCount() - extraBooks - 7);
 			} else {
 				for(i=0; i < extraBooks; i++) {
 					book = ud.books.get(ud.books.size() -1);
 //					Log.d(TAG, "Removing book " + book.title);
-					shelf.remove(book);
+					shelfAdapter.remove(book);
 				}
-				lv.setSelection(OAuthInterface.ITEMS_TO_DOWNLOAD - booksToDelete + 1);
+				updatesListView.setSelection(OAuthInterface.ITEMS_TO_DOWNLOAD - booksToDelete + 1);
 			}
 			
 		}
 		ud.tempBooks.clear();
 		if(deleteAllBooks) {
-			lv.setSelection(0);
+			updatesListView.setSelection(0);
 			deleteAllBooks = false;
 		}
 		gettingScrollData = false;
@@ -444,7 +434,7 @@ OnScrollListener {
 			xmlPage += PAGES_TO_MOVE_BY;
 		}
 		goingForward = true;
-		myApp.oauth.getXMLFile(xmlPage);
+		myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 	}
 
 	private void onFirstListItemDisplayed() {
@@ -461,15 +451,10 @@ OnScrollListener {
 			xmlPage--;
 		}
 		
-		// This shouldn't be needed.
-//		if(myApp.userData.xmlPage < 1) {
-//			myApp.userData.xmlPage = 1;
-//			return;
-//		}
 		goingForward = false;
 		Log.d(TAG, "Getting page " + xmlPage + " booksToDelete " + booksToDelete);
 		findViewById(R.id.status_label).setVisibility(View.VISIBLE);
-		myApp.oauth.getXMLFile(xmlPage);
+		myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 	}
 	
 	@Override
@@ -478,19 +463,20 @@ OnScrollListener {
 		
 	}
 	
+    private void getImages() {
+        // Fire off a thread to do some work that we shouldn't do directly in the UI thread
+        Thread t = new Thread(null, doBackgroundThreadProcessing, "Background");
+        t.start();
+    }
+    
 	// Create runnable for posting
     private final Runnable doUpdateGUI = new Runnable() {
         public void run() {
             updateResultsInUi();
         }
     };
-    
-    protected void getImages() {
-        // Fire off a thread to do some work that we shouldn't do directly in the UI thread
-        Thread t = new Thread(null, doBackgroundThreadProcessing, "Background");
-        t.start();
-    }
 
+    
     private Runnable doBackgroundThreadProcessing = new Runnable() {
     	public void run() {
     		backgroundThreadProcessing();
@@ -498,37 +484,33 @@ OnScrollListener {
     };
     
     private void backgroundThreadProcessing() {
-    	ListView lv = (ListView) findViewById(R.id.updates_listview);
-    	ShelfAdapter adapter = (ShelfAdapter) lv.getAdapter();
+    	ShelfAdapter adapter = (ShelfAdapter) updatesListView.getAdapter();
     	Book b;
-    	for(int i = 0; i < myApp.userData.books.size(); i++) {
+    	int size = myApp.userData.books.size();
+    	for(int i = 0; i < size; i++) {
     		b = adapter.getItem(i);
     		try {
     			if(b.small_image_url == null) {
     				continue;
     			}
-    			URL newurl = new URL(b.small_image_url); 
-    			Log.d(TAG, "Getting " + b.small_image_url);
-    			b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-    			b.small_image_url = null;  // free up some memory.
-    			
-    			mHandler.post(doUpdateGUI);	
+    			if(b.bitmap == null) {
+    				URL newurl = new URL(GOODREADS_IMG_URL + b.small_image_url); 
+    				Log.d(TAG, "Getting " + GOODREADS_IMG_URL + b.small_image_url);
+    				b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+    				b.small_image_url = null;
+    			}
+    			mHandler.post(doUpdateGUI);
     		} catch (Exception e) {
     				throw new RuntimeException(e);
     			}
     			
     	}
-        	
-        
-    	
     	
     }
     
     private void updateResultsInUi() {
-        // Back in the UI thread -- update our UI elements based on the data in mResults
-    	ListView lv = (ListView) findViewById(R.id.updates_listview);
-    	ShelfAdapter adapter = (ShelfAdapter) lv.getAdapter();
-    	adapter.notifyDataSetChanged();
+        // Back in the UI thread -- update UI elements
+    	shelfAdapter.notifyDataSetChanged();
     }
 
 

@@ -24,7 +24,8 @@ class BooksSaxHandler extends DefaultHandler {
     
     private UserData userdata;
     private boolean inAuthors = false;
-     
+    private static final int url_length = GoodreadsActivity.GOODREADS_IMG_URL.length(); 
+    
     BooksSaxHandler(UserData ud) {
     	userdata = ud;
     	builder = new StringBuilder();
@@ -59,10 +60,11 @@ class BooksSaxHandler extends DefaultHandler {
         } else if(localName.equalsIgnoreCase(SMALL_IMAGE_URL)) {
         	if(!inAuthors) {
         		String url = builder.toString().trim();
-        		int url_length = OAuthInterface.URL_ADDRESS.length();
-        		if(url.substring(0, url_length).compareTo(OAuthInterface.URL_ADDRESS) != 0) {
-        			userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url = url;
-        			Log.d(TAG, "small_image_url:" + builder.toString().trim());
+        		if(url.substring(0, url_length).compareTo(GoodreadsActivity.GOODREADS_IMG_URL) == 0) {
+        			userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url = 
+        				url.substring(url_length);
+//        			Log.d(TAG, "small_image_url:" +
+//        					userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url);
         		}
         	}
         } else if(localName.equalsIgnoreCase(AUTHORS)) {

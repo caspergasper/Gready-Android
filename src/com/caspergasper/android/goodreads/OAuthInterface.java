@@ -116,10 +116,10 @@ public class OAuthInterface {
 	}
 	
 	
-	void getXMLFile(int xmlPage) {
+	void getXMLFile(int xmlPage, int url) {
 		// create an HTTP request to a protected resource
         String url_string;
-		
+		goodreads_url = url;
     	switch(goodreads_url) {
     	case GET_USER_INFO: 
     		url_string = URL_ADDRESS + USER_INFO_URL_PATH + myApp.userID + ".xml?key=" + CONSUMER_KEY;
@@ -128,7 +128,6 @@ public class OAuthInterface {
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
     		".xml?v=2&key=" + CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
     		"&shelf=" + myApp.userData.shelfToGet + "&page=" + xmlPage;
-//    		(goingForward ? ++myApp.userData.xmlPage : --myApp.userData.xmlPage);
 //    		url_string = "http://www.goodreads.com/review/list/3074479.xml?key=UvPjrkah6sJXg88qs75xRA&v=2&page=" + ++myApp.userData.bookPage; 
     		break;
     	case GET_SHELVES:
