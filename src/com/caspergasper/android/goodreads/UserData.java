@@ -30,7 +30,6 @@ class UserData {
 	List <Book> books;
 	List <Book> tempBooks;
 	String shelfToGet;
-	boolean booksRemovedFromFront = false;
 	private SAXParserFactory factory;
 	private SAXParser parser;
 	

@@ -20,7 +20,8 @@ public class GoodReadsApp extends Application {
 	static final String ACCESS_TOKEN_SECRET = "access_token_secret";
 	static final String USER_ID = "user_id"; 
 	GoodreadsActivity goodreads_activity;
-	boolean threadLock = false;
+	volatile boolean threadLock = false;
+	volatile boolean getImageThreadRunning;
 	
 	public static GoodReadsApp getInstance() {
 		return singleton;

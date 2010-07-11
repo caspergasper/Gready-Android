@@ -158,6 +158,7 @@ public class OAuthInterface {
     		consumer.sign(request);
         	
         	// Create background thread to download and render XML
+    		myApp.getImageThreadRunning = false;
         	new MyAsyncTask().execute(request);
 		    
         } catch(OAuthException e) {

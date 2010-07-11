@@ -57,6 +57,7 @@ OnScrollListener {
 	private ListView updatesListView;
 	private ShelfAdapter shelfAdapter;
 	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
+	private boolean booksRemovedFromFront = false;
 	
 	// Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
@@ -150,7 +151,9 @@ OnScrollListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
-		
+		if(myApp.threadLock) {
+			return false;
+		}
 		if(item.getGroupId() == SUBMENU_GROUPID) {
 			if(item.getItemId() == myApp.userData.shelves.size()) {
 				myApp.userData.shelfToGet = "all";
@@ -184,7 +187,7 @@ OnScrollListener {
 		b.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				// do nothing
-				EditText et = (EditText) d.findViewById(R.id.searchbox);
+				final EditText et = (EditText) d.findViewById(R.id.searchbox);
 				String text = et.getText().toString().trim(); 
 				if(text == null || text.length() < 1) {
 					return;
@@ -209,6 +212,7 @@ OnScrollListener {
 	
 	private void newQuery() {
 		deleteAllBooks = true;
+		booksRemovedFromFront = false;
 		xmlPage = 1;
 	}
 	
@@ -332,7 +336,7 @@ OnScrollListener {
 				shelfAdapter.insert(ud.tempBooks.get(i), 0);
 			}
 			if(xmlPage == 1) {
-				ud.booksRemovedFromFront = false;
+				booksRemovedFromFront = false;
 			}
 		}
 		
@@ -345,7 +349,7 @@ OnScrollListener {
 //					Log.d(TAG, "Removing " + myApp.userData.books.get(0).title);
 					shelfAdapter.remove(ud.books.get(0));
 				}
-				ud.booksRemovedFromFront = true;
+				booksRemovedFromFront = true;
 				// Scroll back a bit so the screen doesn't jump
 				// Can't get it to align precisely as the items are different size
 				updatesListView.setSelection(updatesListView.getCount() - extraBooks - 7);
@@ -418,7 +422,7 @@ OnScrollListener {
 				Log.d(TAG, "We need to load some more..");
 				onLastListItemDisplayed();
 			}
-		} else if(first == 0  && !gettingScrollData && !myApp.threadLock && myApp.userData.booksRemovedFromFront) {
+		} else if(first == 0  && !gettingScrollData && !myApp.threadLock && booksRemovedFromFront) {
 			gettingScrollData = true;
 			Log.d(TAG, "We need to load some earlier entries..");
 			onFirstListItemDisplayed();
@@ -466,6 +470,7 @@ OnScrollListener {
     private void getImages() {
         // Fire off a thread to do some work that we shouldn't do directly in the UI thread
         Thread t = new Thread(null, doBackgroundThreadProcessing, "Background");
+        myApp.getImageThreadRunning = true;
         t.start();
     }
     
@@ -488,23 +493,28 @@ OnScrollListener {
     	Book b;
     	int size = myApp.userData.books.size();
     	for(int i = 0; i < size; i++) {
-    		b = adapter.getItem(i);
-    		try {
-    			if(b.small_image_url == null) {
-    				continue;
-    			}
-    			if(b.bitmap == null) {
-    				URL newurl = new URL(GOODREADS_IMG_URL + b.small_image_url); 
-    				Log.d(TAG, "Getting " + GOODREADS_IMG_URL + b.small_image_url);
-    				b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-    				b.small_image_url = null;
-    			}
-    			mHandler.post(doUpdateGUI);
-    		} catch (Exception e) {
-    				throw new RuntimeException(e);
-    			}
-    			
-    	}
+    		if(!myApp.getImageThreadRunning) {
+    			Log.d(TAG, "stopping getImage thread.");
+    			break;
+    		}
+			b = adapter.getItem(i);
+			try {
+				if(b.small_image_url == null) {
+					continue;
+				}
+				if(b.bitmap == null) {
+					URL newurl = new URL(GOODREADS_IMG_URL + b.small_image_url); 
+					Log.d(TAG, "Getting " + GOODREADS_IMG_URL + b.small_image_url);
+					b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+					b.small_image_url = null;
+				}
+				mHandler.post(doUpdateGUI);
+			} catch (Exception e) {
+				myApp.errMessage = e.toString() + " " + e.getStackTrace().toString();
+				showErrorDialog();
+			}
+		} // for
+    	
     	
     }
     
