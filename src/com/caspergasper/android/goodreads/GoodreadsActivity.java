@@ -30,6 +30,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -391,22 +392,27 @@ OnScrollListener {
 	
 	@Override
 	public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-		List <Book> books = myApp.userData.books;
+		Book b = myApp.userData.books.get(_index);
 		Dialog d = new Dialog(GoodreadsActivity.this);
 		Window window = d.getWindow();
 		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
 				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		
+		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		d.setContentView(R.layout.book_dialog);
-		d.setTitle(books.get(_index).title);
-		TextView textview = (TextView) d.findViewById(R.id.author);
-		textview.setText(books.get(_index).author);
+		
+		if(b.bitmap != null) {
+			ImageView imgView = (ImageView) d.findViewById(R.id.bookDialogImage);
+			imgView.setImageBitmap(b.bitmap);
+		}
+		
+		TextView textview = (TextView) d.findViewById(R.id.title);
+		textview.setText(b.title);
+		textview = (TextView) d.findViewById(R.id.author);
+		textview.setText(b.author);
 		textview = (TextView) d.findViewById(R.id.avg_rating);
-		textview.setText("Average rating: " + 
-				books.get(_index).average_rating);
+		textview.setText("Average rating: " + b.average_rating);
 		textview = (TextView) d.findViewById(R.id.description);
-		textview.setText(
-				Html.fromHtml(books.get(_index).description));
+		textview.setText(Html.fromHtml(b.description));
 		d.show();
 		
 	}

@@ -50,6 +50,9 @@ android:textStyle="bold">
 <!--android:layout_android:autoLink="web" centerHorizontal="true">-->
 <!--</ImageView>   android:entries="@array/updates" -->
 <!--android:layout_below="@+id/updates_label" -->
+<View    android:layout_width="fill_parent"
+         android:layout_height="1dip"
+         android:background="#40909090" />
 <ListView android:id="@+id/updates_listview" android:layout_width="fill_parent" 
  
 android:isScrollContainer="true" android:smoothScrollbar="true" 
