@@ -19,7 +19,7 @@ public class OAuthInterface {
 	static final String URL_ADDRESS = "http://www.goodreads.com/";
 	private static final String REQUEST_TOKEN_ENDPOINT_URL = "oauth/request_token";
 	private static final String ACCESS_TOKEN_ENDPOINT_URL = "oauth/access_token";
-	private static final String AUTHORIZE_WEBSITE_URL = "oauth/authorize";
+	private static final String AUTHORIZE_WEBSITE_URL = "oauth/authorize?mobile=1";
 	
 	static final String GET_USER_ID_PATH = "api/auth_user";
 	static final String USER_INFO_URL_PATH = "user/show/";

@@ -161,12 +161,12 @@ OnScrollListener {
 			} else {
 				myApp.userData.shelfToGet = myApp.userData.shelves.get(item.getItemId()).title;
 			}
-			findViewById(R.id.status_label).setVisibility(View.VISIBLE);
+			showUpdateMessage(R.string.getBooks);
 			newQuery();
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
-				findViewById(R.id.status_label).setVisibility(View.VISIBLE);
+				showUpdateMessage(R.string.getUpdates);
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 				return true;
 		} else if(item.getItemId() == R.id.search) {
@@ -174,6 +174,12 @@ OnScrollListener {
 			return true;
 		}
 			return false;	
+	}
+	
+	void showUpdateMessage(int resource) {
+		TextView textView = (TextView) findViewById(R.id.status_label);
+		textView.setText(resource);
+		textView.setVisibility(View.VISIBLE);
 	}
 	
 	void showSearchDialog() {
@@ -201,7 +207,7 @@ OnScrollListener {
 					myApp.oauth.searchQuery = Uri.encode(text);
 					myApp.userData.shelfToGet = d.getContext().getString(R.string.searchResults); 
 					newQuery();
-					findViewById(R.id.status_label).setVisibility(View.VISIBLE);
+					showUpdateMessage(R.string.getSearch);
 					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.SEARCH_SHELVES);
 				}
 				d.hide();
@@ -437,7 +443,7 @@ OnScrollListener {
 	}
 
 	private void onLastListItemDisplayed() {
-		findViewById(R.id.status_label).setVisibility(View.VISIBLE);
+		showUpdateMessage(R.string.getBooks);
 		if(goingForward) {
 			xmlPage++;
 		} else {
@@ -463,7 +469,7 @@ OnScrollListener {
 		
 		goingForward = false;
 		Log.d(TAG, "Getting page " + xmlPage + " booksToDelete " + booksToDelete);
-		findViewById(R.id.status_label).setVisibility(View.VISIBLE);
+		showUpdateMessage(R.string.getBooks);
 		myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 	}
 	

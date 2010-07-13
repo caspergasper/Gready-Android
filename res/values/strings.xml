@@ -6,7 +6,9 @@
     <string name="updates_label">Updates</string>
     <string name="reviews_label">reviews</string>
     <string name="friends_label">friends</string>
-    <string name="status">Downloading data...</string>
+    <string name="getBooks">Getting shelf...</string>
+    <string name="getUpdates">Getting latest updates...</string>
+    <string name="getSearch">Getting search results...</string>
     <string name="build_menu">Building the menu...</string>
     <string name="internet_access">Internet Access</string>
     <string name="updates">Updates</string>
@@ -14,7 +16,6 @@
     This app is pretty buggy right now :-)\
       Hopefully in the future it will allow you to see your book list, and add reviews.\
       (Casper).</string>
-    <string name="entername">Enter your Goodreads ID number:</string>
     <string name="welcome">Welcome to Goodreads for Android!</string>
     <string name="user">User Settings</string>
     <string name="hello">Hello World, GoodreadsActivity!</string>
