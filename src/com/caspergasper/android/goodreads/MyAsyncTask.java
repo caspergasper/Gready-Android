@@ -50,9 +50,12 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    case OAuthInterface.GET_SHELVES:
 	    	myApp.userData.getSAXShelves(is);
 	    	break;
+	    case OAuthInterface.SEARCH_SHELVES:
 	    case OAuthInterface.GET_SHELF:
-	    	Log.d(TAG, "Getting data updates");
-	    	myApp.userData.getSAXBooks(is);
+	    	myApp.userData.getSAXBooks(is, false);
+	    	break;
+	    case OAuthInterface.GET_BOOKS_BY_ISBN:
+	    	myApp.userData.getSAXBooks(is, true);
 	    	break;
 	    } 
 	    } catch(Exception e) { 

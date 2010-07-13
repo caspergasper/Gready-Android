@@ -8,25 +8,23 @@ import org.xml.sax.helpers.DefaultHandler;
 import android.util.Log;
 
 
-class BooksSaxHandler extends DefaultHandler {
+class ISBNBooksSaxHandler extends DefaultHandler {
     private StringBuilder builder;
     private final static String NAME = "name";
     private final static String TITLE = "title";
     private final static String DESCRIPTION = "description";
-    private final static String REVIEWS = "reviews";
-    private final static String START = "start";
-    private final static String END = "end";
-    private final static String TOTAL = "total";
     private final static String AVERAGE_RATING = "average_rating";
     private final static String LINK = "link";
     private final static String SMALL_IMAGE_URL = "small_image_url";
     private final static String AUTHORS = "authors";
+    private final static String REVIEWS = "reviews";
     
     private UserData userdata;
     private boolean inAuthors = false;
+    private boolean inReviews = false;
     private static final int url_length = GoodreadsActivity.GOODREADS_IMG_URL.length(); 
     
-    BooksSaxHandler(UserData ud) {
+    ISBNBooksSaxHandler(UserData ud) {
     	userdata = ud;
     	builder = new StringBuilder();
     }
@@ -52,20 +50,20 @@ class BooksSaxHandler extends DefaultHandler {
         		userdata.tempBooks.get(userdata.tempBooks.size() - 1).setBookLink(builder.toString().trim());
         	}
         } else if(localName.equalsIgnoreCase(NAME)) {
-        	userdata.tempBooks.get(userdata.tempBooks.size() -1).author += 
+        	if(inAuthors) {
+        		userdata.tempBooks.get(userdata.tempBooks.size() -1).author += 
         		builder.toString().trim() + " ";
+        	}
         } else if(localName.equalsIgnoreCase(AVERAGE_RATING)) {
         	userdata.tempBooks.get(userdata.tempBooks.size() - 1).average_rating = 
         		builder.toString().trim();
         } else if(localName.equalsIgnoreCase(SMALL_IMAGE_URL)) {
-        	if(!inAuthors) {
-        		String url = builder.toString().trim();
-        		if(url.substring(0, url_length).compareTo(GoodreadsActivity.GOODREADS_IMG_URL) == 0) {
-        			userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url = 
-        				url.substring(url_length);
-//        			Log.d(TAG, "small_image_url:" +
-//        					userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url);
-        		}
+    		String url = builder.toString().trim();
+    		if(!inReviews && !inAuthors && 
+    				url.substring(0, url_length).compareTo(GoodreadsActivity.GOODREADS_IMG_URL) == 0  
+    			&&	userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url == null) {
+    			userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url = 
+    				url.substring(url_length);
         	}
         } else if(localName.equalsIgnoreCase(AUTHORS)) {
         	inAuthors = false;
@@ -85,13 +83,10 @@ class BooksSaxHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String name,
             Attributes attributes) throws SAXException {
     	super.startElement(uri, localName, name, attributes);
-//       Log.d(TAG, "Start tag: " + localName);
-        if(localName.equalsIgnoreCase(REVIEWS)){
-        	userdata.startBook = Integer.parseInt(attributes.getValue(START));
-        	userdata.endBook = Integer.parseInt(attributes.getValue(END));
-        	userdata.totalBooks = Integer.parseInt(attributes.getValue(TOTAL));
-        } if(localName.equalsIgnoreCase(AUTHORS)){
+    	if(localName.equalsIgnoreCase(AUTHORS)){
         	inAuthors = true;
+        } else if(localName.equalsIgnoreCase(REVIEWS)){
+        	inReviews = true;
         }
     }
 

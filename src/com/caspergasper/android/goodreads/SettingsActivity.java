@@ -42,6 +42,7 @@ public class SettingsActivity extends Activity {
 					TextView fl = (TextView) findViewById(R.id.enterid_feedback_label);
 					fl.setText(R.string.auth_successful);
 					startActivity(new Intent(SettingsActivity.this, GoodreadsActivity.class));
+					finish();
 				} else {
 					showErrorDialog();
 					return;

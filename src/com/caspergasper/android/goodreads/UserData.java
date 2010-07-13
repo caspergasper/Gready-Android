@@ -13,6 +13,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import android.util.Log;
 
@@ -30,7 +31,6 @@ class UserData {
 	List <Book> books;
 	List <Book> tempBooks;
 	String shelfToGet;
-	boolean booksRemovedFromFront = false;
 	private SAXParserFactory factory;
 	private SAXParser parser;
 	String isbnScan;
@@ -50,17 +50,21 @@ class UserData {
 
 	}
 	
-	void getSAXBooks(InputStream is) {
+	void getSAXBooks(InputStream is, boolean isISBN) {
 		Reader reader;
 		InputSource source;
-		BooksSaxHandler handler;
+		DefaultHandler handler;
 		try {
 			Log.d(TAG, "Start parsing books.");
 			// Have to strip off non-UTF-8 characters  -
 			// sadly there's a few of those in the XML :-( 
 			reader = new InputStreamReader(is, "UTF-8");
 			source = new InputSource(reader);
-			handler = new BooksSaxHandler(this);
+			if(isISBN) {
+				handler = new ISBNBooksSaxHandler(this);
+			} else {
+				handler = new BooksSaxHandler(this);
+			}
 			parser.parse(source, handler);				
 			Log.d(TAG, "End parsing books.");
 			
@@ -75,7 +79,7 @@ class UserData {
 		}
             return;
 	}
-		
+	
 	void getSAXUserid(InputStream is) {
 		try {
 			UserSAXHandler saxHandler = new UserSAXHandler();

@@ -19,7 +19,7 @@ public class OAuthInterface {
 	static final String URL_ADDRESS = "http://www.goodreads.com/";
 	private static final String REQUEST_TOKEN_ENDPOINT_URL = "oauth/request_token";
 	private static final String ACCESS_TOKEN_ENDPOINT_URL = "oauth/access_token";
-	private static final String AUTHORIZE_WEBSITE_URL = "oauth/authorize";
+	private static final String AUTHORIZE_WEBSITE_URL = "oauth/authorize?mobile=1";
 	
 	static final String GET_USER_ID_PATH = "api/auth_user";
 	static final String USER_INFO_URL_PATH = "user/show/";
@@ -29,7 +29,6 @@ public class OAuthInterface {
 	static final String SHELVES_URL_PATH ="shelf/list?format=xml&key=" + CONSUMER_KEY;
 	static final String UPDATES_URL_PATH = "updates/friends.xml";
 	static final String	BOOKS_ISBN_PATH = "book/isbn";
-	
 	static final String CALLBACK_URL = "goodreadsactivity://token";
 	static final String OAUTH_VERIFIER = "oauth_token";
 	
@@ -44,11 +43,14 @@ public class OAuthInterface {
 	public static final int GET_FRIEND_UPDATES = 3;
 	public static final int GET_SHELVES = 4;
 	public static final int GET_BOOKS_BY_ISBN = 5;
+	public static final int SEARCH_SHELVES = 6;
 	
 	int goodreads_url;
 	private OAuthConsumer consumer;
 	private OAuthProvider provider;
 	private GoodReadsApp myApp;
+	String searchQuery;
+	
 	OAuthInterface() {
 		// create a consumer object and configure it with the access
         // token and token secret obtained from the service provider
@@ -79,6 +81,9 @@ public class OAuthInterface {
 	        // a url based on AUTHORIZE_WEBSITE_URL and CALLBACK_URL to
 	        // which your app must now send the user 
 	        String url = provider.retrieveRequestToken(consumer, CALLBACK_URL);
+	        myApp.addTokenToPrefs(GoodReadsApp.ACCESS_TOKEN, consumer.getToken());
+	        myApp.addTokenToPrefs(GoodReadsApp.ACCESS_TOKEN_SECRET, 
+					consumer.getTokenSecret());
 	        Log.d(TAG, url);
 	        return url;
 	        
@@ -91,6 +96,12 @@ public class OAuthInterface {
 	
 	boolean getAccessToken(String verificationCode) {
 		try {
+			if(provider == null) {
+				// If app has been removed from memory need to recreate provider
+				provider = new CommonsHttpOAuthProvider(
+		        	URL_ADDRESS + REQUEST_TOKEN_ENDPOINT_URL, URL_ADDRESS + ACCESS_TOKEN_ENDPOINT_URL,
+		        	URL_ADDRESS + AUTHORIZE_WEBSITE_URL);
+			}
 			provider.retrieveAccessToken(consumer, verificationCode);
 			myApp.accessToken = consumer.getToken();
 			myApp.addTokenToPrefs(GoodReadsApp.ACCESS_TOKEN, myApp.accessToken);
@@ -106,10 +117,10 @@ public class OAuthInterface {
 	}
 	
 	
-	void getXMLFile(int xmlPage) {
+	void getXMLFile(int xmlPage, int url) {
 		// create an HTTP request to a protected resource
         String url_string;
-		
+		goodreads_url = url;
     	switch(goodreads_url) {
     	case GET_USER_INFO: 
     		url_string = URL_ADDRESS + USER_INFO_URL_PATH + myApp.userID + ".xml?key=" + CONSUMER_KEY;
@@ -118,13 +129,17 @@ public class OAuthInterface {
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
     		".xml?v=2&key=" + CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
     		"&shelf=" + myApp.userData.shelfToGet + "&page=" + xmlPage;
-//    		(goingForward ? ++myApp.userData.xmlPage : --myApp.userData.xmlPage);
 //    		url_string = "http://www.goodreads.com/review/list/3074479.xml?key=UvPjrkah6sJXg88qs75xRA&v=2&page=" + ++myApp.userData.bookPage; 
     		break;
     	case GET_SHELVES:
     		url_string = URL_ADDRESS + SHELVES_URL_PATH + "&user_id=" + myApp.userID + 
     		"&page=" + xmlPage;
 //    		url_string ="http://www.goodreads.com/shelf/list?format=xml&key=UvPjrkah6sJXg88qs75xRA&user_id=1005037&page=" + ++myApp.userData.shelfPage;
+    		break;
+    	case SEARCH_SHELVES:
+    		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
+    		".xml?v=2&key=" + CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
+    		"&page=" + xmlPage + "&search[query]=" + searchQuery;
     		break;
     	case GET_USER_ID:
     		url_string = URL_ADDRESS + GET_USER_ID_PATH;
@@ -133,11 +148,11 @@ public class OAuthInterface {
     		url_string = URL_ADDRESS + UPDATES_URL_PATH;
     		break;
     	case GET_BOOKS_BY_ISBN:
-    		url_string = URL_ADDRESS + BOOKS_ISBN_PATH + "?isbn=" + myApp.userData.isbnScan + "&key=" + CONSUMER_KEY + "&per_page=1";
+    		url_string = URL_ADDRESS + BOOKS_ISBN_PATH + "?isbn=" + myApp.userData.isbnScan + 
+    		"&key=" + CONSUMER_KEY + "&format=xml";
     		break;
     	default: 
     		url_string = "";
-    	
     	}
         
         try {
@@ -147,6 +162,7 @@ public class OAuthInterface {
     		consumer.sign(request);
         	
         	// Create background thread to download and render XML
+    		myApp.getImageThreadRunning = false;
         	new MyAsyncTask().execute(request);
 		    
         } catch(OAuthException e) {
