@@ -11,11 +11,16 @@ public class Book {
 	String average_rating;
 	String description = "";
 	Bitmap bitmap;
-//	int id;
+	int id;
+	String shelves;
 	String author = "";
 
 	Book(String str) {
 		title = str;
+	}
+	
+	Book(int _id) {
+		id = _id;
 	}
 	
 	@Override
@@ -28,4 +33,13 @@ public class Book {
 			bookLink = strLink.substring(strLink.lastIndexOf('/'));
 		}
 	}
+	
+	void setShelf(String shelf) {
+		if(shelves == null){
+			shelves = shelf;
+		} else {
+			shelves += " " + shelf;
+		}
+		
+	} 
 }

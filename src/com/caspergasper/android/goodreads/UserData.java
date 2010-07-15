@@ -50,7 +50,7 @@ class UserData {
 
 	}
 	
-	void getSAXBooks(InputStream is, boolean isISBN) {
+	void getSAXBooks(InputStream is, int goodreadsUrl) {
 		Reader reader;
 		InputSource source;
 		DefaultHandler handler;
@@ -60,7 +60,7 @@ class UserData {
 			// sadly there's a few of those in the XML :-( 
 			reader = new InputStreamReader(is, "UTF-8");
 			source = new InputSource(reader);
-			if(isISBN) {
+			if(goodreadsUrl == OAuthInterface.GET_BOOKS_BY_ISBN) {
 				handler = new ISBNBooksSaxHandler(this);
 			} else {
 				handler = new BooksSaxHandler(this);

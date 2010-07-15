@@ -23,14 +23,16 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    // send the request
         HttpClient httpClient = new DefaultHttpClient();
         HttpResponse response = httpClient.execute(request[0]);
-//        Log.d(TAG, response.getStatusLine().toString());
-	    if(response.getStatusLine().getStatusCode() != 200) {
+	    int responseCode = response.getStatusLine().getStatusCode();
+	    if(responseCode == 404 && myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN) {
+	    	myApp.errMessage = "Sorry, can't find this book on goodreads -- is it a valid book barcode?";
+	    	return 1;
+	    }else if(responseCode != 200) {
 	    	myApp.errMessage = "I/O ERROR!  Cannot download " + response.getStatusLine() + 
 	    		" " + response.getStatusLine().getStatusCode();
 	    	return 1;
 	    }
 	    InputStream is = response.getEntity().getContent();
-	    
 	    Log.d(TAG, "End downloading.");
 	    
 	    switch(myApp.oauth.goodreads_url) {
@@ -41,9 +43,6 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    	myApp.addTokenToPrefs(GoodReadsApp.USER_ID, 
 	    			myApp.userID);
 	    	break;
-//	    case OAuth_interface.GET_USER_INFO: 
-////	    	myApp.userData.getUpdates(is);
-//	    	break;
 	    case OAuthInterface.GET_FRIEND_UPDATES:
 	    	myApp.userData.getSAXUpdates(is);
 	    	break;
@@ -51,11 +50,9 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    	myApp.userData.getSAXShelves(is);
 	    	break;
 	    case OAuthInterface.SEARCH_SHELVES:
-	    case OAuthInterface.GET_SHELF:
-	    	myApp.userData.getSAXBooks(is, false);
-	    	break;
 	    case OAuthInterface.GET_BOOKS_BY_ISBN:
-	    	myApp.userData.getSAXBooks(is, true);
+	    case OAuthInterface.GET_SHELF:
+	    	myApp.userData.getSAXBooks(is, myApp.oauth.goodreads_url);
 	    	break;
 	    } 
 	    } catch(Exception e) { 

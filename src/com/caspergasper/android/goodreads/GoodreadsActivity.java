@@ -40,15 +40,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class GoodreadsActivity.
- */
 public class GoodreadsActivity extends Activity implements OnItemLongClickListener, OnItemClickListener,
 OnScrollListener {
 	
 	private GoodReadsApp myApp;
-	
 	private static final int SUBMENU_GROUPID = 1;
 	
 	// arbitrary limit, may need tweaking but should be 
@@ -94,19 +89,10 @@ OnScrollListener {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onPause()
-	 */
 	public void onPause() {
 		super.onPause();
 	}
 	
-
-	/**
-	 * Called when the activity is first created.
-	 *
-	 * @param savedInstanceState the saved instance state
-	 */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         try{
@@ -116,6 +102,7 @@ OnScrollListener {
 	        myApp = GoodReadsApp.getInstance();
 	        myApp.goodreads_activity = this;
 	        updatesListView = (ListView) findViewById(R.id.updates_listview);
+	        newQuery();  // For when activity has been cleared from memory but app hasn't
     	} catch(Exception e) {
 			myApp.errMessage = "GoodreadsActivity onCreate " + e.toString();
 			showErrorDialog();
@@ -129,9 +116,6 @@ OnScrollListener {
     	// but so far I haven't found I need to.
     }
 	
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
-	 */
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -164,9 +148,6 @@ OnScrollListener {
         return true;
     }
 		
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
@@ -307,7 +288,6 @@ OnScrollListener {
 			getImages();
 		break;
 		case OAuthInterface.GET_USER_ID:
-			// Let's get the updates
 			Log.d(TAG, "Getting friend updates for first time");
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 		break;
@@ -414,10 +394,25 @@ OnScrollListener {
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-		String bookLink = myApp.userData.books.get(_index).bookLink; 
-		if(bookLink != null) {
+		final Book b =  myApp.userData.books.get(_index);
+		if(myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN && 
+				b.shelves == null){
+			// Ask user if they want to add this to shelf
+			AlertDialog.Builder ad = new AlertDialog.Builder(GoodreadsActivity.this);
+			ad.setTitle("Add to shelf");
+			ad.setMessage("Do you want to add this book to your shelf?");
+			ad.setPositiveButton("Yes", new OnClickListener() {
+				public void onClick(DialogInterface dialog, int arg1) {
+					myApp.oauth.postBookToShelf(b.id, "read");
+				}
+			});
+			ad.setNegativeButton("No", null);
+			ad.show();
+			return true;
+		} 
+		if(b.bookLink != null) {
 			gotoWebURL(OAuthInterface.URL_ADDRESS +
-				OAuthInterface.BOOKPAGE_PATH + bookLink);
+				OAuthInterface.BOOKPAGE_PATH + b.bookLink);
 		} else {
 			toastMe(R.string.no_book_page);
 		}
@@ -512,6 +507,9 @@ OnScrollListener {
 		if (scanResult != null) {
 			// handle scan result
 			String barcode = scanResult.getContents();
+			if(barcode == null){
+				return;
+			}
 			Log.d(TAG, "scanned UPC:" + barcode);
 			String isbn = Utility.ConvertUPCtoISBN(barcode);
 			Log.d(TAG, "converted ISBN:" + isbn);

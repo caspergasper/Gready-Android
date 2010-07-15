@@ -76,10 +76,6 @@ class BooksSaxHandler extends DefaultHandler {
         builder.setLength(0);
     }
 
-    @Override
-    public void startDocument() throws SAXException {
-        super.startDocument();
-    }
 
     @Override
     public void startElement(String uri, String localName, String name,

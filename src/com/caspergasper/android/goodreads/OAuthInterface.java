@@ -2,13 +2,19 @@ package com.caspergasper.android.goodreads;
 
 import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 
+import java.net.URLEncoder;
+
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 import oauth.signpost.exception.OAuthException;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
 
@@ -29,6 +35,7 @@ public class OAuthInterface {
 	static final String SHELVES_URL_PATH ="shelf/list?format=xml&key=" + CONSUMER_KEY;
 	static final String UPDATES_URL_PATH = "updates/friends.xml";
 	static final String	BOOKS_ISBN_PATH = "book/isbn";
+	static final String ADD_BOOK_PATH = "shelf/add_to_shelf.xml";
 	static final String CALLBACK_URL = "goodreadsactivity://token";
 	static final String OAUTH_VERIFIER = "oauth_token";
 	
@@ -50,6 +57,8 @@ public class OAuthInterface {
 	private OAuthProvider provider;
 	private GoodReadsApp myApp;
 	String searchQuery;
+	private int bookId;
+	private String shelf;
 	
 	OAuthInterface() {
 		// create a consumer object and configure it with the access
@@ -171,5 +180,50 @@ public class OAuthInterface {
         	throw new RuntimeException(e.toString());
         } 
 	}
+	
+	void postBookToShelf(int _bookId, String _shelf) {
+		 // Fire off a thread to do some work that we shouldn't do directly in the UI thread
+        bookId = _bookId;
+        shelf = _shelf;
+		Thread t = new Thread(null, doPostBook, "addBook");
+        t.start();
+		
+	}
+	
+	 private Runnable doPostBook = new Runnable() {
+	    	public void run() {
+	    		postBook();
+	    	}
+	    };
+	    
+	    private void postBook() {
+	        try {
+//	        	DefaultHttpClient client = new DefaultHttpClient();
+	        	HttpPost request = new HttpPost(OAuthInterface.URL_ADDRESS + OAuthInterface.ADD_BOOK_PATH);
+	        	Log.d(TAG, "Adding book id " + bookId + " to " + shelf);
+//	        	request.getParams().setParameter("book_id", bookId);
+//	        	request.getParams().setParameter("name", shelf);
+	    		StringEntity body = new StringEntity(
+	    		        "book_id=" + bookId +
+	    		        "&name=" + shelf);
+
+	    		request.setEntity(body); 
+	        	
+	        	// sign the request
+	    		consumer.sign(request);
+	    		
+	    		DefaultHttpClient httpClient = new DefaultHttpClient();
+	    		HttpResponse response = httpClient.execute(request); 
+	    		Log.d(TAG, response.getStatusLine().toString());
+	        } catch(OAuthException e) {
+	        	Log.e(TAG, e.toString());
+	        	myApp.errMessage = e.toString();
+	        	throw new RuntimeException(e.toString());
+	        } catch(Exception e) {
+	        	Log.e(TAG, e.toString());
+	        	myApp.errMessage = e.toString();
+	        	throw new RuntimeException(e.toString());
+	        }
+	    }
 
 }

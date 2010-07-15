@@ -47,11 +47,6 @@ class ShelvesSaxHandler extends DefaultHandler {
     }
 
     @Override
-    public void startDocument() throws SAXException {
-        super.startDocument();
-    }
-
-    @Override
     public void startElement(String uri, String localName, String name,
             Attributes attributes) throws SAXException {
     	super.startElement(uri, localName, name, attributes);
