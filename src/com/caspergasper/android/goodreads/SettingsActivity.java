@@ -33,7 +33,6 @@ public class SettingsActivity extends Activity {
 	public void onResume() {
 	try {
 			super.onResume();
-			
 			Uri uri = this.getIntent().getData();  
 			if (uri != null && uri.toString().startsWith(CALLBACK_URL)) {  
 				// Callback from getAuthorization() 

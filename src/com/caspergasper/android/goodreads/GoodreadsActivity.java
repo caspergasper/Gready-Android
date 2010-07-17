@@ -397,17 +397,7 @@ OnScrollListener {
 		final Book b =  myApp.userData.books.get(_index);
 		if(myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN && 
 				b.shelves == null){
-			// Ask user if they want to add this to shelf
-			AlertDialog.Builder ad = new AlertDialog.Builder(GoodreadsActivity.this);
-			ad.setTitle("Add to shelf");
-			ad.setMessage("Do you want to add this book to your shelf?");
-			ad.setPositiveButton("Yes", new OnClickListener() {
-				public void onClick(DialogInterface dialog, int arg1) {
-					myApp.oauth.postBookToShelf(b.id, "read");
-				}
-			});
-			ad.setNegativeButton("No", null);
-			ad.show();
+			addBookToShelf(b.id);
 			return true;
 		} 
 		if(b.bookLink != null) {
@@ -417,6 +407,21 @@ OnScrollListener {
 			toastMe(R.string.no_book_page);
 		}
 		return true;
+	}
+	
+	private void addBookToShelf(final int id) {
+		// Ask user if they want to add this to shelf
+		AlertDialog.Builder ad = new AlertDialog.Builder(GoodreadsActivity.this);
+		ad.setTitle(R.string.addToShelf);
+		ad.setMessage(R.string.addToShelfQ);
+		ad.setPositiveButton("Yes", new OnClickListener() {
+			public void onClick(DialogInterface dialog, int arg1) {
+				myApp.oauth.postBookToShelf(id, "to-read");
+			}
+		});
+		ad.setNegativeButton("No", null);
+		ad.show();
+	
 	}
 	
 	@Override
@@ -511,7 +516,7 @@ OnScrollListener {
 				return;
 			}
 			Log.d(TAG, "scanned UPC:" + barcode);
-			String isbn = Utility.ConvertUPCtoISBN(barcode);
+			String isbn = GoodReadsApp.ConvertUPCtoISBN(barcode);
 			Log.d(TAG, "converted ISBN:" + isbn);
 			// TODO show book details 
 			myApp.userData.isbnScan = isbn;

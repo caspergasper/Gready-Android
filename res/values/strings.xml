@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="bookshelves_label">bookshelves</string>
-    <string name="stored_id_user">You will be remembered as</string>
     <string name="username_label">user:</string>
     <string name="updates_label">Updates</string>
     <string name="reviews_label">reviews</string>
@@ -32,4 +31,6 @@
 <string name="searchSite">  Search Goodreads site</string>
 <string name="searchResults">Search Results</string>
 <string name="getBookByISBN">Getting book by ISBN...</string>
+<string name="addToShelf">Add to shelf</string>
+<string name="addToShelfQ">Do you want to add this book to your to-read shelf?</string>
 </resources>

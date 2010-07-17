@@ -2,3 +2,4 @@
 local.properties
 bin/
 gen/com/caspergasper/android/goodreads/R.java
+src/com/caspergasper/android/goodreads/DeveloperKeys.java

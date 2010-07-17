@@ -42,27 +42,25 @@ class BooksSaxHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String name)
             throws SAXException {
     	super.endElement(uri, localName, name);	
-        if(localName.equalsIgnoreCase(TITLE)) {
+        int pos = userdata.tempBooks.size() - 1;
+    	if(localName.equalsIgnoreCase(TITLE)) {
         	userdata.tempBooks.add(new Book(builder.toString().trim()));
         } else if(localName.equalsIgnoreCase(DESCRIPTION)) {
-    		userdata.tempBooks.get(userdata.tempBooks.size() - 1).description 
+    		userdata.tempBooks.get(pos).description 
     		= builder.toString().trim().replaceAll("&lt;/?div&gt;", "");
         } else if(localName.equalsIgnoreCase(LINK)) { 
-        	if(userdata.tempBooks.get(userdata.tempBooks.size() - 1).bookLink == null) {
-        		userdata.tempBooks.get(userdata.tempBooks.size() - 1).setBookLink(builder.toString().trim());
+        	if(userdata.tempBooks.get(pos).bookLink == null) {
+        		userdata.tempBooks.get(pos).setBookLink(builder.toString().trim());
         	}
         } else if(localName.equalsIgnoreCase(NAME)) {
-        	userdata.tempBooks.get(userdata.tempBooks.size() -1).author += 
-        		builder.toString().trim() + " ";
+        	userdata.tempBooks.get(pos).author += builder.toString().trim() + " ";
         } else if(localName.equalsIgnoreCase(AVERAGE_RATING)) {
-        	userdata.tempBooks.get(userdata.tempBooks.size() - 1).average_rating = 
-        		builder.toString().trim();
+        	userdata.tempBooks.get(pos).average_rating = builder.toString().trim();
         } else if(localName.equalsIgnoreCase(SMALL_IMAGE_URL)) {
         	if(!inAuthors) {
         		String url = builder.toString().trim();
         		if(url.substring(0, url_length).compareTo(GoodreadsActivity.GOODREADS_IMG_URL) == 0) {
-        			userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url = 
-        				url.substring(url_length);
+        			userdata.tempBooks.get(pos).small_image_url = url.substring(url_length);
 //        			Log.d(TAG, "small_image_url:" +
 //        					userdata.tempBooks.get(userdata.tempBooks.size() - 1).small_image_url);
         		}

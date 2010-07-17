@@ -30,13 +30,13 @@ class UpdatesSaxHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String name)
             throws SAXException {
     	super.endElement(uri, localName, name);
+    	int pos = userdata.tempUpdates.size() - 1;
         if(localName.equalsIgnoreCase(ACTION_TEXT)) {
         	userdata.tempUpdates.add(new Update(builder.toString().trim().replaceAll("</?a[^>]+>", "")));
         } else if(localName.equalsIgnoreCase(NAME)) {
-        		userdata.tempUpdates.get(userdata.tempUpdates.size() -1).username = 
-        			builder.toString().trim();
+        		userdata.tempUpdates.get(pos).username = builder.toString().trim();
         }  else if(localName.equalsIgnoreCase(BODY)) {
-        		userdata.tempUpdates.get(userdata.tempUpdates.size() - 1).body = builder.toString().trim();        	
+        		userdata.tempUpdates.get(pos).body = builder.toString().trim();        	
         } else {
 //            	Log.d(TAG, "tag: " + localName);
 //            	Log.d(TAG, "value: " + builder.toString().trim());
