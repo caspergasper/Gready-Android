@@ -1,15 +1,12 @@
 package com.caspergasper.android.goodreads;
 
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 class UpdatesSaxHandler extends DefaultHandler {
     private StringBuilder builder;
-//    private final static String FRIENDS_COUNT = "friends_count";
     private final static String NAME = "name";
     private final static String ACTION_TEXT = "action_text";
-//    private final static String SMALL_IMG_URL = "small_image_url";
     private final static String BODY = "body";
     
     private UserData userdata;

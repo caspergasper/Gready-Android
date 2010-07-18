@@ -33,4 +33,5 @@
 <string name="getBookByISBN">Getting book by ISBN...</string>
 <string name="addToShelf">Add to shelf</string>
 <string name="addToShelfQ">Do you want to add this book to your to-read shelf?</string>
+<string name="bookAddedToShelf">Added book to shelf.</string>
 </resources>

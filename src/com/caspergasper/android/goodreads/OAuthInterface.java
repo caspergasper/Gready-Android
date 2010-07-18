@@ -184,16 +184,22 @@ public class OAuthInterface {
 		 // Fire off a thread to do some work that we shouldn't do directly in the UI thread
         bookId = _bookId;
         shelf = _shelf;
-		
+		// Create dialog box
         Thread t = new Thread(null, doPostBook, "addBook");
         t.start();
-		
 	}
 	
 	 private Runnable doPostBook = new Runnable() {
 	    	public void run() {
 	    		postBook();
 	    	}
+	    };
+	    
+	 // Create runnable for posting
+	    private final Runnable doPostBookUpdateGUI = new Runnable() {
+	        public void run() {
+	            postBookUpdateResults();
+	        }
 	    };
 	    
 	    private void postBook() {
@@ -208,6 +214,12 @@ public class OAuthInterface {
 	    		consumer.sign(post);  		
 	    		HttpResponse response = httpClient.execute(post); 
 	    		Log.d(TAG, response.getStatusLine().toString());
+	    		if(response.getStatusLine().getStatusCode() == 201){
+	    			myApp.goodreads_activity.mHandler.post(doPostBookUpdateGUI);
+	    		} else {
+	    			myApp.errMessage = response.getStatusLine().toString();
+	    			throw new RuntimeException(response.getStatusLine().toString());
+	    		}
 	        } catch(OAuthException e) {
 	        	Log.e(TAG, e.toString());
 	        	myApp.errMessage = e.toString();
@@ -218,5 +230,9 @@ public class OAuthInterface {
 	        	throw new RuntimeException(e.toString());
 	        }
 	    }
-
+	    
+	    private void postBookUpdateResults() {
+	    	myApp.goodreads_activity.toastMe(R.string.bookAddedToShelf);
+	    	myApp.userData.books.get(0).shelves.add("to-read");
+	    }
 }

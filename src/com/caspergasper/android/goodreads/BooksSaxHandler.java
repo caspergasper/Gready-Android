@@ -5,9 +5,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.util.Log;
-
-
 class BooksSaxHandler extends DefaultHandler {
     private StringBuilder builder;
     private final static String NAME = "name";
@@ -21,10 +18,12 @@ class BooksSaxHandler extends DefaultHandler {
     private final static String LINK = "link";
     private final static String SMALL_IMAGE_URL = "small_image_url";
     private final static String AUTHORS = "authors";
+    private final static String SHELF = "shelf";
     
     private UserData userdata;
     private boolean inAuthors = false;
     private static final int url_length = GoodreadsActivity.GOODREADS_IMG_URL.length(); 
+    private int pos;
     
     BooksSaxHandler(UserData ud) {
     	userdata = ud;
@@ -42,7 +41,7 @@ class BooksSaxHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String name)
             throws SAXException {
     	super.endElement(uri, localName, name);	
-        int pos = userdata.tempBooks.size() - 1;
+        pos = userdata.tempBooks.size() - 1;
     	if(localName.equalsIgnoreCase(TITLE)) {
         	userdata.tempBooks.add(new Book(builder.toString().trim()));
         } else if(localName.equalsIgnoreCase(DESCRIPTION)) {
@@ -84,8 +83,10 @@ class BooksSaxHandler extends DefaultHandler {
         	userdata.startBook = Integer.parseInt(attributes.getValue(START));
         	userdata.endBook = Integer.parseInt(attributes.getValue(END));
         	userdata.totalBooks = Integer.parseInt(attributes.getValue(TOTAL));
-        } if(localName.equalsIgnoreCase(AUTHORS)){
+        } else if(localName.equalsIgnoreCase(AUTHORS)){
         	inAuthors = true;
+        } else if(localName.equalsIgnoreCase(SHELF)){
+        	userdata.tempBooks.get(pos).shelves.add(attributes.getValue(NAME));
         }
     }
 

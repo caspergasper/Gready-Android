@@ -79,10 +79,6 @@ class ISBNBooksSaxHandler extends DefaultHandler {
         	inAuthors = false;
         } else if(localName.equalsIgnoreCase(MY_REVIEW)) {
         	inMyReview = false;
-        } else if(localName.equalsIgnoreCase(SHELF)) {
-        	if(inMyReview) {
-        		userdata.tempBooks.get(lastBookPos).setShelf(builder.toString().trim());
-        	}
         } else {
 //            	Log.d(TAG, "tag: " + localName);
 //            	Log.d(TAG, "value: " + builder.toString().trim());
@@ -100,6 +96,10 @@ class ISBNBooksSaxHandler extends DefaultHandler {
         	inReviews = true;
         }  else if(localName.equalsIgnoreCase(MY_REVIEW)){
         	inMyReview = true;
+        } else if(localName.equalsIgnoreCase(SHELF)){
+        	if(inMyReview) {
+        		userdata.tempBooks.get(lastBookPos).shelves.add(attributes.getValue(NAME));
+        	}
         }
     }
     

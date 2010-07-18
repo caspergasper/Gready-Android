@@ -1,5 +1,8 @@
 package com.caspergasper.android.goodreads;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.graphics.Bitmap;
 
 
@@ -12,7 +15,7 @@ public class Book {
 	String description = "";
 	Bitmap bitmap;
 	int id;
-	String shelves;
+	List <String> shelves = new ArrayList<String>();
 	String author = "";
 
 	Book(String str) {
@@ -34,12 +37,15 @@ public class Book {
 		}
 	}
 	
-	void setShelf(String shelf) {
-		if(shelves == null){
-			shelves = shelf;
-		} else {
-			shelves += " " + shelf;
+	String getShelves() {
+		String retVal = "";
+		for(String str : shelves){
+			if(retVal == "") {
+				retVal = str;
+			} else {
+				retVal += ", " + str;
+			}
 		}
-		
-	} 
+		return retVal;
+	}
 }

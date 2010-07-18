@@ -313,7 +313,7 @@ OnScrollListener {
 		ad.show();
 	}
 
-	private void toastMe(int msgid) {
+	void toastMe(int msgid) {
 		Toast toast = Toast.makeText(getApplicationContext(), msgid, Toast.LENGTH_SHORT);
 		toast.show();
 	}
@@ -395,11 +395,6 @@ OnScrollListener {
 	@Override
 	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 		final Book b =  myApp.userData.books.get(_index);
-		if(myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN && 
-				b.shelves == null){
-			addBookToShelf(b.id);
-			return true;
-		} 
 		if(b.bookLink != null) {
 			gotoWebURL(OAuthInterface.URL_ADDRESS +
 				OAuthInterface.BOOKPAGE_PATH + b.bookLink);
@@ -421,12 +416,18 @@ OnScrollListener {
 		});
 		ad.setNegativeButton("No", null);
 		ad.show();
-	
 	}
 	
 	@Override
 	public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 		Book b = myApp.userData.books.get(_index);
+		TextView textview;
+		if(myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN && 
+				b.shelves == null){
+			addBookToShelf(b.id);
+			return;
+		} 
+		
 		Dialog d = new Dialog(GoodreadsActivity.this);
 		Window window = d.getWindow();
 		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
@@ -439,12 +440,14 @@ OnScrollListener {
 			imgView.setImageBitmap(b.bitmap);
 		}
 		
-		TextView textview = (TextView) d.findViewById(R.id.title);
+		textview = (TextView) d.findViewById(R.id.title);
 		textview.setText(b.title);
 		textview = (TextView) d.findViewById(R.id.author);
 		textview.setText(b.author);
 		textview = (TextView) d.findViewById(R.id.avg_rating);
 		textview.setText("Average rating: " + b.average_rating);
+		textview = (TextView) d.findViewById(R.id.shelves);
+		textview.setText("Shelves: " + b.getShelves());
 		textview = (TextView) d.findViewById(R.id.description);
 		textview.setText(Html.fromHtml(b.description));
 		d.show();	
