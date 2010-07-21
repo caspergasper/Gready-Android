@@ -27,7 +27,7 @@ class ISBNBooksSaxHandler extends DefaultHandler {
     private boolean inAuthors = false;
     private boolean inReviews = false;
     private boolean inMyReview = false;
-    private static final int url_length = GoodreadsActivity.GOODREADS_IMG_URL.length(); 
+    private static final int url_length = BooksActivity.GOODREADS_IMG_URL.length(); 
     private int lastBookPos = 0;
     
     ISBNBooksSaxHandler(UserData ud) {
@@ -70,7 +70,7 @@ class ISBNBooksSaxHandler extends DefaultHandler {
         } else if(localName.equalsIgnoreCase(SMALL_IMAGE_URL)) {
     		String url = builder.toString().trim();
     		if(!inReviews && !inAuthors && 
-    				url.substring(0, url_length).compareTo(GoodreadsActivity.GOODREADS_IMG_URL) == 0  
+    				url.substring(0, url_length).compareTo(BooksActivity.GOODREADS_IMG_URL) == 0  
     			&&	userdata.tempBooks.get(lastBookPos).small_image_url == null) {
     			userdata.tempBooks.get(lastBookPos).small_image_url = 
     				url.substring(url_length);

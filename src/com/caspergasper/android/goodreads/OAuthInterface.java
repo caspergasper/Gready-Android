@@ -215,7 +215,7 @@ public class OAuthInterface {
 	    		HttpResponse response = httpClient.execute(post); 
 	    		Log.d(TAG, response.getStatusLine().toString());
 	    		if(response.getStatusLine().getStatusCode() == 201){
-	    			myApp.goodreads_activity.mHandler.post(doPostBookUpdateGUI);
+	    			myApp.goodreads_activity(BooksActivity).mHandler.post(doPostBookUpdateGUI);
 	    		} else {
 	    			myApp.errMessage = response.getStatusLine().toString();
 	    			throw new RuntimeException(response.getStatusLine().toString());

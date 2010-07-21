@@ -40,7 +40,7 @@ public class SettingsActivity extends Activity {
 				if(myApp.oauth.getAccessToken(verifier)) {
 					TextView fl = (TextView) findViewById(R.id.enterid_feedback_label);
 					fl.setText(R.string.auth_successful);
-					startActivity(new Intent(SettingsActivity.this, GoodreadsActivity.class));
+					startActivity(new Intent(SettingsActivity.this, UpdatesActivity.class));
 					finish();
 				} else {
 					showErrorDialog();
@@ -64,7 +64,7 @@ public class SettingsActivity extends Activity {
 //        MenuItem item = menu.findItem(R.id.identifyuser);
 //        item.setIntent(new Intent(SettingsActivity.this, GoodreadsActivity.class));
         MenuItem item = menu.findItem(R.id.updates);
-        item.setIntent(new Intent(SettingsActivity.this, GoodreadsActivity.class));
+        item.setIntent(new Intent(SettingsActivity.this, UpdatesActivity.class));
         
         return true;
     }

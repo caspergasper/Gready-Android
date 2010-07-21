@@ -1,8 +1,11 @@
 package com.caspergasper.android.goodreads;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 
 public class GoodReadsApp extends Application {
 	
@@ -19,7 +22,7 @@ public class GoodReadsApp extends Application {
 	static final String ACCESS_TOKEN = "access_token";
 	static final String ACCESS_TOKEN_SECRET = "access_token_secret";
 	static final String USER_ID = "user_id"; 
-	GoodreadsActivity goodreads_activity;
+	Activity goodreads_activity;
 	volatile boolean threadLock = false;
 	volatile boolean getImageThreadRunning;
 	
@@ -98,5 +101,11 @@ public class GoodReadsApp extends Application {
 		return isbn;
 	}
 
+	
+	void gotoWebURL(String path) {
+		Uri uri = Uri.parse(path);
+		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		startActivity(intent);
+	}
 }
 
