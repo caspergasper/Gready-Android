@@ -404,30 +404,37 @@ OnScrollListener {
 		return true;
 	}
 	
-	private void addBookToShelf(final int id) {
+	private void addBookToShelf(final Book b) {
 		// Ask user if they want to add this to shelf
 		AlertDialog.Builder ad = new AlertDialog.Builder(GoodreadsActivity.this);
 		ad.setTitle(R.string.addToShelf);
 		ad.setMessage(R.string.addToShelfQ);
 		ad.setPositiveButton("Yes", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int arg1) {
-				myApp.oauth.postBookToShelf(id, "to-read");
+				myApp.oauth.postBookToShelf(b.id, "to-read");
 			}
 		});
-		ad.setNegativeButton("No", null);
+		ad.setNegativeButton("No", new OnClickListener() {
+			public void onClick(DialogInterface dialog, int arg1) {
+				showBookDetail(b);
+			}
+		});
 		ad.show();
 	}
 	
 	@Override
 	public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 		Book b = myApp.userData.books.get(_index);
-		TextView textview;
 		if(myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN && 
-				b.shelves == null){
-			addBookToShelf(b.id);
-			return;
-		} 
-		
+				b.shelves.size() == 0){
+			addBookToShelf(b);
+		} else {
+			showBookDetail(b);
+		}
+	}
+	
+	private final void showBookDetail(Book b) {
+		TextView textview;
 		Dialog d = new Dialog(GoodreadsActivity.this);
 		Window window = d.getWindow();
 		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
@@ -447,7 +454,11 @@ OnScrollListener {
 		textview = (TextView) d.findViewById(R.id.avg_rating);
 		textview.setText("Average rating: " + b.average_rating);
 		textview = (TextView) d.findViewById(R.id.shelves);
-		textview.setText("Shelves: " + b.getShelves());
+		if(b.shelves.size() == 0) {
+			textview.setText("Shelves: not shelved");
+		} else {
+			textview.setText("Shelves: " + b.getShelves());
+		}
 		textview = (TextView) d.findViewById(R.id.description);
 		textview.setText(Html.fromHtml(b.description));
 		d.show();	
