@@ -215,7 +215,8 @@ public class OAuthInterface {
 	    		HttpResponse response = httpClient.execute(post); 
 	    		Log.d(TAG, response.getStatusLine().toString());
 	    		if(response.getStatusLine().getStatusCode() == 201){
-	    			myApp.goodreads_activity(BooksActivity).mHandler.post(doPostBookUpdateGUI);
+	    			BooksActivity activity = (BooksActivity) myApp.goodreads_activity; 
+	    			activity.mHandler.post(doPostBookUpdateGUI);
 	    		} else {
 	    			myApp.errMessage = response.getStatusLine().toString();
 	    			throw new RuntimeException(response.getStatusLine().toString());
@@ -232,7 +233,8 @@ public class OAuthInterface {
 	    }
 	    
 	    private void postBookUpdateResults() {
-	    	myApp.goodreads_activity.toastMe(R.string.bookAddedToShelf);
+	    	BooksActivity activity = (BooksActivity) myApp.goodreads_activity;
+	    	activity.toastMe(R.string.bookAddedToShelf);
 	    	myApp.userData.books.get(0).shelves.add("to-read");
 	    }
 }

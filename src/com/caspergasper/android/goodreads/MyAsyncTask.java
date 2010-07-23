@@ -9,7 +9,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -73,7 +72,8 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	protected void onPostExecute(Integer result) {
 	    super.onPostExecute(result);   
 	    myApp.threadLock = false;
-	    if(myApp.oauth.goodreads_url == OAuthInterface.GET_FRIEND_UPDATES){ 
+	    if(myApp.oauth.goodreads_url == OAuthInterface.GET_FRIEND_UPDATES || 
+	    		myApp.oauth.goodreads_url == OAuthInterface.GET_SHELVES){ 
 	    	UpdatesActivity updatesActivity = (UpdatesActivity) myApp.goodreads_activity;
 	    	updatesActivity.updateMainScreenForUser(result);
 	    } else {

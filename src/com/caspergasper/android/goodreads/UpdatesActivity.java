@@ -74,7 +74,7 @@ public class UpdatesActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         try{
 	    	super.onCreate(savedInstanceState);
-	        setContentView(R.layout.main);
+	        setContentView(R.layout.updates);
 	        
 	        myApp = GoodReadsApp.getInstance();
 	        myApp.goodreads_activity = this;
@@ -136,6 +136,7 @@ public class UpdatesActivity extends Activity {
 			showUpdateMessage(R.string.getBooks);
 			newQuery();
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
+			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
 				showUpdateMessage(R.string.getUpdates);

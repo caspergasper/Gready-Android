@@ -1,7 +1,10 @@
 package com.caspergasper.android.goodreads;
 
+import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import android.util.Log;
 
 class UpdatesSaxHandler extends DefaultHandler {
     private StringBuilder builder;
@@ -35,8 +38,8 @@ class UpdatesSaxHandler extends DefaultHandler {
         }  else if(localName.equalsIgnoreCase(BODY)) {
         		userdata.tempUpdates.get(pos).body = builder.toString().trim();        	
         } else {
-//            	Log.d(TAG, "tag: " + localName);
-//            	Log.d(TAG, "value: " + builder.toString().trim());
+            	Log.d(TAG, "tag: " + localName);
+            	Log.d(TAG, "value: " + builder.toString().trim());
         }
         builder.setLength(0);
     }
