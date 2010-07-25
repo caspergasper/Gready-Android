@@ -19,14 +19,7 @@ android:textStyle="bold">
 <View    android:layout_width="fill_parent"
          android:layout_height="1dip"
          android:background="#40909090" />
-<EditText
- android:id="@+id/editView"
- android:layout_width="fill_parent"
- android:layout_height="wrap_content"
- android:inputType="textShortMessage"
-></EditText>
-<ListView android:id="@+id/updates_listview" android:layout_width="fill_parent" 
- 
+<ListView android:id="@+id/updates_listview" android:layout_width="fill_parent"  
 android:isScrollContainer="true" android:smoothScrollbar="true" 
 android:layout_height="wrap_content" android:scrollbars="vertical" 
 android:visibility="invisible" android:choiceMode="singleChoice">
