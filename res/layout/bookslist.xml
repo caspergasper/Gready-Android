@@ -9,7 +9,7 @@ android:id="@+id/gr_bookshelf" android:src="@drawable/gr_bookshelf">
 </ImageView>
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" 
 android:id="@+id/status_label" android:layout_alignParentRight="true" 
-android:text="@string/getUpdates">
+android:text="@string/getBooks">
 </TextView>
 <!--<RelativeLayout android:layout_height="wrap_content" -->
 <!--android:layout_below="@+id/gr_bookshelf" android:id="@+id/userinfo_layout" -->
@@ -41,7 +41,7 @@ android:text="@string/getUpdates">
 <!--</RelativeLayout>-->
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" 
  android:id="@+id/updates_label" 
-android:text="@string/updates_label"  
+android:text="@string/books_label"  
 android:textStyle="bold">
 </TextView>
 <!--android:paddingLeft="8px" android:paddingTop="4px"-->

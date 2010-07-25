@@ -167,7 +167,7 @@ public class OAuthInterface {
         	HttpGet request = new HttpGet(url_string);
         	
     		// sign the request
-    		consumer.sign(request);
+        	consumer.sign(request);
         	
         	// Create background thread to download and render XML
     		myApp.getImageThreadRunning = false;

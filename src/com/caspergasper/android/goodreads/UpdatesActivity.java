@@ -22,24 +22,29 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 
-public class UpdatesActivity extends Activity {
+public class UpdatesActivity extends Activity implements OnItemLongClickListener {
 	
 	private GoodReadsApp myApp;
 	private static final int SUBMENU_GROUPID = 1;
 	
 	private int xmlPage = 1;
 	private ListView updatesListView;
+	private static final String M_USER = "m/user/";
+	private static final String REVIEWS = "/reviews";
 	
 	@Override
 	public void onResume() {
+		myApp.goodreads_activity = this;
 		try {
 			super.onResume();
 			if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
@@ -51,8 +56,7 @@ public class UpdatesActivity extends Activity {
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_USER_ID);
 				return;     
 			} else {
-				if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0 
-						&& !myApp.threadLock) {
+				if(myApp.userData.updates.size() == 0 && !myApp.threadLock) {
 					// Got valid tokens and a userid, let's go get some data...
 					Log.d(TAG, "Getting updates now...");
 					xmlPage = 1;
@@ -61,7 +65,7 @@ public class UpdatesActivity extends Activity {
 			}
 		} catch(Exception e) {
 			myApp.errMessage = "GoodreadsActivity onResume " + e.toString();
-			showErrorDialog();
+			myApp.showErrorDialog(this);
 		}
 	}
 	
@@ -82,7 +86,7 @@ public class UpdatesActivity extends Activity {
 	        newQuery();  // For when activity has been cleared from memory but app hasn't
     	} catch(Exception e) {
 			myApp.errMessage = "UpdatesActivity onCreate " + e.toString();
-			showErrorDialog();
+			myApp.showErrorDialog(this);
 		}
     }
     
@@ -96,7 +100,7 @@ public class UpdatesActivity extends Activity {
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.startmenu, menu);
+        inflater.inflate(R.menu.updates_menu, menu);
         SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, R.string.bookshelves_label);
     	sub.setHeaderIcon(android.R.drawable.ic_menu_view);
     	sub.setIcon(android.R.drawable.ic_menu_view);
@@ -133,9 +137,6 @@ public class UpdatesActivity extends Activity {
 			} else {
 				myApp.userData.shelfToGet = myApp.userData.shelves.get(item.getItemId()).title;
 			}
-			showUpdateMessage(R.string.getBooks);
-			newQuery();
-			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
@@ -153,6 +154,21 @@ public class UpdatesActivity extends Activity {
 		}
 			return false;	
 	}
+	
+	@Override
+	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
+		final Update u = myApp.userData.updates.get(_index);
+		if(u.updateLink != null) {
+			String path = OAuthInterface.URL_ADDRESS +
+				M_USER + u.id + REVIEWS + u.updateLink;
+			Log.d(TAG, path);
+			myApp.gotoWebURL(path, myApp.goodreads_activity);
+		} else {
+			toastMe(R.string.no_update_page);
+		}
+		return true;
+	}
+	
 	
 	void showUpdateMessage(int resource) {
 		TextView textView = (TextView) findViewById(R.id.status_label);
@@ -180,7 +196,7 @@ public class UpdatesActivity extends Activity {
 				RadioGroup radioGroup = (RadioGroup) d.findViewById(R.id.RadioGroup);
 				if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchSite) {
 				myApp.gotoWebURL(OAuthInterface.URL_ADDRESS +
-						OAuthInterface.BOOKPAGE_SEARCH + Uri.encode(text));
+						OAuthInterface.BOOKPAGE_SEARCH + Uri.encode(text), myApp.goodreads_activity);
 				} else if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchShelves) {
 					myApp.oauth.searchQuery = Uri.encode(text);
 					myApp.userData.shelfToGet = d.getContext().getString(R.string.searchResults); 
@@ -200,12 +216,15 @@ public class UpdatesActivity extends Activity {
 	}
 	
     void updateMainScreenForUser(int result) {
-    	Log.d(TAG, "updateMainScreenForUser");
+    	Log.d(TAG, "updatesMainScreenForUser");
     	TextView tv;
     	UserData ud = myApp.userData;
     	
-    	if(result != 0) {
-			showErrorDialog();
+    	if(result == 1) {
+			myApp.showErrorDialog(this);
+			return;
+		} else if(result == 2) {
+			myApp.showGetAuthorizationDialog(this);
 			return;
 		}
     	switch (myApp.oauth.goodreads_url) {
@@ -213,7 +232,7 @@ public class UpdatesActivity extends Activity {
 			UpdateAdapter updateAdapter;
 			if(ud.updates.size() == 0) {
 				updatesListView.setOnItemClickListener(null);
-				updatesListView.setOnItemLongClickListener(null);
+				updatesListView.setOnItemLongClickListener(this);
 				updatesListView.setOnScrollListener(null);
 			    updateAdapter = new UpdateAdapter(this, R.layout.updateitem,
 						ud.updates);
@@ -235,6 +254,7 @@ public class UpdatesActivity extends Activity {
 		break;
 		case OAuthInterface.GET_USER_ID:
 			Log.d(TAG, "Getting friend updates for first time");
+			ud.updates.clear();
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 		break;
     	case OAuthInterface.GET_SHELVES:
@@ -246,18 +266,6 @@ public class UpdatesActivity extends Activity {
     	break;
     	}
     }
-    
-	private void showErrorDialog() {
-		AlertDialog.Builder ad = new AlertDialog.Builder(UpdatesActivity.this);
-		ad.setTitle("ERROR!");
-		ad.setMessage(myApp.errMessage);
-		ad.setPositiveButton("OK", new OnClickListener() {
-			public void onClick(DialogInterface dialog, int arg1) {
-				// do nothing
-			}
-		});
-		ad.show();
-	}
 
 	void toastMe(int msgid) {
 		Toast toast = Toast.makeText(getApplicationContext(), msgid, Toast.LENGTH_SHORT);
@@ -269,26 +277,6 @@ public class UpdatesActivity extends Activity {
 			updateAdapter.add(u);
 		}
 		myApp.userData.tempUpdates.clear();	
-	}
-		
-	//do something when book scanner finishes.
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-		if (scanResult != null) {
-			// handle scan result
-			String barcode = scanResult.getContents();
-			if(barcode == null){
-				return;
-			}
-			Log.d(TAG, "scanned UPC:" + barcode);
-			String isbn = GoodReadsApp.ConvertUPCtoISBN(barcode);
-			Log.d(TAG, "converted ISBN:" + isbn);
-			// TODO show book details 
-			myApp.userData.isbnScan = isbn;
-			showUpdateMessage(R.string.getBookByISBN);
-			newQuery();
-			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_BOOKS_BY_ISBN);
-		}				    
 	}
 	
 }

@@ -3,6 +3,7 @@
     <string name="bookshelves_label">bookshelves</string>
     <string name="username_label">user:</string>
     <string name="updates_label">Updates</string>
+    <string name="books_label">Books</string>
     <string name="reviews_label">reviews</string>
     <string name="friends_label">friends</string>
     <string name="getBooks">Getting shelf...</string>
@@ -22,8 +23,10 @@
 <string name="usersettings">User Settings</string>
 <string name="getting_authentication">Getting authentication, please wait...</string>
 <string name="auth_successful">Authentication successful.</string>
+<string name="getAuthorization">Authorization denied.\nWould you like to try authorizing your account again?</string>
 <string name="delete_prefs">Delete saved preferences</string>
 <string name="no_book_page">Sorry, there isn\'t a book page for this one.</string>
+<string name="no_update_page">Sorry, can\'t find this Update on the site.</string>
 <string name="scanbook_label">Scan</string>
 <string name="search">Search</string>
 <string name="searchTitle">Search for books or authors</string>

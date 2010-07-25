@@ -64,6 +64,7 @@ OnScrollListener {
     final Handler mHandler = new Handler();
 
 	public void onResume() {
+		myApp.goodreads_activity = this;
 		try {
 			super.onResume();
 			if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
@@ -75,17 +76,16 @@ OnScrollListener {
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_USER_ID);
 				return;     
 			} else {
-				if(myApp.userData.updates.size() == 0 && myApp.userData.books.size() == 0 
-						&& !myApp.threadLock) {
+				if(myApp.userData.books.size() == 0 && !myApp.threadLock) {
 					// Got valid tokens and a userid, let's go get some data...
-					Log.d(TAG, "Getting updates now...");
+					Log.d(TAG, "Getting books now...");
 					xmlPage = 1;
-					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
+					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 				} 
 			}
 		} catch(Exception e) {
 			myApp.errMessage = "GoodreadsActivity onResume " + e.toString();
-			showErrorDialog();
+			myApp.showErrorDialog(this);
 		}
 	}
 	
@@ -97,15 +97,13 @@ OnScrollListener {
     public void onCreate(Bundle savedInstanceState) {
         try{
 	    	super.onCreate(savedInstanceState);
-	        setContentView(R.layout.main);
-	        
+	        setContentView(R.layout.bookslist);
 	        myApp = GoodReadsApp.getInstance();
-	        myApp.goodreads_activity = this;
 	        updatesListView = (ListView) findViewById(R.id.updates_listview);
 	        newQuery();  // For when activity has been cleared from memory but app hasn't
     	} catch(Exception e) {
 			myApp.errMessage = "GoodreadsActivity onCreate " + e.toString();
-			showErrorDialog();
+			myApp.showErrorDialog(this);
 		}
     }
     
@@ -165,9 +163,8 @@ OnScrollListener {
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
-				showUpdateMessage(R.string.getUpdates);
-				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
-				return true;
+			startActivity(new Intent(BooksActivity.this, UpdatesActivity.class));	
+			return true;
 		}
 		else if(item.getItemId() == R.id.scanbook) {
 			IntentIntegrator.initiateScan(BooksActivity.this,IntentIntegrator.DEFAULT_TITLE,IntentIntegrator.DEFAULT_MESSAGE,IntentIntegrator.DEFAULT_YES,IntentIntegrator.DEFAULT_NO,IntentIntegrator.PRODUCT_CODE_TYPES);
@@ -206,7 +203,7 @@ OnScrollListener {
 				RadioGroup radioGroup = (RadioGroup) d.findViewById(R.id.RadioGroup);
 				if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchSite) {
 				myApp.gotoWebURL(OAuthInterface.URL_ADDRESS +
-						OAuthInterface.BOOKPAGE_SEARCH + Uri.encode(text));
+						OAuthInterface.BOOKPAGE_SEARCH + Uri.encode(text), myApp.goodreads_activity);
 				} else if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchShelves) {
 					myApp.oauth.searchQuery = Uri.encode(text);
 					myApp.userData.shelfToGet = d.getContext().getString(R.string.searchResults); 
@@ -228,39 +225,18 @@ OnScrollListener {
 	}
 	
     void updateMainScreenForUser(int result) {
-    	Log.d(TAG, "updateMainScreenForUser");
+    	Log.d(TAG, "booksMainScreenForUser");
     	TextView tv;
     	UserData ud = myApp.userData;
     	
-    	if(result != 0) {
-			showErrorDialog();
+    	if(result == 1) {
+			myApp.showErrorDialog(this);
+			return;
+		} else if(result == 2) {
+			myApp.showGetAuthorizationDialog(this);
 			return;
 		}
     	switch (myApp.oauth.goodreads_url) {
-		case OAuthInterface.GET_FRIEND_UPDATES:
-			UpdateAdapter updateAdapter;
-			if(ud.updates.size() == 0) {
-				updatesListView.setOnItemClickListener(null);
-				updatesListView.setOnItemLongClickListener(null);
-				updatesListView.setOnScrollListener(null);
-			    updateAdapter = new UpdateAdapter(this, R.layout.updateitem,
-						ud.updates);
-			    updatesListView.setAdapter(updateAdapter);
-			} else {
-				updateAdapter = (UpdateAdapter) updatesListView.getAdapter();
-				updateAdapter.clear();
-			}
-			addUpdatesToListView(updateAdapter);
-			updatesListView.setVisibility(View.VISIBLE);
-			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
-			tv = (TextView) findViewById(R.id.updates_label);
-			tv.setText(R.string.updates_label);
-			if(myApp.userData.shelves.size() == 0) {
-				xmlPage = 1;
-				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);
-			}
-			ud.books.clear();
-		break;
 		case OAuthInterface.SEARCH_SHELVES:
 		case OAuthInterface.GET_BOOKS_BY_ISBN:
 		case OAuthInterface.GET_SHELF:
@@ -287,42 +263,12 @@ OnScrollListener {
 			// Load images in background
 			getImages();
 		break;
-		case OAuthInterface.GET_USER_ID:
-			Log.d(TAG, "Getting friend updates for first time");
-			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
-		break;
-    	case OAuthInterface.GET_SHELVES:
-    		// We need to cater for users with > 100 bookshelves like Cait :-)
-    		if(ud.endShelf < ud.totalShelves) {
-    			Log.d(TAG, "Getting extra shelf for some user that reads too much...");
-    			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
-    		}
-    	break;
     	}
     }
     
-	private void showErrorDialog() {
-		AlertDialog.Builder ad = new AlertDialog.Builder(BooksActivity.this);
-		ad.setTitle("ERROR!");
-		ad.setMessage(myApp.errMessage);
-		ad.setPositiveButton("OK", new OnClickListener() {
-			public void onClick(DialogInterface dialog, int arg1) {
-				// do nothing
-			}
-		});
-		ad.show();
-	}
-
 	void toastMe(int msgid) {
 		Toast toast = Toast.makeText(getApplicationContext(), msgid, Toast.LENGTH_SHORT);
 		toast.show();
-	}
-	
-	private void addUpdatesToListView(UpdateAdapter updateAdapter) {
-		for(Update u : myApp.userData.tempUpdates) {
-			updateAdapter.add(u);
-		}
-		myApp.userData.tempUpdates.clear();	
 	}
 	
 	private void addBooksToListView() {
@@ -390,8 +336,11 @@ OnScrollListener {
 	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 		final Book b =  myApp.userData.books.get(_index);
 		if(b.bookLink != null) {
-			myApp.gotoWebURL(OAuthInterface.URL_ADDRESS +
-				OAuthInterface.BOOKPAGE_PATH + b.bookLink);
+			String path = OAuthInterface.URL_ADDRESS +
+				OAuthInterface.BOOKPAGE_PATH + b.bookLink;
+			Uri uri = Uri.parse(path);
+			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
 		} else {
 			toastMe(R.string.no_book_page);
 		}
@@ -578,11 +527,10 @@ OnScrollListener {
 				mHandler.post(doUpdateGUI);
 			} catch (Exception e) {
 				myApp.errMessage = e.toString() + " " + e.getStackTrace().toString();
-				showErrorDialog();
+				myApp.showErrorDialog(this);
 			}
 		} // for
-    	
-    	
+    		
     }
     
     private void updateResultsInUi() {

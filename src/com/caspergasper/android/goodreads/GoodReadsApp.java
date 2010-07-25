@@ -1,9 +1,12 @@
 package com.caspergasper.android.goodreads;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 
@@ -102,10 +105,36 @@ public class GoodReadsApp extends Application {
 	}
 
 	
-	void gotoWebURL(String path) {
+	void gotoWebURL(String path, Activity activity) {
 		Uri uri = Uri.parse(path);
 		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-		startActivity(intent);
+		activity.startActivity(intent);
+	}
+	
+	void showErrorDialog(Activity activity) {
+		AlertDialog.Builder ad = new AlertDialog.Builder(activity);
+		ad.setTitle("ERROR!");
+		ad.setMessage(errMessage);
+		ad.setPositiveButton("OK", new OnClickListener() {
+			public void onClick(DialogInterface dialog, int arg1) {
+				// do nothing
+			}
+		});
+		ad.show();
+	}
+	
+	void showGetAuthorizationDialog(final Activity activity) {
+		AlertDialog.Builder ad = new AlertDialog.Builder(activity);
+		ad.setTitle("ERROR!");
+		ad.setMessage(R.string.getAuthorization);
+		ad.setPositiveButton("OK", new OnClickListener() {
+			public void onClick(DialogInterface dialog, int arg1) {
+				deleteAllPrefs();
+				activity.startActivity(new Intent(activity, SettingsActivity.class));
+			}
+		});
+		ad.setNegativeButton("No thanks", null);
+		ad.show();
 	}
 }
 

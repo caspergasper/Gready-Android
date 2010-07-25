@@ -4,6 +4,8 @@ public class Update {
 	String updateText;
 	String username;
 	String body;
+	int id;
+	String updateLink;
 	
 	Update(String text) {
 		updateText = text;

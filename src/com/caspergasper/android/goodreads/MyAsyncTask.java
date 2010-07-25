@@ -27,9 +27,14 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    if(responseCode == 404 && myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN) {
 	    	myApp.errMessage = "Sorry, can't find this book on goodreads -- is it a valid book barcode?";
 	    	return 1;
-	    }else if(responseCode != 200) {
-	    	myApp.errMessage = "I/O ERROR!  Cannot download " + response.getStatusLine() + 
+	    } else if(responseCode == 401 || responseCode == 403) {
+	    	// Authorization failed.
+	    	myApp.errMessage = "Authentication Error!  Cannot download " + response.getStatusLine() + 
 	    		" " + response.getStatusLine().getStatusCode();
+	    	return 2;
+	    } else if(responseCode != 200) {
+	    	myApp.errMessage = "I/O ERROR!  Cannot download " + response.getStatusLine() + 
+    		" " + response.getStatusLine().getStatusCode();
 	    	return 1;
 	    }
 	    InputStream is = response.getEntity().getContent();
@@ -73,7 +78,8 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    super.onPostExecute(result);   
 	    myApp.threadLock = false;
 	    if(myApp.oauth.goodreads_url == OAuthInterface.GET_FRIEND_UPDATES || 
-	    		myApp.oauth.goodreads_url == OAuthInterface.GET_SHELVES){ 
+	    		myApp.oauth.goodreads_url == OAuthInterface.GET_SHELVES || 
+	    		myApp.oauth.goodreads_url == OAuthInterface.GET_USER_ID){ 
 	    	UpdatesActivity updatesActivity = (UpdatesActivity) myApp.goodreads_activity;
 	    	updatesActivity.updateMainScreenForUser(result);
 	    } else {
