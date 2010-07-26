@@ -3,4 +3,6 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
 <item android:titleCondensed="@string/updates" android:title="@string/updates" 
 android:id="@+id/updates" android:icon="@android:drawable/ic_menu_info_details"></item>
+<item android:titleCondensed="@string/update_status" android:title="@string/update_status" 
+android:id="@+id/update_status" android:icon="@android:drawable/ic_menu_edit"></item>
 </menu>

@@ -52,6 +52,7 @@ public class OAuthInterface {
 	public static final int GET_SHELVES = 4;
 	public static final int GET_BOOKS_BY_ISBN = 5;
 	public static final int SEARCH_SHELVES = 6;
+	public static final int GET_SHELF_FOR_UPDATE = 7;
 	
 	int goodreads_url;
 	private OAuthConsumer consumer;
@@ -136,6 +137,7 @@ public class OAuthInterface {
     		url_string = URL_ADDRESS + USER_INFO_URL_PATH + myApp.userID + ".xml?key=" + DeveloperKeys.CONSUMER_KEY;
     		break;
     	case GET_SHELF:
+    	case GET_SHELF_FOR_UPDATE:
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
     		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
     		"&shelf=" + myApp.userData.shelfToGet + "&page=" + xmlPage; 

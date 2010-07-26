@@ -6,13 +6,9 @@ import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +38,8 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 	private ListView updatesListView;
 	private static final String M_USER = "m/user/";
 	private static final String REVIEWS = "/reviews";
+	private Dialog updateDialog = null;
+	private static final String CURRENTLY_READING = "currently-reading";
 	
 	@Override
 	public void onResume() {
@@ -144,14 +143,14 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 				return true;
 		}
-		else if(item.getItemId() == R.id.scanbook) {
-			IntentIntegrator.initiateScan(UpdatesActivity.this,IntentIntegrator.DEFAULT_TITLE,IntentIntegrator.DEFAULT_MESSAGE,IntentIntegrator.DEFAULT_YES,IntentIntegrator.DEFAULT_NO,IntentIntegrator.PRODUCT_CODE_TYPES);
+		else if(item.getItemId() == R.id.update_status) {
+			showUpdateDialog();
+			myApp.userData.shelfToGet = CURRENTLY_READING;
+			xmlPage = 1;
+			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF_FOR_UPDATE);
 			return true;
 		}
- 		else if(item.getItemId() == R.id.search) {
-			showSearchDialog();
-			return true;
-		}
+ 		
 			return false;	
 	}
 	
@@ -176,39 +175,39 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 		textView.setVisibility(View.VISIBLE);
 	}
 	
-	void showSearchDialog() {
-		final Dialog d = new Dialog(UpdatesActivity.this);
-		Window window = d.getWindow();
+	void showUpdateDialog() {
+		updateDialog = new Dialog(UpdatesActivity.this);
+		Window window = updateDialog.getWindow();
 		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
 				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
 		
-		d.setContentView(R.layout.booksearch_dialog);
-		d.setTitle(R.string.searchTitle);
-		final Button b = (Button) d.findViewById(R.id.searchbutton);
+		updateDialog.setContentView(R.layout.updatestatus_dialog);
+		updateDialog.setTitle(R.string.update_status);
+		final Button b = (Button) updateDialog.findViewById(R.id.updatebutton);
 		b.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				// do nothing
-				final EditText et = (EditText) d.findViewById(R.id.searchbox);
+				final EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
 				String text = et.getText().toString().trim(); 
 				if(text == null || text.length() < 1) {
 					return;
 				}
-				RadioGroup radioGroup = (RadioGroup) d.findViewById(R.id.RadioGroup);
-				if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchSite) {
-				myApp.gotoWebURL(OAuthInterface.URL_ADDRESS +
-						OAuthInterface.BOOKPAGE_SEARCH + Uri.encode(text), myApp.goodreads_activity);
-				} else if(radioGroup.getCheckedRadioButtonId() == R.id.RadioButtonSearchShelves) {
-					myApp.oauth.searchQuery = Uri.encode(text);
-					myApp.userData.shelfToGet = d.getContext().getString(R.string.searchResults); 
-					newQuery();
-					showUpdateMessage(R.string.getSearch);
-					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.SEARCH_SHELVES);
-				}
-				d.hide();
+				updateDialog.hide();
 			}
 		});
-		d.show();
+		updateDialog.show();
 	
+	}
+	
+	private void updateDialogRadioGroup() {
+		RadioGroup group = (RadioGroup) updateDialog.findViewById(R.id.RadioGroup);
+		for(Book b : myApp.userData.tempBooks){
+			Log.d(TAG, "adding book " + b.title);
+			RadioButton button = new RadioButton(this);
+			button.setText(b.title);
+			group.addView(button);
+		}
+		myApp.userData.tempBooks.clear();
 	}
 	
 	private void newQuery() {
@@ -263,6 +262,9 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
     			Log.d(TAG, "Getting extra shelf for some user that reads too much...");
     			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
     		}
+    	break;
+    	case OAuthInterface.GET_SHELF_FOR_UPDATE:
+    		updateDialogRadioGroup();
     	break;
     	}
     }

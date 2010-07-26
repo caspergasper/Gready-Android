@@ -12,6 +12,8 @@
     <string name="build_menu">Building the menu...</string>
     <string name="internet_access">Internet Access</string>
     <string name="updates">Updates</string>
+    <string name="update_status">Update status</string>
+    <string name="general_update_status">General update</string>
     <string name="about_text"> \
     This app is pretty buggy right now :-)\
       Hopefully in the future it will allow you to see your book list, and add reviews.\

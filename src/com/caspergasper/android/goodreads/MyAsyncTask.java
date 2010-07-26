@@ -57,6 +57,7 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    case OAuthInterface.SEARCH_SHELVES:
 	    case OAuthInterface.GET_BOOKS_BY_ISBN:
 	    case OAuthInterface.GET_SHELF:
+	    case OAuthInterface.GET_SHELF_FOR_UPDATE:
 	    	myApp.userData.getSAXBooks(is, myApp.oauth.goodreads_url);
 	    	break;
 	    } 
@@ -79,7 +80,8 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    myApp.threadLock = false;
 	    if(myApp.oauth.goodreads_url == OAuthInterface.GET_FRIEND_UPDATES || 
 	    		myApp.oauth.goodreads_url == OAuthInterface.GET_SHELVES || 
-	    		myApp.oauth.goodreads_url == OAuthInterface.GET_USER_ID){ 
+	    		myApp.oauth.goodreads_url == OAuthInterface.GET_USER_ID  ||
+	    		myApp.oauth.goodreads_url == OAuthInterface.GET_SHELF_FOR_UPDATE){ 
 	    	UpdatesActivity updatesActivity = (UpdatesActivity) myApp.goodreads_activity;
 	    	updatesActivity.updateMainScreenForUser(result);
 	    } else {

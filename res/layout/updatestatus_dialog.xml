@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_root"
+              android:orientation="vertical"
+              android:layout_width="300dp"
+              android:layout_height="fill_parent"
+              android:padding="8dp"
+              android:background="#ffffff"
+              android:textColor="#000000"
+              >
+    <EditText android:id="@+id/statusbox"
+              android:layout_width="fill_parent"
+              android:layout_height="80dp"
+              android:inputType="textMultiLine"
+              android:singleLine="false"
+              />
+    <Button android:id="@+id/updatebutton"
+  android:text="@string/update_status"
+  android:layout_width="wrap_content" android:layout_height="wrap_content"
+  android:layout_gravity="center_horizontal" 
+  
+  	/>
+   <ScrollView android:id="@+id/ScrollView"
+   android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              >
+  <RadioGroup android:id="@+id/RadioGroup" 
+android:layout_width="fill_parent" android:layout_height="fill_parent"
+android:checkedButton="@+id/RadioButtonGeneralUpdate"  
+ >
+<RadioButton android:text="@string/general_update_status" android:id="@+id/RadioButtonGeneralUpdate" 
+android:layout_width="fill_parent" android:layout_height="fill_parent" 
+   android:textColor="#000000"></RadioButton>
+  </RadioGroup>
+  </ScrollView>  	
+</LinearLayout>

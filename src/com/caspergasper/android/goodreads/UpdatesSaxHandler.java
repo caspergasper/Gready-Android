@@ -49,8 +49,6 @@ class UpdatesSaxHandler extends DefaultHandler {
         }  else if(localName.equalsIgnoreCase(ID)) {
         	userdata.tempUpdates.get(pos).id = Integer.parseInt(builder.toString().trim());
         }  else if(localName.equalsIgnoreCase(LINK)) {
-        	Log.d(TAG, "tag: " + localName);
-        	Log.d(TAG, "value: " + builder.toString().trim());
         	if(inReview) {
         		String url = builder.toString().trim();
         		userdata.tempUpdates.get(pos).updateLink = url.substring(url.lastIndexOf('/'));
