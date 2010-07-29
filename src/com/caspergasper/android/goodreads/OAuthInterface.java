@@ -37,6 +37,7 @@ public class OAuthInterface {
 	static final String UPDATES_URL_PATH = "updates/friends.xml";
 	static final String	BOOKS_ISBN_PATH = "book/isbn";
 	static final String ADD_BOOK_PATH = "shelf/add_to_shelf.xml";
+	static final String ADD_UPDATE_PATH = "user_status.xml";
 	static final String CALLBACK_URL = "goodreadsactivity://token";
 	static final String OAUTH_VERIFIER = "oauth_token";
 	
@@ -61,6 +62,8 @@ public class OAuthInterface {
 	String searchQuery;
 	private int bookId;
 	private String shelf;
+	private int page;
+	private String body;
 	
 	OAuthInterface() {
 		// create a consumer object and configure it with the access
@@ -186,8 +189,16 @@ public class OAuthInterface {
 		 // Fire off a thread to do some work that we shouldn't do directly in the UI thread
         bookId = _bookId;
         shelf = _shelf;
-		// Create dialog box
         Thread t = new Thread(null, doPostBook, "addBook");
+        t.start();
+	}
+	
+	void postUpdateToStatus(int _bookId, int _page, String _body) {
+		//book_id, page, body
+		bookId = _bookId;
+		page = _page;
+		body = _body;
+		Thread t = new Thread(null, doPostUpdate, "addUpdate");
         t.start();
 	}
 	
@@ -197,28 +208,65 @@ public class OAuthInterface {
 	    	}
 	    };
 	    
+	    
+	 private Runnable doPostUpdate = new Runnable() {
+	    	public void run() {
+	    		postUpdate();
+	    	}
+	    };
+	    
 	 // Create runnable for posting
-	    private final Runnable doPostBookUpdateGUI = new Runnable() {
+	 private final Runnable doPostBookUpdateGUI = new Runnable() {
 	        public void run() {
 	            postBookUpdateResults();
 	        }
 	    };
 	    
+	    private final Runnable doPostUpdateStatusGUI = new Runnable() {
+	        public void run() {
+	            postUpdateStatusResults();
+	        }
+	    };
+	    
+	    private void postUpdate() {     	
+        	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();
+        	if(bookId != 0) {
+        		out.add(new BasicNameValuePair("user_status[book_id]", Integer.toString(bookId)));
+        		if(page != 0) {
+        			out.add(new BasicNameValuePair("user_status[page]", Integer.toString(page)));
+        		}
+        	}
+        	if(body.length() > 0) {
+        		out.add(new BasicNameValuePair("user_status[body]", body));
+        	}
+        	postUpdateOrBook(out, OAuthInterface.ADD_UPDATE_PATH);
+	    }
+	    
 	    private void postBook() {
+	    	Log.d(TAG, "Adding book id " + bookId + " to " + shelf);     	
+        	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();
+        	out.add(new BasicNameValuePair("book_id", Integer.toString(bookId)));
+        	out.add(new BasicNameValuePair("name", shelf));
+        	postUpdateOrBook(out, OAuthInterface.ADD_BOOK_PATH);
+	    }
+	    
+	    private void postUpdateOrBook(LinkedList<BasicNameValuePair> postData, String URL) {
 	        try {
 	        	HttpClient httpClient = new DefaultHttpClient();
-	        	HttpPost post = new HttpPost(OAuthInterface.URL_ADDRESS + OAuthInterface.ADD_BOOK_PATH);
-	        	Log.d(TAG, "Adding book id " + bookId + " to " + shelf);     	
-	        	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();
-	        	out.add(new BasicNameValuePair("book_id", Integer.toString(bookId)));
-	        	out.add(new BasicNameValuePair("name", shelf));
-	        	post.setEntity(new UrlEncodedFormEntity(out, HTTP.UTF_8));
+	        	HttpPost post = new HttpPost(OAuthInterface.URL_ADDRESS + URL);
+	        	post.setEntity(new UrlEncodedFormEntity(postData, HTTP.UTF_8));
 	    		consumer.sign(post);  		
 	    		HttpResponse response = httpClient.execute(post); 
 	    		Log.d(TAG, response.getStatusLine().toString());
-	    		if(response.getStatusLine().getStatusCode() == 201){
-	    			BooksActivity activity = (BooksActivity) myApp.goodreads_activity; 
-	    			activity.mHandler.post(doPostBookUpdateGUI);
+	    		int responseCode = response.getStatusLine().getStatusCode();
+	    		if(responseCode == 201 || responseCode == 200){
+	    			if(URL == OAuthInterface.ADD_BOOK_PATH) {
+	    				BooksActivity activity = (BooksActivity) myApp.goodreads_activity; 
+	    				activity.mHandler.post(doPostBookUpdateGUI);
+	    			} else if(URL == OAuthInterface.ADD_UPDATE_PATH) {
+	    				UpdatesActivity activity = (UpdatesActivity) myApp.goodreads_activity; 
+	    				activity.mHandler.post(doPostUpdateStatusGUI);
+	    			}
 	    		} else {
 	    			myApp.errMessage = response.getStatusLine().toString();
 	    			throw new RuntimeException(response.getStatusLine().toString());
@@ -238,5 +286,10 @@ public class OAuthInterface {
 	    	BooksActivity activity = (BooksActivity) myApp.goodreads_activity;
 	    	activity.toastMe(R.string.bookAddedToShelf);
 	    	myApp.userData.books.get(0).shelves.add("to-read");
+	    }
+	    
+	    private void postUpdateStatusResults() {
+	    	UpdatesActivity activity = (UpdatesActivity) myApp.goodreads_activity;
+	    	activity.toastMe(R.string.statusUpdated);
 	    }
 }

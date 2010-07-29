@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/layout_root"
-              android:orientation="vertical"
-              android:layout_width="300dp"
+              android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:padding="8dp"
               android:background="#ffffff"
@@ -14,23 +13,45 @@
               android:inputType="textMultiLine"
               android:singleLine="false"
               />
-    <Button android:id="@+id/updatebutton"
+     <TextView android:id="@+id/page_num_label"
+     			android:layout_width="wrap_content"
+     			android:layout_height="wrap_content"
+     			android:text="@string/page_num_label"
+     			android:layout_below="@id/statusbox"
+     			android:visibility="invisible"
+     			android:textColor="#FF000000"
+     			android:gravity="center_vertical"
+     			/>
+  	<EditText android:id="@+id/pagestatusbox"
+              android:layout_width="55dp"
+              android:layout_height="wrap_content"
+              android:inputType="number"
+              android:singleLine="true"
+              android:layout_below="@id/statusbox"
+              android:layout_toRightOf="@id/page_num_label"
+              android:visibility="invisible"
+              />
+              
+      <Button android:id="@+id/updatebutton"
   android:text="@string/update_status"
   android:layout_width="wrap_content" android:layout_height="wrap_content"
-  android:layout_gravity="center_horizontal" 
-  
+  android:layout_below="@id/statusbox" 
+  android:layout_toRightOf="@id/pagestatusbox"
   	/>
    <ScrollView android:id="@+id/ScrollView"
    android:layout_width="fill_parent"
               android:layout_height="wrap_content"
+              android:layout_below="@id/updatebutton"
               >
   <RadioGroup android:id="@+id/RadioGroup" 
 android:layout_width="fill_parent" android:layout_height="fill_parent"
-android:checkedButton="@+id/RadioButtonGeneralUpdate"  
- >
+android:checkedButton="@+id/RadioButtonGeneralUpdate"  android:paddingTop="5dp" android:paddingBottom="5dp">
 <RadioButton android:text="@string/general_update_status" android:id="@+id/RadioButtonGeneralUpdate" 
 android:layout_width="fill_parent" android:layout_height="fill_parent" 
    android:textColor="#000000"></RadioButton>
+   <View    android:layout_width="fill_parent"
+         android:layout_height="1dip"
+         android:background="#80909090" />
   </RadioGroup>
   </ScrollView>  	
-</LinearLayout>
+</RelativeLayout>

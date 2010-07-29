@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +28,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 
 
 public class UpdatesActivity extends Activity implements OnItemLongClickListener {
@@ -40,6 +42,8 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 	private static final String REVIEWS = "/reviews";
 	private Dialog updateDialog = null;
 	private static final String CURRENTLY_READING = "currently-reading";
+	// Need handler for callbacks to the UI thread
+    final Handler mHandler = new Handler();
 	
 	@Override
 	public void onResume() {
@@ -180,32 +184,62 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 		Window window = updateDialog.getWindow();
 		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
 				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		
+		updateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		updateDialog.setContentView(R.layout.updatestatus_dialog);
 		updateDialog.setTitle(R.string.update_status);
 		final Button b = (Button) updateDialog.findViewById(R.id.updatebutton);
+		final RadioGroup group = (RadioGroup) updateDialog.findViewById(R.id.RadioGroup);
+		
 		b.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
-				// do nothing
-				final EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
+				int pageNum = 0;
+				int bookId = 0;
+				EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
 				String text = et.getText().toString().trim(); 
-				if(text == null || text.length() < 1) {
-					return;
+				et = (EditText) updateDialog.findViewById(R.id.pagestatusbox);
+				if(et.getText().toString().length() > 0) {
+					pageNum = Integer.parseInt(et.getText().toString());
+				}
+				
+				if(pageNum != 0 || text.length() > 0) {
+					int checkedId = group.getCheckedRadioButtonId();
+					if(checkedId != R.id.RadioButtonGeneralUpdate) {
+						bookId = checkedId;
+					}
+					myApp.oauth.postUpdateToStatus(bookId, pageNum, text);
 				}
 				updateDialog.hide();
 			}
 		});
+		
+		group.setOnCheckedChangeListener(new OnCheckedChangeListener() {	
+			@Override
+			public void onCheckedChanged(RadioGroup arg0, int arg1) {
+				Log.d(TAG, Integer.toString(arg1));
+				if(arg1 == R.id.RadioButtonGeneralUpdate) {
+					updateDialog.findViewById(R.id.page_num_label).setVisibility(View.INVISIBLE);
+					updateDialog.findViewById(R.id.pagestatusbox).setVisibility(View.INVISIBLE);
+				} else {
+					updateDialog.findViewById(R.id.page_num_label).setVisibility(View.VISIBLE);
+					updateDialog.findViewById(R.id.pagestatusbox).setVisibility(View.VISIBLE);
+				}
+			}
+		});
 		updateDialog.show();
-	
 	}
 	
 	private void updateDialogRadioGroup() {
+		// Callback from getting the currently-reading shelf.
+		// book ids are stored as the radiobutton ids.
 		RadioGroup group = (RadioGroup) updateDialog.findViewById(R.id.RadioGroup);
+		
 		for(Book b : myApp.userData.tempBooks){
-			Log.d(TAG, "adding book " + b.title);
 			RadioButton button = new RadioButton(this);
+			button.setId(b.id);
+//			Log.d(TAG, "buttonid:" + String.valueOf(button.getId()));
+//			Log.d(TAG, "bookid:" + String.valueOf(b.id));
 			button.setText(b.title);
-			group.addView(button);
+			group.addView(button);	
 		}
 		myApp.userData.tempBooks.clear();
 	}

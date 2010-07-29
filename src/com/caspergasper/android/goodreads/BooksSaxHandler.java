@@ -1,9 +1,12 @@
 package com.caspergasper.android.goodreads;
 
 import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import android.util.Log;
 
 class BooksSaxHandler extends DefaultHandler {
     private StringBuilder builder;
@@ -19,9 +22,13 @@ class BooksSaxHandler extends DefaultHandler {
     private final static String SMALL_IMAGE_URL = "small_image_url";
     private final static String AUTHORS = "authors";
     private final static String SHELF = "shelf";
+    private final static String ID = "id";
+    private final static String TYPE = "type";
+    private final static String INTEGER = "integer";
     
     private UserData userdata;
     private boolean inAuthors = false;
+    private boolean inId = false;
     private static final int url_length = BooksActivity.GOODREADS_IMG_URL.length(); 
     private int pos;
     
@@ -42,8 +49,11 @@ class BooksSaxHandler extends DefaultHandler {
             throws SAXException {
     	super.endElement(uri, localName, name);	
         pos = userdata.tempBooks.size() - 1;
-    	if(localName.equalsIgnoreCase(TITLE)) {
-        	userdata.tempBooks.add(new Book(builder.toString().trim()));
+        if(inId && localName.equalsIgnoreCase(ID)) {
+        	userdata.tempBooks.add(new Book(Integer.parseInt(builder.toString().trim())));
+        	inId = false;
+        } else if(localName.equalsIgnoreCase(TITLE)) {
+        	userdata.tempBooks.get(pos).title = builder.toString().trim();
         } else if(localName.equalsIgnoreCase(DESCRIPTION)) {
     		userdata.tempBooks.get(pos).description 
     		= builder.toString().trim().replaceAll("&lt;/?div&gt;", "");
@@ -87,6 +97,11 @@ class BooksSaxHandler extends DefaultHandler {
         	inAuthors = true;
         } else if(localName.equalsIgnoreCase(SHELF)){
         	userdata.tempBooks.get(pos).shelves.add(attributes.getValue(NAME));
+        } else if(localName.equalsIgnoreCase(ID)){
+        	String attribute = attributes.getValue(TYPE);
+        	if(attribute != null && attribute.equalsIgnoreCase(INTEGER)) {
+        		inId = true;
+        	}
         }
     }
 
