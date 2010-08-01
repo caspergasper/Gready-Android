@@ -29,6 +29,7 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    	return 1;
 	    } else if(responseCode == 401 || responseCode == 403) {
 	    	// Authorization failed.
+	    	Log.d(TAG, response.getStatusLine().toString());
 	    	myApp.errMessage = "Authentication Error!  Cannot download " + response.getStatusLine() + 
 	    		" " + response.getStatusLine().getStatusCode();
 	    	return 2;

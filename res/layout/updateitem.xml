@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<TextView-->
-<!--  xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--  android:layout_height="fill_parent" android:focusable="true" -->
-<!--  android:focusableInTouchMode="true" android:linksClickable="true" -->
-<!--  android:layout_width="fill_parent" android:minLines="2" android:paddingLeft="8px" -->
-<!--  android:paddingRight="4px" android:maxLines="8" style="@style/goodreads" -->
-<!--  android:ellipsize="end" android:bufferType="spannable">-->
-<!--</TextView>-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_updates"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="2dp"
+              android:background="#ffffff"
+              android:textColor="#000000"
+              >
+  <ImageView android:id="@+id/bookListViewImage"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="4dp"
+               android:src="@drawable/icon"
+               />
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_height="fill_parent" android:layout_width="fill_parent"
+android:layout_height="wrap_content" android:layout_width="fill_parent"
 android:id="@+id/updates_textview" android:padding="3dp">
 </TextView>
+</LinearLayout>

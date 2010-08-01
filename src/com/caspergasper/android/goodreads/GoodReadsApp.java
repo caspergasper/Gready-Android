@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.os.Handler;
 
 public class GoodReadsApp extends Application {
 	

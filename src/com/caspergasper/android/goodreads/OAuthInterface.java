@@ -152,7 +152,7 @@ public class OAuthInterface {
     	case SEARCH_SHELVES:
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
     		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
-    		"&page=" + xmlPage + "&search[query]=" + searchQuery;
+    		"&page=" + xmlPage + "&shelf=all" + "&search[query]=" + searchQuery;
     		break;
     	case GET_USER_ID:
     		url_string = URL_ADDRESS + GET_USER_ID_PATH;
@@ -239,6 +239,7 @@ public class OAuthInterface {
         	if(body.length() > 0) {
         		out.add(new BasicNameValuePair("user_status[body]", body));
         	}
+        	
         	postUpdateOrBook(out, OAuthInterface.ADD_UPDATE_PATH);
 	    }
 	    
@@ -252,6 +253,9 @@ public class OAuthInterface {
 	    
 	    private void postUpdateOrBook(LinkedList<BasicNameValuePair> postData, String URL) {
 	        try {
+//	        	Log.d(TAG, "bookid=" + Integer.toString(bookId));
+//	        	Log.d(TAG, "pagenum=" + Integer.toString(page));
+//	        	Log.d(TAG, "body=" + body);
 	        	HttpClient httpClient = new DefaultHttpClient();
 	        	HttpPost post = new HttpPost(OAuthInterface.URL_ADDRESS + URL);
 	        	post.setEntity(new UrlEncodedFormEntity(postData, HTTP.UTF_8));

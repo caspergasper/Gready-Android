@@ -3,12 +3,14 @@ package com.caspergasper.android.goodreads;
 
 import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 
+import java.net.URL;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -44,6 +46,7 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 	private static final String CURRENTLY_READING = "currently-reading";
 	// Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
+    UpdateAdapter updateAdapter;
 	
 	@Override
 	public void onResume() {
@@ -282,6 +285,8 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 			if(myApp.userData.shelves.size() == 0) {
 				xmlPage = 1;
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);
+			} else {
+				getImages();
 			}
 			ud.books.clear();
 		break;
@@ -295,6 +300,8 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
     		if(ud.endShelf < ud.totalShelves) {
     			Log.d(TAG, "Getting extra shelf for some user that reads too much...");
     			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
+    		} else {
+    			getImages();
     		}
     	break;
     	case OAuthInterface.GET_SHELF_FOR_UPDATE:
@@ -314,5 +321,71 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 		}
 		myApp.userData.tempUpdates.clear();	
 	}
+	
+	
+    private void getImages() {
+        // Fire off a thread to do some work that we shouldn't do directly in the UI thread
+        Thread t = new Thread(null, doBackgroundThreadProcessing, "Background");
+        myApp.getImageThreadRunning = true;
+        t.start();
+    }
+    
+	// Create runnable for posting
+    private final Runnable doUpdateGUI = new Runnable() {
+        public void run() {
+            updateResultsInUi();
+        }
+    };
+
+    
+    private Runnable doBackgroundThreadProcessing = new Runnable() {
+    	public void run() {
+    		backgroundThreadProcessing();
+    	}
+    };
+    
+    private void backgroundThreadProcessing() {
+    	updateAdapter = (UpdateAdapter) updatesListView.getAdapter();
+    	Update u;
+    	int size = myApp.userData.updates.size();
+    	for(int i = 0; i < size; i++) {
+    		if(!myApp.getImageThreadRunning) {
+    			Log.d(TAG, "stopping getImage thread.");
+    			break;
+    		}
+			u = updateAdapter.getItem(i);
+			try {
+				if(u.imgUrl == null) {
+					continue;
+				}
+				if(u.bitmap == null) {
+					URL newurl = new URL(BooksActivity.GOODREADS_IMG_URL + u.imgUrl); 
+					Log.d(TAG, "Getting " + BooksActivity.GOODREADS_IMG_URL + u.imgUrl);
+					u.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+					// Add this image to any further updates by same user
+					Update temp;
+					for(int j = i+1; j < size; j++) {
+						temp = updateAdapter.getItem(j);
+						if(temp.id == u.id) {
+							temp.bitmap = u.bitmap;
+						}
+					}
+					
+				}
+				u.imgUrl = null;
+				mHandler.post(doUpdateGUI);
+			} catch (Exception e) {
+				myApp.errMessage = e.toString() + " " + e.getStackTrace().toString();
+				myApp.showErrorDialog(this);
+			}
+		} // for
+    		
+    }
+    
+    private void updateResultsInUi() {
+        // Back in the UI thread -- update UI elements
+    	updateAdapter.notifyDataSetChanged();
+    }
+
 	
 }

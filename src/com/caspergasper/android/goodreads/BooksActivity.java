@@ -59,9 +59,9 @@ OnScrollListener {
 	private ShelfAdapter shelfAdapter;
 	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
 	private boolean booksRemovedFromFront = false;
-	
 	// Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
+	
 
 	public void onResume() {
 		myApp.goodreads_activity = this;

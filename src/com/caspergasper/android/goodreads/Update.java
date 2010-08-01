@@ -1,11 +1,15 @@
 package com.caspergasper.android.goodreads;
 
+import android.graphics.Bitmap;
+
 public class Update {
 	String updateText;
 	String username;
 	String body;
 	int id;
 	String updateLink;
+	Bitmap bitmap;
+	String imgUrl;
 	
 	Update(String text) {
 		updateText = text;

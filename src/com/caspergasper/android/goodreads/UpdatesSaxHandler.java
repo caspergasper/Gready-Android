@@ -19,10 +19,13 @@ class UpdatesSaxHandler extends DefaultHandler {
     private final static String TYPE = "type";
     private final static String REVIEW = "review";
     private final static String COMMENT = "comment";
+    private final static String IMAGE_URL = "image_url";
     
+    private static final int url_length = BooksActivity.GOODREADS_IMG_URL.length(); 
     private UserData userdata;
     private boolean inReview = false;
-     
+    private boolean inName = false;
+    
     UpdatesSaxHandler(UserData ud) {
     	userdata = ud;
     	builder = new StringBuilder();
@@ -39,11 +42,14 @@ class UpdatesSaxHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String name)
             throws SAXException {
     	super.endElement(uri, localName, name);
+//    	Log.d(TAG, "tag: " + localName);
+//    	Log.d(TAG, "value: " + builder.toString().trim());
     	int pos = userdata.tempUpdates.size() - 1;
         if(localName.equalsIgnoreCase(ACTION_TEXT)) {
         	userdata.tempUpdates.add(new Update(builder.toString().trim().replaceAll("</?a[^>]+>", "")));
         } else if(localName.equalsIgnoreCase(NAME)) {
         	userdata.tempUpdates.get(pos).username = builder.toString().trim();
+        	inName = true;
         }  else if(localName.equalsIgnoreCase(BODY)) {
         	userdata.tempUpdates.get(pos).body = builder.toString().trim();        	
         }  else if(localName.equalsIgnoreCase(ID)) {
@@ -54,9 +60,16 @@ class UpdatesSaxHandler extends DefaultHandler {
         		userdata.tempUpdates.get(pos).updateLink = url.substring(url.lastIndexOf('/'));
         		inReview = false;
         	}
+        }  else if(localName.equalsIgnoreCase(IMAGE_URL)) {
+        	if(inName) {
+        		String url = builder.toString().trim();
+        		if(url.substring(0, url_length).compareTo(BooksActivity.GOODREADS_IMG_URL) == 0) {
+        			userdata.tempUpdates.get(pos).imgUrl = url.substring(url_length);
+        		}
+        		inName = false;
+        	}
         } else {
-//            	Log.d(TAG, "tag: " + localName);
-//            	Log.d(TAG, "value: " + builder.toString().trim());
+
         }
         builder.setLength(0);
     }

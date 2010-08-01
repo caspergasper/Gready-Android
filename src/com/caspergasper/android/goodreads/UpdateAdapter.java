@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -37,6 +38,14 @@ public class UpdateAdapter extends ArrayAdapter<Update> {
         
         TextView tv = (TextView)todoView.findViewById(R.id.updates_textview);
         tv.setText(Html.fromHtml(item.toString()));
+        ImageView iv = (ImageView)todoView.findViewById(R.id.bookListViewImage);
+        if(item.bitmap != null) {
+        	iv.setImageBitmap(item.bitmap);
+//        	Log.d(TAG, "Setting item " + position + " to image.");
+        } else {
+        	iv.setImageResource(R.drawable.icon);
+//        	Log.d(TAG, "NOT Setting item " + position + " to image.");
+        }
         return todoView;
     }
 }
