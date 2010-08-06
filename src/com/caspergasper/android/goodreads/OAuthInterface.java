@@ -150,9 +150,12 @@ public class OAuthInterface {
     		"&page=" + xmlPage;
     		break;
     	case SEARCH_SHELVES:
-    		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
-    		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
-    		"&page=" + xmlPage + "&shelf=all" + "&search[query]=" + searchQuery;
+//    		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
+//    		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
+//    		"&page=" + xmlPage + "&format=xml" + "&search[query]=" + searchQuery;
+    		url_string = URL_ADDRESS + "review/list" + "&format=xml" + 
+    		"&v=2" + "&search[query]=" + searchQuery;
+    		
     		break;
     	case GET_USER_ID:
     		url_string = URL_ADDRESS + GET_USER_ID_PATH;

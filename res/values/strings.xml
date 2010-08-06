@@ -41,4 +41,7 @@
 <string name="bookAddedToShelf">Added book to shelf.</string>
 <string name="page_num_label">page</string>
 <string name="statusUpdated">Status updated.</string>
+<string name="read">read</string>
+<string name="to_read">to-read</string>
+<string name="currently_reading">currently-reading</string>
 </resources>

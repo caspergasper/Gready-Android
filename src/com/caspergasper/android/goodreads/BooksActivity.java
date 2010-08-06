@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,10 +38,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 
 
-public class BooksActivity extends Activity implements OnItemLongClickListener, OnItemClickListener,
+public class BooksActivity extends Activity implements OnItemClickListener,
 OnScrollListener {
 	
 	private GoodReadsApp myApp;
@@ -101,6 +101,7 @@ OnScrollListener {
 	        myApp = GoodReadsApp.getInstance();
 	        updatesListView = (ListView) findViewById(R.id.updates_listview);
 	        newQuery();  // For when activity has been cleared from memory but app hasn't
+	        
     	} catch(Exception e) {
 			myApp.errMessage = "GoodreadsActivity onCreate " + e.toString();
 			myApp.showErrorDialog(this);
@@ -116,6 +117,7 @@ OnScrollListener {
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.startmenu, menu);
 //        MenuItem item = menu.findItem(R.id.identifyuser);
@@ -245,7 +247,8 @@ OnScrollListener {
 				ShelfAdapter(this, R.layout.booklistitem, ud.books);
 				updatesListView.setAdapter(shelfAdapter);
 				updatesListView.setOnItemClickListener(this);
-				updatesListView.setOnItemLongClickListener(this);
+//				updatesListView.setOnItemLongClickListener(this);
+				registerForContextMenu(updatesListView);
 				updatesListView.setOnScrollListener(this);
 			} else {
 				shelfAdapter = (ShelfAdapter) updatesListView.getAdapter();
@@ -264,6 +267,39 @@ OnScrollListener {
 			getImages();
 		break;
     	}
+    }
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+    		ContextMenu.ContextMenuInfo menuInfo) {
+    	super.onCreateContextMenu(menu, v, menuInfo);
+    	
+    	menu.setHeaderTitle("What do you want to do?");
+    	menu.add(0, Menu.FIRST, Menu.NONE, "See mobile site");
+    	SubMenu sub = menu.addSubMenu("Change shelves");
+    	List<Shelf> tempShelves = myApp.userData.shelves;
+    	// Copied text
+    	int shelf_length = tempShelves.size();
+       	
+    	for(int i=0; i<shelf_length && tempShelves.get(i) != null; i++) {
+    		if(tempShelves.get(i).exclusive) {
+    			sub.add(SUBMENU_GROUPID + 1, i, Menu.NONE,
+        				tempShelves.get(i).title);
+    		} else {
+    			sub.add(SUBMENU_GROUPID, i, Menu.NONE,
+    				tempShelves.get(i).title).setCheckable(true);
+    		}				
+    		
+    	}
+    	sub.setGroupCheckable(SUBMENU_GROUPID + 1, true, true);
+    	
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	super.onContextItemSelected(item);
+    	
+    	return false;
     }
     
 	void toastMe(int msgid) {
@@ -332,21 +368,21 @@ OnScrollListener {
 		gettingScrollData = false;
 	}
 	
-	@Override
-	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-		final Book b =  myApp.userData.books.get(_index);
-		if(b.bookLink != null) {
-			String path = OAuthInterface.URL_ADDRESS +
-				OAuthInterface.BOOKPAGE_PATH + b.bookLink;
-			Uri uri = Uri.parse(path);
-			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-			startActivity(intent);
-		} else {
-			toastMe(R.string.no_book_page);
-		}
-		return true;
-	}
-	
+//	@Override
+//	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
+//		final Book b =  myApp.userData.books.get(_index);
+//		if(b.bookLink != null) {
+//			String path = OAuthInterface.URL_ADDRESS +
+//				OAuthInterface.BOOKPAGE_PATH + b.bookLink;
+//			Uri uri = Uri.parse(path);
+//			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//			startActivity(intent);
+//		} else {
+//			toastMe(R.string.no_book_page);
+//		}
+//		return true;
+//	}
+		
 	private void addBookToShelf(final Book b) {
 		// Ask user if they want to add this to shelf
 		AlertDialog.Builder ad = new AlertDialog.Builder(BooksActivity.this);

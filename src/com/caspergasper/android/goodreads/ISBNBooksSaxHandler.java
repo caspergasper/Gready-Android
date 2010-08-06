@@ -22,7 +22,6 @@ class ISBNBooksSaxHandler extends DefaultHandler {
     private final static String SHELF = "shelf";
     private final static String ID = "id";
     
-    
     private UserData userdata;
     private boolean inAuthors = false;
     private boolean inReviews = false;
