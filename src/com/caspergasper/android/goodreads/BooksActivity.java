@@ -38,13 +38,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 
-public class BooksActivity extends Activity implements OnItemClickListener,
+public class BooksActivity extends Activity implements OnItemClickListener, OnItemLongClickListener, 
 OnScrollListener {
 	
 	private GoodReadsApp myApp;
 	private static final int SUBMENU_GROUPID = 1;
+	private static final int SUBMENU_GROUPID_RADIO = 2;
 	
 	// arbitrary limit, may need tweaking but should be 
 	// a multiple of OAuthInterface.ITEMS_TO_DOWNLOAD
@@ -59,6 +61,7 @@ OnScrollListener {
 	private ShelfAdapter shelfAdapter;
 	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
 	private boolean booksRemovedFromFront = false;
+	static Book currentBook;
 	// Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
 	
@@ -247,7 +250,7 @@ OnScrollListener {
 				ShelfAdapter(this, R.layout.booklistitem, ud.books);
 				updatesListView.setAdapter(shelfAdapter);
 				updatesListView.setOnItemClickListener(this);
-//				updatesListView.setOnItemLongClickListener(this);
+				updatesListView.setOnItemLongClickListener(this);
 				registerForContextMenu(updatesListView);
 				updatesListView.setOnScrollListener(this);
 			} else {
@@ -274,32 +277,52 @@ OnScrollListener {
     		ContextMenu.ContextMenuInfo menuInfo) {
     	super.onCreateContextMenu(menu, v, menuInfo);
     	
-    	menu.setHeaderTitle("What do you want to do?");
-    	menu.add(0, Menu.FIRST, Menu.NONE, "See mobile site");
-    	SubMenu sub = menu.addSubMenu("Change shelves");
+    	menu.setHeaderTitle(R.string.what_to_do);
+    	menu.add(0, Menu.FIRST, Menu.NONE, R.string.goto_mobilesite);
+    	SubMenu sub = menu.addSubMenu(R.string.change_shelves);
     	List<Shelf> tempShelves = myApp.userData.shelves;
     	// Copied text
     	int shelf_length = tempShelves.size();
-       	
-    	for(int i=0; i<shelf_length && tempShelves.get(i) != null; i++) {
-    		if(tempShelves.get(i).exclusive) {
-    			sub.add(SUBMENU_GROUPID + 1, i, Menu.NONE,
-        				tempShelves.get(i).title);
+       	Shelf shelf;
+    	for(int i=0; i<shelf_length; i++) {
+    		shelf = tempShelves.get(i);
+    
+    		if(shelf.exclusive) {
+    			sub.add(SUBMENU_GROUPID_RADIO, i, Menu.NONE,
+        				shelf.title);
     		} else {
     			sub.add(SUBMENU_GROUPID, i, Menu.NONE,
-    				tempShelves.get(i).title).setCheckable(true);
-    		}				
-    		
+    				shelf.title).setCheckable(true);
+    		}
+    		for(String shelfTitle : currentBook.shelves) {
+    			if(shelfTitle.compareTo(shelf.title) == 0) {
+    				sub.getItem(i).setChecked(true).setEnabled(false);
+    				break;
+    			}
+    		}
     	}
-    	sub.setGroupCheckable(SUBMENU_GROUPID + 1, true, true);
-    	
+    	sub.setGroupCheckable(SUBMENU_GROUPID_RADIO, true, true);
     }
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
     	super.onContextItemSelected(item);
-    	
-    	return false;
+    	int groupId = item.getGroupId(); 
+    	if(groupId == 0 && item.getItemId() == Menu.FIRST) {
+    		if(currentBook.bookLink != null) {
+    			String path = OAuthInterface.URL_ADDRESS +
+    			OAuthInterface.BOOKPAGE_PATH + currentBook.bookLink;
+    			Uri uri = Uri.parse(path);
+    			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+    			startActivity(intent);
+    		} else {
+    			toastMe(R.string.no_book_page);
+    		}
+    	} else if(groupId == SUBMENU_GROUPID || groupId == SUBMENU_GROUPID_RADIO) {
+    		Log.d(TAG, "add book to shelf " + item.getTitle().toString());
+    		myApp.oauth.postBookToShelf(currentBook.id, item.getTitle().toString());
+    	}
+    	return true;
     }
     
 	void toastMe(int msgid) {
@@ -368,20 +391,11 @@ OnScrollListener {
 		gettingScrollData = false;
 	}
 	
-//	@Override
-//	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-//		final Book b =  myApp.userData.books.get(_index);
-//		if(b.bookLink != null) {
-//			String path = OAuthInterface.URL_ADDRESS +
-//				OAuthInterface.BOOKPAGE_PATH + b.bookLink;
-//			Uri uri = Uri.parse(path);
-//			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-//			startActivity(intent);
-//		} else {
-//			toastMe(R.string.no_book_page);
-//		}
-//		return true;
-//	}
+	@Override
+	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
+		currentBook = myApp.userData.books.get(_index);
+		return false;
+	}
 		
 	private void addBookToShelf(final Book b) {
 		// Ask user if they want to add this to shelf
@@ -470,7 +484,7 @@ OnScrollListener {
 			xmlPage += PAGES_TO_MOVE_BY;
 		}
 		goingForward = true;
-		myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
+		myApp.oauth.getXMLFile(xmlPage, myApp.oauth.goodreads_url);
 	}
 
 	private void onFirstListItemDisplayed() {
@@ -490,7 +504,7 @@ OnScrollListener {
 		goingForward = false;
 		Log.d(TAG, "Getting page " + xmlPage + " booksToDelete " + booksToDelete);
 		showUpdateMessage(R.string.getBooks);
-		myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
+		myApp.oauth.getXMLFile(xmlPage, myApp.oauth.goodreads_url);
 	}
 	
 	@Override

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="bookshelves_label">bookshelves</string>
-    <string name="username_label">user:</string>
     <string name="updates_label">Updates</string>
     <string name="books_label">Books</string>
     <string name="reviews_label">reviews</string>
@@ -19,10 +18,7 @@
       Hopefully in the future it will allow you to see your book list, and add reviews.\
       (Casper).</string>
     <string name="user">User Settings</string>
-    <string name="hello">Hello World, GoodreadsActivity!</string>
     <string name="app_name">Goodreads</string>
-<string name="hi_user">hi</string>
-<string name="usersettings">User Settings</string>
 <string name="getting_authentication">Getting authentication, please wait...</string>
 <string name="auth_successful">Authentication successful.</string>
 <string name="getAuthorization">Authorization denied.\nWould you like to try authorizing your account again?</string>
@@ -44,4 +40,7 @@
 <string name="read">read</string>
 <string name="to_read">to-read</string>
 <string name="currently_reading">currently-reading</string>
+<string name="what_to_do">What do you want to do?</string>
+<string name="goto_mobilesite">Goto mobile site</string>
+<string name="change_shelves">Change Shelves</string>
 </resources>

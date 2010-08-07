@@ -292,7 +292,7 @@ public class OAuthInterface {
 	    private void postBookUpdateResults() {
 	    	BooksActivity activity = (BooksActivity) myApp.goodreads_activity;
 	    	activity.toastMe(R.string.bookAddedToShelf);
-	    	myApp.userData.books.get(0).shelves.add("to-read");
+	    	BooksActivity.currentBook.shelves.add(shelf);
 	    }
 	    
 	    private void postUpdateStatusResults() {
