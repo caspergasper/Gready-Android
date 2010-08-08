@@ -31,9 +31,9 @@ public class OAuthInterface {
 	static final String GET_USER_ID_PATH = "api/auth_user";
 	static final String USER_INFO_URL_PATH = "user/show/";
 	static final String BOOKPAGE_PATH = "m/book"; // mobile site -- main one is "book/show";
-	static final String BOOKPAGE_SEARCH = "m/book?search_type=books&search[query]=";
+	static final String BOOKPAGE_SEARCH = "m/book?search_type=books&search%5Bquery%5D=";
 	static final String SHELF_URL_PATH = "review/list/";
-	static final String SHELVES_URL_PATH ="shelf/list?format=xml&key=" + DeveloperKeys.CONSUMER_KEY;
+	static final String SHELVES_URL_PATH ="shelf/list?format=xml";
 	static final String UPDATES_URL_PATH = "updates/friends.xml";
 	static final String	BOOKS_ISBN_PATH = "book/isbn";
 	static final String ADD_BOOK_PATH = "shelf/add_to_shelf.xml";
@@ -137,12 +137,12 @@ public class OAuthInterface {
 		goodreads_url = url;
     	switch(goodreads_url) {
     	case GET_USER_INFO: 
-    		url_string = URL_ADDRESS + USER_INFO_URL_PATH + myApp.userID + ".xml?key=" + DeveloperKeys.CONSUMER_KEY;
+    		url_string = URL_ADDRESS + USER_INFO_URL_PATH + myApp.userID + ".xml";
     		break;
     	case GET_SHELF:
     	case GET_SHELF_FOR_UPDATE:
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
-    		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
+    		".xml?v=2&per_page=" + ITEMS_TO_DOWNLOAD + 
     		"&shelf=" + myApp.userData.shelfToGet + "&page=" + xmlPage; 
     		break;
     	case GET_SHELVES:
@@ -150,11 +150,11 @@ public class OAuthInterface {
     		"&page=" + xmlPage;
     		break;
     	case SEARCH_SHELVES:
-//    		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
-//    		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
-//    		"&page=" + xmlPage + "&format=xml" + "&search[query]=" + searchQuery;
-    		url_string = URL_ADDRESS + "review/list" + "&format=xml" + 
-    		"&v=2" + "&search[query]=" + searchQuery;
+    		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
+    		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
+    		"&page=" + xmlPage + "&format=xml" + "&search%5Bquery%5D=" + searchQuery;
+//    		url_string = URL_ADDRESS + "review/list" + "&format=xml" + 
+//    		"&v=2" + "&search[query]=" + searchQuery;
     		
     		break;
     	case GET_USER_ID:
@@ -165,7 +165,7 @@ public class OAuthInterface {
     		break;
     	case GET_BOOKS_BY_ISBN:
     		url_string = URL_ADDRESS + BOOKS_ISBN_PATH + "?isbn=" + myApp.userData.isbnScan + 
-    		"&key=" + DeveloperKeys.CONSUMER_KEY + "&format=xml";
+    		"&format=xml";
     		break;
     	default: 
     		url_string = "";

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="vertical"
+			android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#ffffff"
+            android:textColor="#000000">
+<RelativeLayout 
+              android:id="@+id/layout_root"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="4dp"
+              >
+<ImageView android:id="@+id/updateDialogImage"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginRight="4dp"
+               android:src="@drawable/icon"
+               android:paddingBottom="2dp"
+               />
+<TextView android:id="@+id/title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="#000000"
+              android:padding="2dp" 
+              android:layout_toRightOf="@id/updateDialogImage"
+              />
+</RelativeLayout>
+     <ScrollView   
+         android:id="@+id/ScrollView01"  
+       android:layout_height="fill_parent"   
+       android:layout_width="fill_parent"
+       android:layout_below="@id/updateDialogImage">             
+    <TextView android:id="@+id/update"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="#000000"
+              />
+ </ScrollView>
+</LinearLayout>

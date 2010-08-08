@@ -24,16 +24,18 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
 
-public class UpdatesActivity extends Activity implements OnItemLongClickListener {
+public class UpdatesActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
 	
 	private GoodReadsApp myApp;
 	private static final int SUBMENU_GROUPID = 1;
@@ -161,6 +163,13 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 			return false;	
 	}
 	
+	
+	@Override
+	public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
+		final Update u = myApp.userData.updates.get(_index);
+		showUpdateDetail(u);
+	}
+	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> _av, View _v, int _index, long arg3) {
 		final Update u = myApp.userData.updates.get(_index);
@@ -180,6 +189,27 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 		TextView textView = (TextView) findViewById(R.id.status_label);
 		textView.setText(resource);
 		textView.setVisibility(View.VISIBLE);
+	}
+	
+	
+	private final void showUpdateDetail(Update update) {
+		TextView textview;
+		Dialog d = new Dialog(UpdatesActivity.this);
+		Window window = d.getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
+				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		d.setContentView(R.layout.update_dialog);
+		
+		if(update.bitmap != null) {
+			ImageView imgView = (ImageView) d.findViewById(R.id.updateDialogImage);
+			imgView.setImageBitmap(update.bitmap);
+		}
+		textview = (TextView) d.findViewById(R.id.title);
+		textview.setText(update.getUpdateText());
+		textview = (TextView) d.findViewById(R.id.update);
+		textview.setText(update.getBody());
+		d.show();	
 	}
 	
 	void showUpdateDialog() {
@@ -267,9 +297,8 @@ public class UpdatesActivity extends Activity implements OnItemLongClickListener
 		case OAuthInterface.GET_FRIEND_UPDATES:
 			UpdateAdapter updateAdapter;
 			if(ud.updates.size() == 0) {
-				updatesListView.setOnItemClickListener(null);
+				updatesListView.setOnItemClickListener(this);
 				updatesListView.setOnItemLongClickListener(this);
-				updatesListView.setOnScrollListener(null);
 			    updateAdapter = new UpdateAdapter(this, R.layout.updateitem,
 						ud.updates);
 			    updatesListView.setAdapter(updateAdapter);

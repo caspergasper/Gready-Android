@@ -1,9 +1,11 @@
 package com.caspergasper.android.goodreads;
 
+import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
 import java.util.List;
 
 import android.content.Context;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +40,7 @@ public class UpdateAdapter extends ArrayAdapter<Update> {
         
         TextView tv = (TextView)todoView.findViewById(R.id.updates_textview);
         tv.setText(Html.fromHtml(item.toString()));
+
         ImageView iv = (ImageView)todoView.findViewById(R.id.bookListViewImage);
         if(item.bitmap != null) {
         	iv.setImageBitmap(item.bitmap);
@@ -46,6 +49,13 @@ public class UpdateAdapter extends ArrayAdapter<Update> {
         	iv.setImageResource(R.drawable.icon);
 //        	Log.d(TAG, "NOT Setting item " + position + " to image.");
         }
+//        int height = tv.getSuggestedMinimumHeight();
+//        if(height > 57) {
+//        	tv.setText(tv.getText() + " See more...");
+//        } 
+//        Log.d(TAG, "text = " + item.toString());
+//        Log.d(TAG, "getMeasuredHeight = " + height);
+//        
         return todoView;
     }
 }

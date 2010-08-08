@@ -16,6 +16,6 @@
                />
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_height="wrap_content" android:layout_width="fill_parent"
-android:id="@+id/updates_textview" android:padding="3dp">
+android:id="@+id/updates_textview" android:padding="3dp" android:lines="5">
 </TextView>
 </LinearLayout>
