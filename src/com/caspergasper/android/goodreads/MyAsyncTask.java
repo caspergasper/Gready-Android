@@ -83,11 +83,9 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    		myApp.oauth.goodreads_url == OAuthInterface.GET_SHELVES || 
 	    		myApp.oauth.goodreads_url == OAuthInterface.GET_USER_ID  ||
 	    		myApp.oauth.goodreads_url == OAuthInterface.GET_SHELF_FOR_UPDATE){ 
-	    	UpdatesActivity updatesActivity = (UpdatesActivity) myApp.goodreads_activity;
-	    	updatesActivity.updateMainScreenForUser(result);
+	    	((UpdatesActivity) myApp.goodreads_activity).updateMainScreenForUser(result);
 	    } else {
-	    	BooksActivity booksActivity = (BooksActivity) myApp.goodreads_activity;
-	    	booksActivity.updateMainScreenForUser(result);
+	    	((BooksActivity) myApp.goodreads_activity).updateMainScreenForUser(result);
 	    }
 	}
 

@@ -2,19 +2,18 @@ package com.caspergasper.android.goodreads;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import android.graphics.Bitmap;
 
 
 public class Book {
 
+	int id;
+	Bitmap bitmap;
+	String imgUrl;
 	String title;
 	String bookLink;
-	String small_image_url;
 	String average_rating;
 	String description = "";
-	Bitmap bitmap;
-	int id;
 	List <String> shelves = new ArrayList<String>();
 	String author = "";
 

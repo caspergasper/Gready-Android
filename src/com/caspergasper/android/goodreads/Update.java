@@ -8,8 +8,8 @@ public class Update {
 	String updateText;
 	String username;
 	String body;
-	int id;
 	String updateLink;
+	int id;
 	Bitmap bitmap;
 	String imgUrl;
 	
@@ -26,6 +26,18 @@ public class Update {
 		}
 	}
 
+	Spanned getContents() {
+		if(body == null) {
+			return Html.fromHtml(formatUpdateText());
+		} else {
+			return Html.fromHtml(formatUpdateText() + "<br/><br/>" + body);
+		}
+	}
+	
+	Spanned getLimitedContents() {
+		return Html.fromHtml(formatUpdateText() + "<br/><I>Click to see more...</I>");
+	}
+	
 	private String formatUpdateText() {
 		// Strip off username if it's included in the update.
 		// Can username be null?

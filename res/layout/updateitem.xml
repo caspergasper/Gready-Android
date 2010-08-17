@@ -6,16 +6,15 @@
               android:layout_height="fill_parent"
               android:padding="2dp"
               android:background="#ffffff"
-              android:textColor="#000000"
-              >
+              android:textColor="#000000">
   <ImageView android:id="@+id/bookListViewImage"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:layout_marginRight="4dp"
-               android:src="@drawable/icon"
-               />
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_height="wrap_content" android:layout_width="fill_parent"
-android:id="@+id/updates_textview" android:padding="3dp" android:lines="5">
+               android:layout_marginTop="4dp"
+               android:src="@drawable/icon" />
+<TextView android:layout_height="wrap_content" 
+android:layout_width="fill_parent" android:id="@+id/updates_textview" 
+android:padding="3dp" android:lines="5">
 </TextView>
 </LinearLayout>

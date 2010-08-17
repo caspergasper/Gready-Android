@@ -70,8 +70,8 @@ class ISBNBooksSaxHandler extends DefaultHandler {
     		String url = builder.toString().trim();
     		if(!inReviews && !inAuthors && 
     				url.substring(0, url_length).compareTo(BooksActivity.GOODREADS_IMG_URL) == 0  
-    			&&	userdata.tempBooks.get(lastBookPos).small_image_url == null) {
-    			userdata.tempBooks.get(lastBookPos).small_image_url = 
+    			&&	userdata.tempBooks.get(lastBookPos).imgUrl == null) {
+    			userdata.tempBooks.get(lastBookPos).imgUrl = 
     				url.substring(url_length);
         	}
         } else if(localName.equalsIgnoreCase(AUTHORS)) {

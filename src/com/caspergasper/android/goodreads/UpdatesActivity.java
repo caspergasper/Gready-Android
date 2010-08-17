@@ -269,8 +269,6 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		for(Book b : myApp.userData.tempBooks){
 			RadioButton button = new RadioButton(this);
 			button.setId(b.id);
-//			Log.d(TAG, "buttonid:" + String.valueOf(button.getId()));
-//			Log.d(TAG, "bookid:" + String.valueOf(b.id));
 			button.setText(b.title);
 			group.addView(button);	
 		}
@@ -295,7 +293,6 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		}
     	switch (myApp.oauth.goodreads_url) {
 		case OAuthInterface.GET_FRIEND_UPDATES:
-			UpdateAdapter updateAdapter;
 			if(ud.updates.size() == 0) {
 				updatesListView.setOnItemClickListener(this);
 				updatesListView.setOnItemLongClickListener(this);
@@ -306,7 +303,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 				updateAdapter = (UpdateAdapter) updatesListView.getAdapter();
 				updateAdapter.clear();
 			}
-			addUpdatesToListView(updateAdapter);
+			addUpdatesToListView();
 			updatesListView.setVisibility(View.VISIBLE);
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			tv = (TextView) findViewById(R.id.updates_label);
@@ -344,7 +341,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		toast.show();
 	}
 	
-	private void addUpdatesToListView(UpdateAdapter updateAdapter) {
+	private void addUpdatesToListView() {
 		for(Update u : myApp.userData.tempUpdates) {
 			updateAdapter.add(u);
 		}
@@ -374,7 +371,6 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
     };
     
     private void backgroundThreadProcessing() {
-    	updateAdapter = (UpdateAdapter) updatesListView.getAdapter();
     	Update u;
     	int size = myApp.userData.updates.size();
     	for(int i = 0; i < size; i++) {

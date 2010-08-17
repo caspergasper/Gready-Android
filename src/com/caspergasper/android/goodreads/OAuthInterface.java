@@ -151,11 +151,8 @@ public class OAuthInterface {
     		break;
     	case SEARCH_SHELVES:
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
-    		".xml?v=2&key=" + DeveloperKeys.CONSUMER_KEY +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
+    		".xml?v=2"  +  "&per_page=" + ITEMS_TO_DOWNLOAD + 
     		"&page=" + xmlPage + "&format=xml" + "&search%5Bquery%5D=" + searchQuery;
-//    		url_string = URL_ADDRESS + "review/list" + "&format=xml" + 
-//    		"&v=2" + "&search[query]=" + searchQuery;
-    		
     		break;
     	case GET_USER_ID:
     		url_string = URL_ADDRESS + GET_USER_ID_PATH;
@@ -266,13 +263,11 @@ public class OAuthInterface {
 	    		HttpResponse response = httpClient.execute(post); 
 	    		Log.d(TAG, response.getStatusLine().toString());
 	    		int responseCode = response.getStatusLine().getStatusCode();
-	    		if(responseCode == 201 || responseCode == 200){
-	    			if(URL == OAuthInterface.ADD_BOOK_PATH) {
-	    				BooksActivity activity = (BooksActivity) myApp.goodreads_activity; 
-	    				activity.mHandler.post(doPostBookUpdateGUI);
-	    			} else if(URL == OAuthInterface.ADD_UPDATE_PATH) {
-	    				UpdatesActivity activity = (UpdatesActivity) myApp.goodreads_activity; 
-	    				activity.mHandler.post(doPostUpdateStatusGUI);
+	    		if(responseCode == 201){
+	    			if(URL == OAuthInterface.ADD_BOOK_PATH) { 
+	    				((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostBookUpdateGUI);
+	    			} else if(URL == OAuthInterface.ADD_UPDATE_PATH) { 
+	    				((UpdatesActivity) myApp.goodreads_activity).mHandler.post(doPostUpdateStatusGUI);
 	    			}
 	    		} else {
 	    			myApp.errMessage = response.getStatusLine().toString();

@@ -565,14 +565,14 @@ OnScrollListener {
     		}
 			b = adapter.getItem(i);
 			try {
-				if(b.small_image_url == null) {
+				if(b.imgUrl == null) {
 					continue;
 				}
 				if(b.bitmap == null) {
-					URL newurl = new URL(GOODREADS_IMG_URL + b.small_image_url); 
-					Log.d(TAG, "Getting " + GOODREADS_IMG_URL + b.small_image_url);
+					URL newurl = new URL(GOODREADS_IMG_URL + b.imgUrl); 
+					Log.d(TAG, "Getting " + GOODREADS_IMG_URL + b.imgUrl);
 					b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-					b.small_image_url = null;
+					b.imgUrl = null;
 				}
 				mHandler.post(doUpdateGUI);
 			} catch (Exception e) {

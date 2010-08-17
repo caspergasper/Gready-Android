@@ -1,15 +1,19 @@
 package com.caspergasper.android.goodreads;
 
+import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
+
 import java.util.List;
 
 import android.content.Context;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 
 public class UpdateAdapter extends ArrayAdapter<Update> {
 
@@ -41,20 +45,20 @@ public class UpdateAdapter extends ArrayAdapter<Update> {
         } else {
         	holder = (ViewHolder) convertView.getTag();
         }
-        
-        holder.text.setText(Html.fromHtml(item.toString()));
 
         if(item.bitmap != null) {
         	holder.image.setImageBitmap(item.bitmap);
         } else {
         	holder.image.setImageResource(R.drawable.icon);
         }
-//        int height = tv.getMeasuredHeight();
-//        if(height > 57) {
-//        	tv.setText(tv.getText() + " See more...");
-//        } 
-//        Log.d(TAG, "text = " + item.toString());
-//        Log.d(TAG, "getMeasuredHeight = " + height);
+        // Need to set this twice -- once to measure, 
+        // and secondly for when the view is reused.
+        holder.text.setText(item.getContents());  
+        if(holder.text.getLineCount() > 5) {
+        	holder.text.setText(item.getLimitedContents());
+        } else {
+        	holder.text.setText(item.getContents());
+        }
         
         return convertView;
     }
