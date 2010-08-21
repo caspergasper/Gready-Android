@@ -13,6 +13,8 @@ import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,6 +51,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 	// Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
     UpdateAdapter updateAdapter;
+    private static final int MAX_UPDATE_SIZE = 420;
 	
 	@Override
 	public void onResume() {
@@ -87,7 +90,6 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
         try{
 	    	super.onCreate(savedInstanceState);
 	        setContentView(R.layout.updates);
-	        
 	        myApp = GoodReadsApp.getInstance();
 	        myApp.goodreads_activity = this;
 	        updatesListView = (ListView) findViewById(R.id.updates_listview);
@@ -97,7 +99,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			myApp.showErrorDialog(this);
 		}
     }
-    
+       
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
     	super.onConfigurationChanged(newConfig);
@@ -158,8 +160,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			xmlPage = 1;
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF_FOR_UPDATE);
 			return true;
-		}
- 		
+		}  		
 			return false;	
 	}
 	
@@ -183,7 +184,6 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		}
 		return true;
 	}
-	
 	
 	void showUpdateMessage(int resource) {
 		TextView textView = (TextView) findViewById(R.id.status_label);
@@ -213,6 +213,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 	}
 	
 	void showUpdateDialog() {
+		final String CHARS_LEFT = " left";
 		updateDialog = new Dialog(UpdatesActivity.this);
 		Window window = updateDialog.getWindow();
 		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
@@ -222,19 +223,42 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		updateDialog.setTitle(R.string.update_status);
 		final Button b = (Button) updateDialog.findViewById(R.id.updatebutton);
 		final RadioGroup group = (RadioGroup) updateDialog.findViewById(R.id.RadioGroup);
+		final EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
+		final TextView charsLeft = (TextView) updateDialog.findViewById(R.id.char_count_label);
 		
+		// Show characters remaining
+		et.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				charsLeft.setText(Integer.toString(MAX_UPDATE_SIZE - arg0.length()) + CHARS_LEFT);
+			}
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {	
+			}
+			@Override
+			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
+					int arg3) {
+			}
+		});
+			
 		b.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				int pageNum = 0;
 				int bookId = 0;
-				EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
+				
 				String text = et.getText().toString().trim(); 
-				et = (EditText) updateDialog.findViewById(R.id.pagestatusbox);
+				int textLength = text.length(); 
+				if(textLength > MAX_UPDATE_SIZE) {
+					toastMe(R.string.update_too_long);
+					return;
+				}
+				
 				if(et.getText().toString().length() > 0) {
 					pageNum = Integer.parseInt(et.getText().toString());
 				}
 				
-				if(pageNum != 0 || text.length() > 0) {
+				if(pageNum != 0 || textLength > 0) {
 					int checkedId = group.getCheckedRadioButtonId();
 					if(checkedId != R.id.RadioButtonGeneralUpdate) {
 						bookId = checkedId;
@@ -244,6 +268,8 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 				updateDialog.hide();
 			}
 		});
+		
+		
 		
 		group.setOnCheckedChangeListener(new OnCheckedChangeListener() {	
 			@Override
@@ -384,8 +410,8 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 					continue;
 				}
 				if(u.bitmap == null) {
-					URL newurl = new URL(BooksActivity.GOODREADS_IMG_URL + u.imgUrl); 
-					Log.d(TAG, "Getting " + BooksActivity.GOODREADS_IMG_URL + u.imgUrl);
+					URL newurl = new URL(GoodReadsApp.GOODREADS_IMG_URL + u.imgUrl); 
+					Log.d(TAG, "Getting " + GoodReadsApp.GOODREADS_IMG_URL + u.imgUrl);
 					u.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
 					// Add this image to any further updates by same user
 					Update temp;

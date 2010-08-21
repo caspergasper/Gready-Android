@@ -59,13 +59,16 @@ OnScrollListener {
 	private int xmlPage = 1;
 	private ListView updatesListView;
 	private ShelfAdapter shelfAdapter;
-	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
 	private boolean booksRemovedFromFront = false;
 	static Book currentBook;
 	// Need handler for callbacks to the UI thread
     final Handler mHandler = new Handler();
 	
 
+    void removeCurrentBook() {
+    	shelfAdapter.remove(currentBook);
+    }
+    
 	public void onResume() {
 		myApp.goodreads_activity = this;
 		try {
@@ -508,10 +511,7 @@ OnScrollListener {
 	}
 	
 	@Override
-	public void onScrollStateChanged(AbsListView arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onScrollStateChanged(AbsListView arg0, int arg1) {	}
 	
 	//do something when book scanner finishes.
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -569,8 +569,8 @@ OnScrollListener {
 					continue;
 				}
 				if(b.bitmap == null) {
-					URL newurl = new URL(GOODREADS_IMG_URL + b.imgUrl); 
-					Log.d(TAG, "Getting " + GOODREADS_IMG_URL + b.imgUrl);
+					URL newurl = new URL(GoodReadsApp.GOODREADS_IMG_URL + b.imgUrl); 
+					Log.d(TAG, "Getting " + GoodReadsApp.GOODREADS_IMG_URL + b.imgUrl);
 					b.bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
 					b.imgUrl = null;
 				}

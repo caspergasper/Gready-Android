@@ -20,8 +20,7 @@ class UpdatesSaxHandler extends DefaultHandler {
     private final static String REVIEW = "review";
     private final static String COMMENT = "comment";
     private final static String IMAGE_URL = "image_url";
-    
-    private static final int url_length = BooksActivity.GOODREADS_IMG_URL.length(); 
+
     private UserData userdata;
     private boolean inReview = false;
     private boolean inName = false;
@@ -63,8 +62,9 @@ class UpdatesSaxHandler extends DefaultHandler {
         }  else if(localName.equalsIgnoreCase(IMAGE_URL)) {
         	if(inName) {
         		String url = builder.toString().trim();
-        		if(url.substring(0, url_length).compareTo(BooksActivity.GOODREADS_IMG_URL) == 0) {
-        			userdata.tempUpdates.get(pos).imgUrl = url.substring(url_length);
+        		if(url.substring(0, GoodReadsApp.GOODREADS_IMG_URL_LENGTH).compareTo(
+        				GoodReadsApp.GOODREADS_IMG_URL) == 0) {
+        			userdata.tempUpdates.get(pos).imgUrl = url.substring(GoodReadsApp.GOODREADS_IMG_URL_LENGTH);
         		}
         		inName = false;
         	}

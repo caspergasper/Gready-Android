@@ -61,7 +61,7 @@ public class OAuthInterface {
 	private GoodReadsApp myApp;
 	String searchQuery;
 	private int bookId;
-	private String shelf;
+	private String shelfTitle;
 	private int page;
 	private String body;
 	
@@ -188,7 +188,7 @@ public class OAuthInterface {
 	void postBookToShelf(int _bookId, String _shelf) {
 		 // Fire off a thread to do some work that we shouldn't do directly in the UI thread
         bookId = _bookId;
-        shelf = _shelf;
+        shelfTitle = _shelf;
         Thread t = new Thread(null, doPostBook, "addBook");
         t.start();
 	}
@@ -244,18 +244,15 @@ public class OAuthInterface {
 	    }
 	    
 	    private void postBook() {
-	    	Log.d(TAG, "Adding book id " + bookId + " to " + shelf);     	
+	    	Log.d(TAG, "Adding book id " + bookId + " to " + shelfTitle);     	
         	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();
         	out.add(new BasicNameValuePair("book_id", Integer.toString(bookId)));
-        	out.add(new BasicNameValuePair("name", shelf));
+        	out.add(new BasicNameValuePair("name", shelfTitle));
         	postUpdateOrBook(out, OAuthInterface.ADD_BOOK_PATH);
 	    }
 	    
 	    private void postUpdateOrBook(LinkedList<BasicNameValuePair> postData, String URL) {
 	        try {
-//	        	Log.d(TAG, "bookid=" + Integer.toString(bookId));
-//	        	Log.d(TAG, "pagenum=" + Integer.toString(page));
-//	        	Log.d(TAG, "body=" + body);
 	        	HttpClient httpClient = new DefaultHttpClient();
 	        	HttpPost post = new HttpPost(OAuthInterface.URL_ADDRESS + URL);
 	        	post.setEntity(new UrlEncodedFormEntity(postData, HTTP.UTF_8));
@@ -285,13 +282,31 @@ public class OAuthInterface {
 	    }
 	    
 	    private void postBookUpdateResults() {
-	    	BooksActivity activity = (BooksActivity) myApp.goodreads_activity;
-	    	activity.toastMe(R.string.bookAddedToShelf);
-	    	BooksActivity.currentBook.shelves.add(shelf);
+	    	((BooksActivity) myApp.goodreads_activity).toastMe(R.string.bookAddedToShelf);
+	    	// if currentShelf and new shelf are exclusive,
+	    	// hide -- else add to shelf.
+	    	Shelf currentShelf = null;
+	    	Shelf newShelf = null;
+	    	for(Shelf tempShelf : myApp.userData.shelves) {
+    			if(tempShelf.title.compareTo(myApp.userData.shelfToGet) == 0) {
+    				currentShelf = tempShelf;
+    			} else if(tempShelf.title.compareTo(shelfTitle) == 0) {
+    				newShelf = tempShelf;
+    			}
+	    	}
+	    	if(currentShelf == null || newShelf == null) {
+	    		BooksActivity.currentBook.shelves.add(shelfTitle);
+	    		return;
+	    	}
+	    	if(currentShelf.exclusive && newShelf.exclusive) {
+	    		((BooksActivity) myApp.goodreads_activity).removeCurrentBook();
+	    	} else {
+	    		BooksActivity.currentBook.shelves.add(shelfTitle);
+	    	}
+	    	
 	    }
 	    
 	    private void postUpdateStatusResults() {
-	    	UpdatesActivity activity = (UpdatesActivity) myApp.goodreads_activity;
-	    	activity.toastMe(R.string.statusUpdated);
+	    	((UpdatesActivity) myApp.goodreads_activity).toastMe(R.string.statusUpdated);
 	    }
 }

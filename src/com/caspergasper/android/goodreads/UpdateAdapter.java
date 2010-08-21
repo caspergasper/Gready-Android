@@ -1,12 +1,7 @@
 package com.caspergasper.android.goodreads;
 
-import static com.caspergasper.android.goodreads.GoodReadsApp.TAG;
-
 import java.util.List;
-
 import android.content.Context;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,13 +46,10 @@ public class UpdateAdapter extends ArrayAdapter<Update> {
         } else {
         	holder.image.setImageResource(R.drawable.icon);
         }
-        // Need to set this twice -- once to measure, 
-        // and secondly for when the view is reused.
+
         holder.text.setText(item.getContents());  
         if(holder.text.getLineCount() > 5) {
         	holder.text.setText(item.getLimitedContents());
-        } else {
-        	holder.text.setText(item.getContents());
         }
         
         return convertView;

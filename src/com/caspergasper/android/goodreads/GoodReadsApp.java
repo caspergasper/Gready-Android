@@ -28,6 +28,8 @@ public class GoodReadsApp extends Application {
 	Activity goodreads_activity;
 	volatile boolean threadLock = false;
 	volatile boolean getImageThreadRunning;
+	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
+	static final int GOODREADS_IMG_URL_LENGTH = GOODREADS_IMG_URL.length();
 	
 	public static GoodReadsApp getInstance() {
 		return singleton;

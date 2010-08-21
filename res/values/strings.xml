@@ -43,4 +43,5 @@
 <string name="what_to_do">What do you want to do?</string>
 <string name="goto_mobilesite">Goto mobile site</string>
 <string name="change_shelves">Change Shelves</string>
+<string name="update_too_long">Sorry! Your update was over the allowed size.</string>
 </resources>
