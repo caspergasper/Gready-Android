@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.view.MenuItem;
 
 public class GoodReadsApp extends Application {
 	
@@ -30,6 +31,8 @@ public class GoodReadsApp extends Application {
 	volatile boolean getImageThreadRunning;
 	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
 	static final int GOODREADS_IMG_URL_LENGTH = GOODREADS_IMG_URL.length();
+	MenuItem menuItem = null;
+	static final String TO_READ = "to-read";
 	
 	public static GoodReadsApp getInstance() {
 		return singleton;

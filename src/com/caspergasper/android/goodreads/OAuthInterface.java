@@ -287,6 +287,11 @@ public class OAuthInterface {
 	    	// hide -- else add to shelf.
 	    	Shelf currentShelf = null;
 	    	Shelf newShelf = null;
+	    	if(myApp.userData.shelfToGet == null){
+	    		BooksActivity.currentBook.shelves.add(shelfTitle);
+	    		return;
+	    	}
+	    	
 	    	for(Shelf tempShelf : myApp.userData.shelves) {
     			if(tempShelf.title.compareTo(myApp.userData.shelfToGet) == 0) {
     				currentShelf = tempShelf;

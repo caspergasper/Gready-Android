@@ -5,4 +5,8 @@
 android:id="@+id/updates" android:icon="@android:drawable/ic_menu_info_details"></item>
 <item android:titleCondensed="@string/update_status" android:title="@string/update_status" 
 android:id="@+id/update_status" android:icon="@android:drawable/ic_menu_edit"></item>
+<item android:titleCondensed="@string/search" android:title="@string/search" 
+android:id="@+id/search" android:icon="@android:drawable/ic_menu_search"></item>
+<item android:titleCondensed="@string/scanbook_label" android:title="@string/scanbook_label" 
+android:id="@+id/scanbook" android:icon="@android:drawable/ic_menu_camera"></item>
 </menu>

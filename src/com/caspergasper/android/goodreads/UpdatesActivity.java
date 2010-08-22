@@ -75,7 +75,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 				} 
 			}
 		} catch(Exception e) {
-			myApp.errMessage = "GoodreadsActivity onResume " + e.toString();
+			myApp.errMessage = "UpdatesActivity onResume " + e.toString();
 			myApp.showErrorDialog(this);
 		}
 	}
@@ -153,14 +153,17 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 				showUpdateMessage(R.string.getUpdates);
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 				return true;
-		}
-		else if(item.getItemId() == R.id.update_status) {
+		} else if(item.getItemId() == R.id.update_status) {
 			showUpdateDialog();
 			myApp.userData.shelfToGet = CURRENTLY_READING;
 			xmlPage = 1;
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF_FOR_UPDATE);
 			return true;
-		}  		
+		} else if(item.getItemId() == R.id.search || item.getItemId() == R.id.scanbook) {
+			myApp.menuItem = item;
+			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
+			return true;
+		}
 			return false;	
 	}
 	
@@ -225,6 +228,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		final RadioGroup group = (RadioGroup) updateDialog.findViewById(R.id.RadioGroup);
 		final EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
 		final TextView charsLeft = (TextView) updateDialog.findViewById(R.id.char_count_label);
+		final EditText pageCountEdit = (EditText) updateDialog.findViewById(R.id.pagestatusbox);
 		
 		// Show characters remaining
 		et.addTextChangedListener(new TextWatcher() {
@@ -234,12 +238,10 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			}
 			@Override
 			public void beforeTextChanged(CharSequence arg0, int arg1,
-					int arg2, int arg3) {	
-			}
+					int arg2, int arg3) {				}
 			@Override
 			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
-					int arg3) {
-			}
+					int arg3) {			}
 		});
 			
 		b.setOnClickListener(new View.OnClickListener() {
@@ -254,8 +256,8 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 					return;
 				}
 				
-				if(et.getText().toString().length() > 0) {
-					pageNum = Integer.parseInt(et.getText().toString());
+				if(pageCountEdit.getText().toString().length() > 0) {
+					pageNum = Integer.parseInt(pageCountEdit.getText().toString());
 				}
 				
 				if(pageNum != 0 || textLength > 0) {
@@ -274,7 +276,6 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		group.setOnCheckedChangeListener(new OnCheckedChangeListener() {	
 			@Override
 			public void onCheckedChanged(RadioGroup arg0, int arg1) {
-				Log.d(TAG, Integer.toString(arg1));
 				if(arg1 == R.id.RadioButtonGeneralUpdate) {
 					updateDialog.findViewById(R.id.page_num_label).setVisibility(View.INVISIBLE);
 					updateDialog.findViewById(R.id.pagestatusbox).setVisibility(View.INVISIBLE);
@@ -317,6 +318,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			myApp.showGetAuthorizationDialog(this);
 			return;
 		}
+    	try {
     	switch (myApp.oauth.goodreads_url) {
 		case OAuthInterface.GET_FRIEND_UPDATES:
 			if(ud.updates.size() == 0) {
@@ -360,6 +362,10 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
     		updateDialogRadioGroup();
     	break;
     	}
+    	} catch(Exception e) {
+			myApp.errMessage = "UpdatesActivity updateMainScreenForUser " + e.toString();
+			myApp.showErrorDialog(this);
+		}
     }
 
 	void toastMe(int msgid) {

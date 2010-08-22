@@ -82,7 +82,13 @@ OnScrollListener {
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_USER_ID);
 				return;     
 			} else {
-				if(myApp.userData.books.size() == 0 && !myApp.threadLock) {
+				if(myApp.menuItem != null) {
+					onOptionsItemSelected(myApp.menuItem);
+					myApp.menuItem = null;
+					return;
+				}
+				if(myApp.userData.books.size() == 0 && !myApp.threadLock && 
+						myApp.userData.shelfToGet != null) {
 					// Got valid tokens and a userid, let's go get some data...
 					Log.d(TAG, "Getting books now...");
 					xmlPage = 1;
@@ -90,7 +96,7 @@ OnScrollListener {
 				} 
 			}
 		} catch(Exception e) {
-			myApp.errMessage = "GoodreadsActivity onResume " + e.toString();
+			myApp.errMessage = "BooksActivity onResume " + e.toString();
 			myApp.showErrorDialog(this);
 		}
 	}
@@ -109,7 +115,7 @@ OnScrollListener {
 	        newQuery();  // For when activity has been cleared from memory but app hasn't
 	        
     	} catch(Exception e) {
-			myApp.errMessage = "GoodreadsActivity onCreate " + e.toString();
+			myApp.errMessage = "BooksActivity onCreate " + e.toString();
 			myApp.showErrorDialog(this);
 		}
     }
@@ -244,6 +250,7 @@ OnScrollListener {
 			myApp.showGetAuthorizationDialog(this);
 			return;
 		}
+    	try {
     	switch (myApp.oauth.goodreads_url) {
 		case OAuthInterface.SEARCH_SHELVES:
 		case OAuthInterface.GET_BOOKS_BY_ISBN:
@@ -273,6 +280,10 @@ OnScrollListener {
 			getImages();
 		break;
     	}
+    	} catch(Exception e) {
+			myApp.errMessage = "BooksActivity updateMainScreenForUser " + e.toString();
+			myApp.showErrorDialog(this);
+		}
     }
     
     @Override
@@ -407,7 +418,7 @@ OnScrollListener {
 		ad.setMessage(R.string.addToShelfQ);
 		ad.setPositiveButton("Yes", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int arg1) {
-				myApp.oauth.postBookToShelf(b.id, "to-read");
+				myApp.oauth.postBookToShelf(b.id, GoodReadsApp.TO_READ);
 			}
 		});
 		ad.setNegativeButton("No", new OnClickListener() {
@@ -420,12 +431,12 @@ OnScrollListener {
 	
 	@Override
 	public void onItemClick(AdapterView<?> _av, View _v, int _index, long arg3) {
-		Book b = myApp.userData.books.get(_index);
+		currentBook = myApp.userData.books.get(_index);
 		if(myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN && 
-				b.shelves.size() == 0){
-			addBookToShelf(b);
+				currentBook.shelves.size() == 0){
+			addBookToShelf(currentBook);
 		} else {
-			showBookDetail(b);
+			showBookDetail(currentBook);
 		}
 	}
 	
@@ -525,7 +536,7 @@ OnScrollListener {
 			Log.d(TAG, "scanned UPC:" + barcode);
 			String isbn = GoodReadsApp.ConvertUPCtoISBN(barcode);
 			Log.d(TAG, "converted ISBN:" + isbn);
-			// TODO show book details 
+			// show book details 
 			myApp.userData.isbnScan = isbn;
 			showUpdateMessage(R.string.getBookByISBN);
 			newQuery();
