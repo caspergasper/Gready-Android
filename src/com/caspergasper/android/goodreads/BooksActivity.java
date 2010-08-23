@@ -178,6 +178,7 @@ OnScrollListener {
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
 			startActivity(new Intent(BooksActivity.this, UpdatesActivity.class));	
+			finish();
 			return true;
 		}
 		else if(item.getItemId() == R.id.scanbook) {

@@ -148,6 +148,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 				myApp.userData.shelfToGet = myApp.userData.shelves.get(item.getItemId()).title;
 			}
 			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
+			finish();
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
 				showUpdateMessage(R.string.getUpdates);
@@ -161,7 +162,9 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			return true;
 		} else if(item.getItemId() == R.id.search || item.getItemId() == R.id.scanbook) {
 			myApp.menuItem = item;
+			myApp.getImageThreadRunning = false;	// Shouldn't be needed
 			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
+			finish();
 			return true;
 		}
 			return false;	
@@ -321,7 +324,13 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
     	try {
     	switch (myApp.oauth.goodreads_url) {
 		case OAuthInterface.GET_FRIEND_UPDATES:
-			if(ud.updates.size() == 0) {
+			if(updatesListView == null) {
+				Log.d(TAG, "updatesListView is null");
+			}
+			if(updatesListView.getAdapter() == null && ud.updates.size() != 0) {
+				Log.d(TAG, "updatesListViewgetadapter is null");	
+			}
+			if(updatesListView.getAdapter() == null) {
 				updatesListView.setOnItemClickListener(this);
 				updatesListView.setOnItemLongClickListener(this);
 			    updateAdapter = new UpdateAdapter(this, R.layout.updateitem,
@@ -432,6 +441,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 				u.imgUrl = null;
 				mHandler.post(doUpdateGUI);
 			} catch (Exception e) {
+				Log.e(TAG, e.toString());
 				myApp.errMessage = e.toString() + " " + e.getStackTrace().toString();
 				myApp.showErrorDialog(this);
 			}
