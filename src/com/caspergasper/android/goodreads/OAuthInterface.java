@@ -162,7 +162,7 @@ public class OAuthInterface {
     		break;
     	case GET_BOOKS_BY_ISBN:
     		url_string = URL_ADDRESS + BOOKS_ISBN_PATH + "?isbn=" + myApp.userData.isbnScan + 
-    		"&format=xml&key=" + DeveloperKeys.CONSUMER_KEY;
+    		"&format=xml";
     		break;
     	default: 
     		url_string = "";
@@ -172,9 +172,7 @@ public class OAuthInterface {
         	HttpGet request = new HttpGet(url_string);
         	
     		// sign the request
-        	if(goodreads_url != GET_BOOKS_BY_ISBN){
-        		consumer.sign(request);
-        	}
+        	consumer.sign(request);
         	
         	// Create background thread to download and render XML
     		myApp.getImageThreadRunning = false;
