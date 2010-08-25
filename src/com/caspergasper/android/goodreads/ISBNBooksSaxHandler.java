@@ -17,14 +17,12 @@ class ISBNBooksSaxHandler extends DefaultHandler {
     private final static String LINK = "link";
     private final static String SMALL_IMAGE_URL = "small_image_url";
     private final static String AUTHORS = "authors";
-    private final static String REVIEWS = "reviews";
     private final static String MY_REVIEW = "my_review";
     private final static String SHELF = "shelf";
     private final static String ID = "id";
     
     private UserData userdata;
     private boolean inAuthors = false;
-    private boolean inReviews = false;
     private boolean inMyReview = false;
     private boolean pastSmallImgUrl = false;
     private int lastBookPos = 0;
@@ -92,8 +90,6 @@ class ISBNBooksSaxHandler extends DefaultHandler {
     	super.startElement(uri, localName, name, attributes);
     	if(localName.equalsIgnoreCase(AUTHORS)){
         	inAuthors = true;
-        } else if(localName.equalsIgnoreCase(REVIEWS)){
-        	inReviews = true;
         }  else if(localName.equalsIgnoreCase(MY_REVIEW)){
         	inMyReview = true;
         } else if(localName.equalsIgnoreCase(SHELF)){
