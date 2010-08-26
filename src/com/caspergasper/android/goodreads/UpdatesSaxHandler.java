@@ -20,10 +20,11 @@ class UpdatesSaxHandler extends DefaultHandler {
     private final static String REVIEW = "review";
     private final static String COMMENT = "comment";
     private final static String IMAGE_URL = "image_url";
+    private final static String ACTOR = "actor";
 
     private UserData userdata;
     private boolean inReview = false;
-    private boolean inName = false;
+    private boolean inActor = false;
     
     UpdatesSaxHandler(UserData ud) {
     	userdata = ud;
@@ -41,18 +42,19 @@ class UpdatesSaxHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String name)
             throws SAXException {
     	super.endElement(uri, localName, name);
-//    	Log.d(TAG, "tag: " + localName);
-//    	Log.d(TAG, "value: " + builder.toString().trim());
     	int pos = userdata.tempUpdates.size() - 1;
         if(localName.equalsIgnoreCase(ACTION_TEXT)) {
         	userdata.tempUpdates.add(new Update(builder.toString().trim().replaceAll("</?a[^>]+>", "")));
         } else if(localName.equalsIgnoreCase(NAME)) {
-        	userdata.tempUpdates.get(pos).username = builder.toString().trim();
-        	inName = true;
+        	if(inActor) {
+        		userdata.tempUpdates.get(pos).username = builder.toString().trim();
+        	}
         }  else if(localName.equalsIgnoreCase(BODY)) {
         	userdata.tempUpdates.get(pos).body = builder.toString().trim();        	
         }  else if(localName.equalsIgnoreCase(ID)) {
-        	userdata.tempUpdates.get(pos).id = Integer.parseInt(builder.toString().trim());
+        	if(inActor) {
+        		userdata.tempUpdates.get(pos).id = Integer.parseInt(builder.toString().trim());
+        	}
         }  else if(localName.equalsIgnoreCase(LINK)) {
         	if(inReview) {
         		String url = builder.toString().trim();
@@ -60,30 +62,36 @@ class UpdatesSaxHandler extends DefaultHandler {
         		inReview = false;
         	}
         }  else if(localName.equalsIgnoreCase(IMAGE_URL)) {
-        	if(inName) {
+        	if(inActor) {
         		String url = builder.toString().trim();
         		if(url.substring(0, GoodReadsApp.GOODREADS_IMG_URL_LENGTH).compareTo(
         				GoodReadsApp.GOODREADS_IMG_URL) == 0) {
         			userdata.tempUpdates.get(pos).imgUrl = url.substring(GoodReadsApp.GOODREADS_IMG_URL_LENGTH);
         		}
-        		inName = false;
+        		inActor = false;
         	}
         } else {
 
         }
-        builder.setLength(0);
+
+//    	Log.d(TAG, "value: " + builder.toString().trim());
+//    	Log.d(TAG, "tag: </" + localName + ">");
+    	builder.setLength(0);
     }
     
     @Override
     public void startElement(String uri, String localName, String name,
             Attributes attributes) throws SAXException {
     	super.startElement(uri, localName, name, attributes);
+//    	Log.d(TAG, "tag: <" + localName + ">");
     	if(localName.equalsIgnoreCase(UPDATE)) {
     		if(attributes.getValue(TYPE).equalsIgnoreCase(REVIEW) ||
     				attributes.getValue(TYPE).equalsIgnoreCase(COMMENT)) {
     			inReview = true;
     		} 
 //    		Log.d(TAG, "attribval:" + attributes.getValue(TYPE));
+    	} else if(localName.equalsIgnoreCase(ACTOR)) {
+    		inActor = true;
     	}
 //    	for(int i = 0; i<attributes.getLength(); i++) {
 //    		Log.d(TAG, "attrib:" + attributes.getLocalName(i));
