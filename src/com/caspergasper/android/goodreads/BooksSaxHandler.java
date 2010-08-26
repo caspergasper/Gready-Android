@@ -13,6 +13,7 @@ class BooksSaxHandler extends DefaultHandler {
     private final static String NAME = "name";
     private final static String TITLE = "title";
     private final static String DESCRIPTION = "description";
+    private final static String REVIEW = "review";
     private final static String REVIEWS = "reviews";
     private final static String START = "start";
     private final static String END = "end";
@@ -29,6 +30,7 @@ class BooksSaxHandler extends DefaultHandler {
     private UserData userdata;
     private boolean inAuthors = false;
     private boolean inId = false;
+    private boolean inReview = false;
     private int pos;
     
     BooksSaxHandler(UserData ud) {
@@ -50,7 +52,7 @@ class BooksSaxHandler extends DefaultHandler {
         pos = userdata.tempBooks.size() - 1;
         if(inId && localName.equalsIgnoreCase(ID)) {
         	userdata.tempBooks.add(new Book(Integer.parseInt(builder.toString().trim())));
-        	inId = false;
+        	inId = inReview = false;
         } else if(localName.equalsIgnoreCase(TITLE)) {
         	userdata.tempBooks.get(pos).title = builder.toString().trim();
         } else if(localName.equalsIgnoreCase(DESCRIPTION)) {
@@ -93,13 +95,15 @@ class BooksSaxHandler extends DefaultHandler {
         	userdata.startBook = Integer.parseInt(attributes.getValue(START));
         	userdata.endBook = Integer.parseInt(attributes.getValue(END));
         	userdata.totalBooks = Integer.parseInt(attributes.getValue(TOTAL));
+        } else if(localName.equalsIgnoreCase(REVIEW)){
+        	inReview = true;
         } else if(localName.equalsIgnoreCase(AUTHORS)){
         	inAuthors = true;
         } else if(localName.equalsIgnoreCase(SHELF)){
         	userdata.tempBooks.get(pos).shelves.add(attributes.getValue(NAME));
         } else if(localName.equalsIgnoreCase(ID)){
         	String attribute = attributes.getValue(TYPE);
-        	if(attribute != null && attribute.equalsIgnoreCase(INTEGER)) {
+        	if(inReview && attribute != null && attribute.equalsIgnoreCase(INTEGER)) {
         		inId = true;
         	}
         }

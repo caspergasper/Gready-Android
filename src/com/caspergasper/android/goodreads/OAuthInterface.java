@@ -287,28 +287,27 @@ public class OAuthInterface {
 	    	// hide -- else add to shelf.
 	    	Shelf currentShelf = null;
 	    	Shelf newShelf = null;
-	    	
+	    	String shelfToGet;
 	    	
 	    	//  Always add new shelf to book
 	    	BooksActivity.currentBook.shelves.add(shelfTitle);
 	    	if(myApp.userData.shelfToGet == null){
-	    		return;
+	    		shelfToGet = "";
+	    	} else {
+	    		shelfToGet = myApp.userData.shelfToGet;
 	    	}
 	    	
 	    	// Get the current and new shelf to check if they're exclusive
 	    	for(Shelf tempShelf : myApp.userData.shelves) {
-    			if(tempShelf.title.compareTo(myApp.userData.shelfToGet) == 0) {
+    			if(tempShelf.title.compareTo(shelfToGet) == 0) {
     				currentShelf = tempShelf;
     			} else if(tempShelf.title.compareTo(shelfTitle) == 0) {
     				newShelf = tempShelf;
     			}
 	    	}
-	    	if(currentShelf == null || newShelf == null) {
-	    		return;
-	    	}
 	    	
-	    	if(newShelf.exclusive) {
-	    		if(currentShelf.exclusive) {
+	    	if(newShelf != null && newShelf.exclusive) {
+	    		if(currentShelf != null && currentShelf.exclusive) {
 	    			((BooksActivity) myApp.goodreads_activity).removeCurrentBook();
 	    			return;
 	    		} else {
