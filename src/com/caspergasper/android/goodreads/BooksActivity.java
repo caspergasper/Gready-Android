@@ -294,6 +294,7 @@ OnScrollListener {
     	
     	menu.setHeaderTitle(R.string.what_to_do);
     	menu.add(0, Menu.FIRST, Menu.NONE, R.string.goto_mobilesite);
+    	menu.add(0, 2, Menu.NONE, R.string.rate_review);
     	SubMenu sub = menu.addSubMenu(R.string.change_shelves);
     	List<Shelf> tempShelves = myApp.userData.shelves;
     	// Copied text
@@ -333,6 +334,8 @@ OnScrollListener {
     		} else {
     			toastMe(R.string.no_book_page);
     		}
+    	} else if(groupId == 0 && item.getItemId() == 2) {
+    		startActivity(new Intent(BooksActivity.this, ReviewActivity.class));	
     	} else if(groupId == SUBMENU_GROUPID || groupId == SUBMENU_GROUPID_RADIO) {
     		Log.d(TAG, "add book to shelf " + item.getTitle().toString());
     		myApp.oauth.postBookToShelf(currentBook.id, item.getTitle().toString());

@@ -40,6 +40,7 @@ public class OAuthInterface {
 	static final String ADD_UPDATE_PATH = "user_status.xml";
 	static final String CALLBACK_URL = "goodreadsactivity://token";
 	static final String OAUTH_VERIFIER = "oauth_token";
+	static final String REVIEW_PATH = "review/";
 	
 	// Eventually I'd like to do something clever like detect if the user is on wifi
 	// or 3G and download more/less items appropriately.
@@ -61,9 +62,11 @@ public class OAuthInterface {
 	private GoodReadsApp myApp;
 	String searchQuery;
 	private int bookId;
+	private int reviewId;
 	private String shelfTitle;
 	private int page;
 	private String body;
+	private int rating = 0;
 	
 	OAuthInterface() {
 		// create a consumer object and configure it with the access
@@ -202,7 +205,22 @@ public class OAuthInterface {
         t.start();
 	}
 	
-	 private Runnable doPostBook = new Runnable() {
+	void postReview(int _reviewId, int _rating, String _body) {
+		reviewId = _reviewId;
+		body = _body;
+		rating = _rating;
+		Thread t = new Thread(null, doPostReview, "addReview");
+        t.start();
+	}
+	
+	private Runnable doPostReview = new Runnable() {
+    	public void run() {
+    		postReview();
+    	}
+    };
+  
+	
+	private Runnable doPostBook = new Runnable() {
 	    	public void run() {
 	    		postBook();
 	    	}
@@ -221,7 +239,12 @@ public class OAuthInterface {
 	            postBookUpdateResults();
 	        }
 	    };
-	    
+	  
+	 private final Runnable doPostReviewUpdateGUI = new Runnable() {
+		        public void run() {
+		            postReviewUpdateResults();
+		        }
+		    };
 	    private final Runnable doPostUpdateStatusGUI = new Runnable() {
 	        public void run() {
 	            postUpdateStatusResults();
@@ -243,6 +266,18 @@ public class OAuthInterface {
         	postUpdateOrBook(out, OAuthInterface.ADD_UPDATE_PATH);
 	    }
 	    
+	    
+	    private void postReview() {
+	    	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();;
+	    	if(body.length() > 0) {
+        		out.add(new BasicNameValuePair("review[review]", body));
+        	}
+	    	if(rating != 0) {
+	    		out.add(new BasicNameValuePair("review[rating]", Integer.toString(rating)));
+	    	}
+	    	postUpdateOrBook(out, OAuthInterface.REVIEW_PATH + reviewId + ".xml");
+	    }
+	    
 	    private void postBook() {
 	    	Log.d(TAG, "Adding book id " + bookId + " to " + shelfTitle);     	
         	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();
@@ -260,11 +295,13 @@ public class OAuthInterface {
 	    		HttpResponse response = httpClient.execute(post); 
 	    		Log.d(TAG, response.getStatusLine().toString());
 	    		int responseCode = response.getStatusLine().getStatusCode();
-	    		if(responseCode == 201){
+	    		if(responseCode == 201 || responseCode == 200){
 	    			if(URL == OAuthInterface.ADD_BOOK_PATH) { 
 	    				((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostBookUpdateGUI);
 	    			} else if(URL == OAuthInterface.ADD_UPDATE_PATH) { 
 	    				((UpdatesActivity) myApp.goodreads_activity).mHandler.post(doPostUpdateStatusGUI);
+	    			} else if(URL == OAuthInterface.REVIEW_PATH) {
+	    				((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostReviewUpdateGUI);
 	    			}
 	    		} else {
 	    			myApp.errMessage = response.getStatusLine().toString();
@@ -327,5 +364,9 @@ public class OAuthInterface {
 	    
 	    private void postUpdateStatusResults() {
 	    	((UpdatesActivity) myApp.goodreads_activity).toastMe(R.string.statusUpdated);
+	    }
+	    
+	    private void postReviewUpdateResults() {
+	    	((UpdatesActivity) myApp.goodreads_activity).toastMe(R.string.review_updated);
 	    }
 }

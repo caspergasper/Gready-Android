@@ -8,11 +8,13 @@ import android.graphics.Bitmap;
 public class Book {
 
 	int id;
+	int reviewId;
 	Bitmap bitmap;
 	String imgUrl;
 	String title;
 	String bookLink;
 	String average_rating;
+	int myRating = 0;
 	String description = "";
 	List <String> shelves = new ArrayList<String>();
 	String author = "";
@@ -22,7 +24,7 @@ public class Book {
 	}
 	
 	Book(int _id) {
-		id = _id;
+		reviewId = _id;
 	}
 	
 	@Override

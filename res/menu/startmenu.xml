@@ -3,7 +3,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
 <!--<item android:icon="@android:drawable/ic_menu_preferences" android:id="@+id/identifyuser" -->
 <!--android:titleCondensed="@string/usersettings" android:title="@string/usersettings"></item>-->
-<item android:titleCondensed="@string/updates" android:title="@string/updates" 
+<item android:titleCondensed="@string/updates_label" android:title="@string/updates_label" 
 android:id="@+id/updates" android:icon="@android:drawable/ic_menu_info_details"></item>
 <!--<item android:titleCondensed="@string/bookshelves_label" android:title="@string/bookshelves_label" -->
 <!--android:id="@+id/booklist" android:icon="@android:drawable/ic_menu_view"></item>-->

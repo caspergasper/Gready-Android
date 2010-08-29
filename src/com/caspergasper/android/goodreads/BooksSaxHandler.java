@@ -19,6 +19,7 @@ class BooksSaxHandler extends DefaultHandler {
     private final static String END = "end";
     private final static String TOTAL = "total";
     private final static String AVERAGE_RATING = "average_rating";
+    private final static String RATING = "rating";
     private final static String LINK = "link";
     private final static String SMALL_IMAGE_URL = "small_image_url";
     private final static String AUTHORS = "authors";
@@ -50,9 +51,15 @@ class BooksSaxHandler extends DefaultHandler {
             throws SAXException {
     	super.endElement(uri, localName, name);	
         pos = userdata.tempBooks.size() - 1;
-        if(inId && localName.equalsIgnoreCase(ID)) {
-        	userdata.tempBooks.add(new Book(Integer.parseInt(builder.toString().trim())));
-        	inId = inReview = false;
+        if(localName.equalsIgnoreCase(ID)) {
+        	if(inId) {
+        		userdata.tempBooks.get(pos).id = Integer.parseInt(builder.toString().trim());
+        		inId = false;
+        	} else if(!inAuthors) {
+        		userdata.tempBooks.add(new Book(Integer.parseInt(builder.toString().trim())));
+        	} 	
+        } else if(localName.equalsIgnoreCase(RATING)) {
+        	userdata.tempBooks.get(pos).myRating = Integer.parseInt(builder.toString().trim());
         } else if(localName.equalsIgnoreCase(TITLE)) {
         	userdata.tempBooks.get(pos).title = builder.toString().trim();
         } else if(localName.equalsIgnoreCase(DESCRIPTION)) {
@@ -62,6 +69,8 @@ class BooksSaxHandler extends DefaultHandler {
         	if(userdata.tempBooks.get(pos).bookLink == null) {
         		userdata.tempBooks.get(pos).setBookLink(builder.toString().trim());
         	}
+        } else if(localName.equalsIgnoreCase(REVIEW)) {
+        	inReview = false;
         } else if(localName.equalsIgnoreCase(NAME)) {
         	userdata.tempBooks.get(pos).author += builder.toString().trim() + " ";
         } else if(localName.equalsIgnoreCase(AVERAGE_RATING)) {

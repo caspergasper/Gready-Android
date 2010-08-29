@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_root"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="8dp"
+              android:background="#ffffff"
+              android:textColor="#000000"
+              android:orientation="vertical"
+              >
+    <EditText android:id="@+id/statusbox"
+              android:layout_width="fill_parent"
+              android:layout_height="80dp"
+              android:inputType="textMultiLine"
+              android:singleLine="false"
+              />
+      <RatingBar android:id="@+id/rating" android:numStars="5" android:stepSize="1" android:rating="0" 
+      android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+      <Button android:id="@+id/updatebutton"
+  android:text="@string/update_review"
+  android:layout_width="wrap_content" android:layout_height="wrap_content" 
+  android:layout_gravity="center_horizontal"	/> 	
+</LinearLayout>
