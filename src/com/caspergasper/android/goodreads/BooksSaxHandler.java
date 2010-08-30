@@ -27,6 +27,7 @@ class BooksSaxHandler extends DefaultHandler {
     private final static String ID = "id";
     private final static String TYPE = "type";
     private final static String INTEGER = "integer";
+    private final static String BODY = "body";
     
     private UserData userdata;
     private boolean inAuthors = false;
@@ -60,6 +61,8 @@ class BooksSaxHandler extends DefaultHandler {
         	} 	
         } else if(localName.equalsIgnoreCase(RATING)) {
         	userdata.tempBooks.get(pos).myRating = Integer.parseInt(builder.toString().trim());
+        } else if(localName.equalsIgnoreCase(BODY)) {
+        	userdata.tempBooks.get(pos).review = builder.toString().trim();
         } else if(localName.equalsIgnoreCase(TITLE)) {
         	userdata.tempBooks.get(pos).title = builder.toString().trim();
         } else if(localName.equalsIgnoreCase(DESCRIPTION)) {

@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AbsListView.OnScrollListener;
@@ -335,7 +336,7 @@ OnScrollListener {
     			toastMe(R.string.no_book_page);
     		}
     	} else if(groupId == 0 && item.getItemId() == 2) {
-    		startActivity(new Intent(BooksActivity.this, ReviewActivity.class));	
+    		showReviewDialog();	
     	} else if(groupId == SUBMENU_GROUPID || groupId == SUBMENU_GROUPID_RADIO) {
     		Log.d(TAG, "add book to shelf " + item.getTitle().toString());
     		myApp.oauth.postBookToShelf(currentBook.id, item.getTitle().toString());
@@ -346,6 +347,29 @@ OnScrollListener {
 	void toastMe(int msgid) {
 		Toast toast = Toast.makeText(getApplicationContext(), msgid, Toast.LENGTH_SHORT);
 		toast.show();
+	}
+	
+	private void showReviewDialog() {
+		final Dialog d = new Dialog(BooksActivity.this);
+		Window window = d.getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
+				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		d.setContentView(R.layout.review_dialog);
+		((EditText)d.findViewById(R.id.statusbox)).setText(BooksActivity.currentBook.review);
+		((RatingBar)d.findViewById(R.id.rating)).setRating(BooksActivity.currentBook.myRating);
+		((Button)d.findViewById(R.id.updatebutton)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				int rating = (int) ((RatingBar)d.findViewById(R.id.rating)).getRating();
+				String body = ((EditText)d.findViewById(R.id.statusbox)).getText().toString().trim();
+				if(rating != 0 || body.length() > 0) {
+					myApp.oauth.postReview(BooksActivity.currentBook.reviewId, rating, body);
+				}
+				d.hide();
+			}
+		});
+		d.show();
 	}
 	
 	private void addBooksToListView() {

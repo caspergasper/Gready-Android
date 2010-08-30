@@ -300,7 +300,7 @@ public class OAuthInterface {
 	    				((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostBookUpdateGUI);
 	    			} else if(URL == OAuthInterface.ADD_UPDATE_PATH) { 
 	    				((UpdatesActivity) myApp.goodreads_activity).mHandler.post(doPostUpdateStatusGUI);
-	    			} else if(URL == OAuthInterface.REVIEW_PATH) {
+	    			} else {
 	    				((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostReviewUpdateGUI);
 	    			}
 	    		} else {
@@ -367,6 +367,6 @@ public class OAuthInterface {
 	    }
 	    
 	    private void postReviewUpdateResults() {
-	    	((UpdatesActivity) myApp.goodreads_activity).toastMe(R.string.review_updated);
+	    	((BooksActivity) myApp.goodreads_activity).toastMe(R.string.review_updated);
 	    }
 }

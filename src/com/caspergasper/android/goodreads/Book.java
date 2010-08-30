@@ -18,6 +18,7 @@ public class Book {
 	String description = "";
 	List <String> shelves = new ArrayList<String>();
 	String author = "";
+	String review;
 
 	Book(String str) {
 		title = str;
