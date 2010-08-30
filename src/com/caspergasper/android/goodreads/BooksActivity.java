@@ -25,8 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -76,7 +74,7 @@ OnScrollListener {
 			super.onResume();
 			if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
 	        	Log.d(TAG, "Missing accessTokens, retrieving...");
-	        	startActivity(new Intent(BooksActivity.this, SettingsActivity.class));
+	        	startActivity(new Intent(BooksActivity.this, OAuthCallbackActivity.class));
 	        	return;
 	        } 
 			if(myApp.userID == 0  && !myApp.threadLock) {
@@ -200,12 +198,7 @@ OnScrollListener {
 	}
 	
 	void showSearchDialog() {
-		final Dialog d = new Dialog(BooksActivity.this);
-		Window window = d.getWindow();
-		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
-				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		
-		d.setContentView(R.layout.booksearch_dialog);
+		final Dialog d = myApp.createDialogBox(BooksActivity.this, R.layout.booksearch_dialog, false);
 		d.setTitle(R.string.searchTitle);
 		final Button b = (Button) d.findViewById(R.id.searchbutton);
 		b.setOnClickListener(new View.OnClickListener() {
@@ -231,7 +224,6 @@ OnScrollListener {
 			}
 		});
 		d.show();
-	
 	}
 	
 	private void newQuery() {
@@ -242,7 +234,6 @@ OnScrollListener {
 	
     void updateMainScreenForUser(int result) {
     	Log.d(TAG, "booksMainScreenForUser");
-    	TextView tv;
     	UserData ud = myApp.userData;
     	
     	if(result == 1) {
@@ -268,11 +259,11 @@ OnScrollListener {
 			} else {
 				shelfAdapter = (ShelfAdapter) updatesListView.getAdapter();
 			}
-			tv = (TextView) findViewById(R.id.updates_label);
 			if(myApp.oauth.goodreads_url == OAuthInterface.GET_BOOKS_BY_ISBN) {
-				tv.setText("");
+				((TextView) findViewById(R.id.updates_label)).setText("");
 			} else {
-				tv.setText("(" + ud.totalBooks + ") " + ud.shelfToGet);
+				((TextView) findViewById(R.id.updates_label)).setText("(" + ud.totalBooks + ") " 
+						+ ud.shelfToGet);
 			}
 			updatesListView.setVisibility(View.VISIBLE);
 			addBooksToListView();
@@ -350,12 +341,7 @@ OnScrollListener {
 	}
 	
 	private void showReviewDialog() {
-		final Dialog d = new Dialog(BooksActivity.this);
-		Window window = d.getWindow();
-		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
-				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		d.setContentView(R.layout.review_dialog);
+		final Dialog d = myApp.createDialogBox(BooksActivity.this, R.layout.review_dialog, true);
 		((EditText)d.findViewById(R.id.statusbox)).setText(BooksActivity.currentBook.review);
 		((RatingBar)d.findViewById(R.id.rating)).setRating(BooksActivity.currentBook.myRating);
 		((Button)d.findViewById(R.id.updatebutton)).setOnClickListener(new View.OnClickListener() {
@@ -469,33 +455,20 @@ OnScrollListener {
 	}
 	
 	private final void showBookDetail(Book b) {
-		TextView textview;
-		Dialog d = new Dialog(BooksActivity.this);
-		Window window = d.getWindow();
-		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
-				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		d.setContentView(R.layout.book_dialog);
-		
+		Dialog d = myApp.createDialogBox(BooksActivity.this, R.layout.book_dialog, true);
 		if(b.bitmap != null) {
-			ImageView imgView = (ImageView) d.findViewById(R.id.bookDialogImage);
-			imgView.setImageBitmap(b.bitmap);
-		}
-		
-		textview = (TextView) d.findViewById(R.id.title);
-		textview.setText(b.title);
-		textview = (TextView) d.findViewById(R.id.author);
-		textview.setText(b.author);
-		textview = (TextView) d.findViewById(R.id.avg_rating);
-		textview.setText("Average rating: " + b.average_rating);
-		textview = (TextView) d.findViewById(R.id.shelves);
+			((ImageView) d.findViewById(R.id.bookDialogImage)).setImageBitmap(b.bitmap);
+		}	
+		((RatingBar) d.findViewById(R.id.rating)).setRating(b.myRating);
+		((TextView) d.findViewById(R.id.title)).setText(b.title);
+		((TextView) d.findViewById(R.id.author)).setText(b.author);
+		((TextView) d.findViewById(R.id.avg_rating)).setText("Avg rating: " + b.average_rating);
 		if(b.shelves.size() == 0) {
-			textview.setText("Shelves: not shelved");
+			((TextView) d.findViewById(R.id.shelves)).setText("Shelves: not shelved");
 		} else {
-			textview.setText("Shelves: " + b.getShelves());
+			((TextView) d.findViewById(R.id.shelves)).setText("Shelves: " + b.getShelves());
 		}
-		textview = (TextView) d.findViewById(R.id.description);
-		textview.setText(Html.fromHtml(b.description));
+		((TextView) d.findViewById(R.id.description)).setText(Html.fromHtml(b.description));
 		d.show();	
 	}
 	

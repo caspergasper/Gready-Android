@@ -3,6 +3,7 @@ package com.caspergasper.android.goodreads;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,8 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class GoodReadsApp extends Application {
 	
@@ -135,11 +138,23 @@ public class GoodReadsApp extends Application {
 		ad.setPositiveButton("OK", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int arg1) {
 				deleteAllPrefs();
-				activity.startActivity(new Intent(activity, SettingsActivity.class));
+				activity.startActivity(new Intent(activity, OAuthCallbackActivity.class));
 			}
 		});
 		ad.setNegativeButton("No thanks", null);
 		ad.show();
+	}
+	
+	Dialog createDialogBox(Activity activity, int layoutId, boolean hideTitle) {
+		Dialog d = new Dialog(activity);
+		Window window = d.getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
+				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+		if(hideTitle) {
+			d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		}
+		d.setContentView(layoutId);
+		return d;
 	}
 }
 

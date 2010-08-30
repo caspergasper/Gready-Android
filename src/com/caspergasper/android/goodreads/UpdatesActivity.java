@@ -21,8 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -60,7 +58,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			super.onResume();
 			if (myApp.accessToken == null  || myApp.accessTokenSecret == null) {
 	        	Log.d(TAG, "Missing accessTokens, retrieving...");
-	        	startActivity(new Intent(UpdatesActivity.this, SettingsActivity.class));
+	        	startActivity(new Intent(UpdatesActivity.this, OAuthCallbackActivity.class));
 	        	return;
 	        } 
 			if(myApp.userID == 0  && !myApp.threadLock) {
@@ -199,34 +197,18 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 	
 	
 	private final void showUpdateDetail(Update update) {
-		TextView textview;
-		Dialog d = new Dialog(UpdatesActivity.this);
-		Window window = d.getWindow();
-		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
-				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		d.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		d.setContentView(R.layout.update_dialog);
-		
+		Dialog d = myApp.createDialogBox(UpdatesActivity.this, R.layout.update_dialog, true);
 		if(update.bitmap != null) {
-			ImageView imgView = (ImageView) d.findViewById(R.id.updateDialogImage);
-			imgView.setImageBitmap(update.bitmap);
+			((ImageView) d.findViewById(R.id.updateDialogImage)).setImageBitmap(update.bitmap);
 		}
-		textview = (TextView) d.findViewById(R.id.title);
-		textview.setText(update.getUpdateText());
-		textview = (TextView) d.findViewById(R.id.update);
-		textview.setText(update.getBody());
+		((TextView) d.findViewById(R.id.title)).setText(update.getUpdateText());
+		((TextView) d.findViewById(R.id.update)).setText(update.getBody());
 		d.show();	
 	}
 	
 	void showUpdateDialog() {
 		final String CHARS_LEFT = " left";
-		updateDialog = new Dialog(UpdatesActivity.this);
-		Window window = updateDialog.getWindow();
-		window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, 
-				WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-		updateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		updateDialog.setContentView(R.layout.updatestatus_dialog);
-		updateDialog.setTitle(R.string.update_status);
+		updateDialog = myApp.createDialogBox(UpdatesActivity.this, R.layout.updatestatus_dialog, true);
 		final Button b = (Button) updateDialog.findViewById(R.id.updatebutton);
 		final RadioGroup group = (RadioGroup) updateDialog.findViewById(R.id.RadioGroup);
 		final EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
@@ -311,7 +293,6 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 	
     void updateMainScreenForUser(int result) {
     	Log.d(TAG, "updatesMainScreenForUser");
-    	TextView tv;
     	UserData ud = myApp.userData;
     	
     	if(result == 1) {
@@ -343,8 +324,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			addUpdatesToListView();
 			updatesListView.setVisibility(View.VISIBLE);
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
-			tv = (TextView) findViewById(R.id.updates_label);
-			tv.setText(R.string.updates_label);
+			((TextView) findViewById(R.id.updates_label)).setText(R.string.updates_label);
 			if(myApp.userData.shelves.size() == 0) {
 				xmlPage = 1;
 				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);

@@ -10,24 +10,21 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:padding="4dp"
-              >
+              android:padding="4dp">
 <TextView android:id="@+id/title"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:textColor="#000000"
               android:textStyle="bold"
               android:padding="2dp" 
-              android:layout_centerHorizontal="true"
-              />
+              android:layout_centerHorizontal="true"/>
  <ImageView android:id="@+id/bookDialogImage"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:layout_marginRight="4dp"
                android:src="@drawable/icon"
                android:layout_below="@id/title"
-               android:paddingBottom="2dp"
-               />
+               android:paddingBottom="2dp" />
     <TextView android:id="@+id/author"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -39,25 +36,35 @@
               android:layout_height="wrap_content"
               android:textColor="#000000"
               android:layout_toRightOf="@id/bookDialogImage"
-              android:layout_below="@id/author"
-              />  
-     <TextView android:id="@+id/shelves"
+              android:layout_below="@id/author"   /> 
+   <TextView android:id="@+id/my_rating"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:textColor="#000000"
-              android:layout_toRightOf="@+id/bookDialogImage"
+              android:layout_toRightOf="@id/bookDialogImage"
               android:layout_below="@id/avg_rating"
-              /> 
+              android:text="@string/my_rating"  /> 
+ <RatingBar android:id="@+id/rating" android:numStars="5" android:stepSize="1" android:rating="0" 
+      style="?android:attr/ratingBarStyleSmall"  android:layout_width="wrap_content" 
+      android:layout_height="wrap_content" android:layout_toRightOf="@id/my_rating"
+              android:layout_below="@id/avg_rating"  
+              android:paddingLeft="2dp" android:paddingBottom="15dp" />
+     <TextView android:id="@+id/shelves"
+     android:paddingTop="15dp"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="#000000"
+              android:layout_toRightOf="@id/bookDialogImage"
+              android:layout_below="@id/my_rating"
+               /> 
 </RelativeLayout>
      <ScrollView   
          android:id="@+id/ScrollView01"  
        android:layout_height="fill_parent"   
-       android:layout_width="fill_parent"
-       android:layout_below="@id/bookDialogImage">             
+       android:layout_width="fill_parent">             
     <TextView android:id="@+id/description"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:textColor="#000000"
-              />
+              android:textColor="#000000" />
  </ScrollView>
 </LinearLayout>
