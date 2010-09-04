@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-  xmlns:android="http://schemas.android.com/apk/res/android">
+<menu  xmlns:android="http://schemas.android.com/apk/res/android">
 <!--<item android:icon="@android:drawable/ic_menu_preferences" android:id="@+id/identifyuser" -->
 <!--android:titleCondensed="@string/usersettings" android:title="@string/usersettings"></item>-->
 <item android:titleCondensed="@string/updates_label" android:title="@string/updates_label" 
@@ -11,4 +10,6 @@ android:id="@+id/updates" android:icon="@android:drawable/ic_menu_info_details">
 android:id="@+id/search" android:icon="@android:drawable/ic_menu_search"></item>
 <item android:titleCondensed="@string/scanbook_label" android:title="@string/scanbook_label" 
 android:id="@+id/scanbook" android:icon="@android:drawable/ic_menu_camera"></item>
+<item android:titleCondensed="@string/preferences" android:title="@string/preferences" 
+android:id="@+id/preferences" android:icon="@android:drawable/ic_menu_preferences"></item>
 </menu>

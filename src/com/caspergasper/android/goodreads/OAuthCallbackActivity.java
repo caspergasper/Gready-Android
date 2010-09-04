@@ -22,7 +22,7 @@ public class OAuthCallbackActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         try {
         		super.onCreate(savedInstanceState);
-        		setContentView(R.layout.userprefs);
+        		setContentView(R.layout.oauth_callback);
         		myApp = GoodReadsApp.getInstance();
     		} catch(Exception e) {
     			myApp.errMessage =  "onCreate " + e.toString();

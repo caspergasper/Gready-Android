@@ -3,20 +3,28 @@
               android:id="@+id/layout_root"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:padding="8dp"
+     
               android:background="#ffffff"
               android:textColor="#000000"
-              android:orientation="vertical"
-              >
+              android:orientation="vertical" >
     <EditText android:id="@+id/statusbox"
               android:layout_width="fill_parent"
-              android:layout_height="80dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
               android:inputType="textMultiLine"
               android:singleLine="false"
+              android:layout_gravity="fill_horizontal"
               />
-      <RatingBar android:id="@+id/rating" android:numStars="5" android:stepSize="1" android:rating="0" 
-      android:layout_width="wrap_content"
-              android:layout_height="wrap_content"/>
+<TextView android:text="@string/rate_this_book" android:textColor="#000000"
+android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:paddingLeft="4dp"/>
+<RatingBar android:id="@+id/set_rating" android:numStars="5" android:rating="0" 
+      android:layout_width="wrap_content" android:max="5" android:isIndicator="false"
+              android:layout_height="wrap_content"  android:stepSize="1"
+              android:paddingLeft="0dp" android:paddingRight="0dp" 
+               style="@style/bookRatingBar" android:layout_gravity="center_horizontal"
+               android:layout_marginBottom="20dp" />
       <Button android:id="@+id/updatebutton"
   android:text="@string/update_review"
   android:layout_width="wrap_content" android:layout_height="wrap_content" 

@@ -6,4 +6,9 @@
 
 
 </style>
+<style name="bookRatingBar" parent="@android:style/Widget.RatingBar">
+	        <item name="android:progressDrawable">@drawable/book_rating_bar_full</item>
+	        <item name="android:minHeight">48dip</item>
+	        <item name="android:maxHeight">48dip</item>
+ </style>
 </resources>

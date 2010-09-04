@@ -164,6 +164,9 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
 			finish();
 			return true;
+		} else if(item.getItemId() == R.id.preferences) {
+			startActivity(new Intent(UpdatesActivity.this, PreferencesActivity.class));
+			return true;
 		}
 			return false;	
 	}

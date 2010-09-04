@@ -131,10 +131,6 @@ OnScrollListener {
 		super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.startmenu, menu);
-//        MenuItem item = menu.findItem(R.id.identifyuser);
-//        item.setIntent(new Intent(GoodreadsActivity.this, SettingsActivity.class));
-//        MenuItem item = menu.findItem(R.id.updates);
-//        item.setIntent(new Intent(GoodreadsActivity.this, About.class));
         SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, R.string.bookshelves_label);
     	sub.setHeaderIcon(android.R.drawable.ic_menu_view);
     	sub.setIcon(android.R.drawable.ic_menu_view);
@@ -179,13 +175,14 @@ OnScrollListener {
 			startActivity(new Intent(BooksActivity.this, UpdatesActivity.class));	
 			finish();
 			return true;
-		}
-		else if(item.getItemId() == R.id.scanbook) {
+		} else if(item.getItemId() == R.id.scanbook) {
 			IntentIntegrator.initiateScan(BooksActivity.this,IntentIntegrator.DEFAULT_TITLE,IntentIntegrator.DEFAULT_MESSAGE,IntentIntegrator.DEFAULT_YES,IntentIntegrator.DEFAULT_NO,IntentIntegrator.PRODUCT_CODE_TYPES);
 			return true;
-		}
- 		else if(item.getItemId() == R.id.search) {
+		} else if(item.getItemId() == R.id.search) {
 			showSearchDialog();
+			return true;
+		} else if(item.getItemId() == R.id.preferences) {
+			startActivity(new Intent(BooksActivity.this, PreferencesActivity.class));
 			return true;
 		}
 			return false;	
@@ -269,9 +266,23 @@ OnScrollListener {
 			addBooksToListView();
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			ud.updates.clear();
-			// Load images in background
-			getImages();
+			if(myApp.userData.shelves.size() == 0) {
+				xmlPage = 1;
+				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);
+			} else {
+				// Load images in background
+				getImages();
+			}
 		break;
+		case OAuthInterface.GET_SHELVES:
+    		// We need to cater for users with > 100 bookshelves like Cait :-)
+    		if(ud.endShelf < ud.totalShelves) {
+    			Log.d(TAG, "Getting extra shelf for some user that reads too much...");
+    			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
+    		} else {
+    			getImages();
+    		}
+    	break;
     	}
     	} catch(Exception e) {
 			myApp.errMessage = "BooksActivity updateMainScreenForUser " + e.toString();
@@ -287,6 +298,7 @@ OnScrollListener {
     	menu.setHeaderTitle(R.string.what_to_do);
     	menu.add(0, Menu.FIRST, Menu.NONE, R.string.goto_mobilesite);
     	menu.add(0, 2, Menu.NONE, R.string.rate_review);
+    	menu.add(0, 3, Menu.NONE, R.string.see_book_details);
     	SubMenu sub = menu.addSubMenu(R.string.change_shelves);
     	List<Shelf> tempShelves = myApp.userData.shelves;
     	// Copied text
@@ -316,7 +328,8 @@ OnScrollListener {
     public boolean onContextItemSelected(MenuItem item) {
     	super.onContextItemSelected(item);
     	int groupId = item.getGroupId(); 
-    	if(groupId == 0 && item.getItemId() == Menu.FIRST) {
+    	int itemId = item.getItemId();
+    	if(groupId == 0 && itemId == Menu.FIRST) {
     		if(currentBook.bookLink != null) {
     			String path = OAuthInterface.URL_ADDRESS +
     			OAuthInterface.BOOKPAGE_PATH + currentBook.bookLink;
@@ -326,8 +339,10 @@ OnScrollListener {
     		} else {
     			toastMe(R.string.no_book_page);
     		}
-    	} else if(groupId == 0 && item.getItemId() == 2) {
+    	} else if(groupId == 0 && itemId == 2) {
     		showReviewDialog();	
+    	} else if(groupId == 0 && itemId == 3) {
+    		showBookDetail(currentBook);
     	} else if(groupId == SUBMENU_GROUPID || groupId == SUBMENU_GROUPID_RADIO) {
     		Log.d(TAG, "add book to shelf " + item.getTitle().toString());
     		myApp.oauth.postBookToShelf(currentBook.id, item.getTitle().toString());
@@ -341,16 +356,19 @@ OnScrollListener {
 	}
 	
 	private void showReviewDialog() {
-		final Dialog d = myApp.createDialogBox(BooksActivity.this, R.layout.review_dialog, true);
+		final Dialog d = myApp.createDialogBox(BooksActivity.this, R.layout.review_dialog, false);
+		d.setTitle(R.string.edit_review);
 		((EditText)d.findViewById(R.id.statusbox)).setText(BooksActivity.currentBook.review);
-		((RatingBar)d.findViewById(R.id.rating)).setRating(BooksActivity.currentBook.myRating);
+		((RatingBar)d.findViewById(R.id.set_rating)).setRating(BooksActivity.currentBook.myRating);
 		((Button)d.findViewById(R.id.updatebutton)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				int rating = (int) ((RatingBar)d.findViewById(R.id.rating)).getRating();
+				int rating = (int) ((RatingBar)d.findViewById(R.id.set_rating)).getRating();
 				String body = ((EditText)d.findViewById(R.id.statusbox)).getText().toString().trim();
 				if(rating != 0 || body.length() > 0) {
 					myApp.oauth.postReview(BooksActivity.currentBook.reviewId, rating, body);
+					BooksActivity.currentBook.myRating = rating;
+					BooksActivity.currentBook.review = body;
 				}
 				d.hide();
 			}
