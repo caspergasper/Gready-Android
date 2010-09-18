@@ -89,6 +89,10 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 	    	super.onCreate(savedInstanceState);
 	        setContentView(R.layout.updates);
 	        myApp = GoodReadsApp.getInstance();
+	        if(myApp.userData.shelfToGet.compareToIgnoreCase("Updates") != 0) {
+	        	startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
+				finish();
+	        }
 	        myApp.goodreads_activity = this;
 	        updatesListView = (ListView) findViewById(R.id.updates_listview);
 	        newQuery();  // For when activity has been cleared from memory but app hasn't
@@ -165,7 +169,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			finish();
 			return true;
 		} else if(item.getItemId() == R.id.preferences) {
-			startActivity(new Intent(UpdatesActivity.this, PreferencesActivity.class));
+			startActivity(new Intent(UpdatesActivity.this, Preferences.class));
 			return true;
 		}
 			return false;	

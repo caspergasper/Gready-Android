@@ -172,6 +172,7 @@ OnScrollListener {
 			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 			return true;
 		} else if(item.getItemId() == R.id.updates) {
+			myApp.userData.shelfToGet = "Updates";
 			startActivity(new Intent(BooksActivity.this, UpdatesActivity.class));	
 			finish();
 			return true;
@@ -182,7 +183,7 @@ OnScrollListener {
 			showSearchDialog();
 			return true;
 		} else if(item.getItemId() == R.id.preferences) {
-			startActivity(new Intent(BooksActivity.this, PreferencesActivity.class));
+			startActivity(new Intent(BooksActivity.this, Preferences.class));
 			return true;
 		}
 			return false;	

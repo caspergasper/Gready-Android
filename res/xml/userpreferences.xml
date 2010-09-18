@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+<ListPreference 
+android:key="PREF_NUM_OF_UPDATES" 
+android:summary="@string/num_of_updates_to_show"
+android:title="@string/num_of_updates"
+android:entries="@array/max_updates"
+android:entryValues="@array/max_updates"  
+android:defaultValue="All"
+android:persistent="true" />
+<ListPreference 
+android:key="PREF_STARTUP_SHELF"
+android:title="@string/start_which_activity"
+android:summary="@string/start_which_activity"
+ />
+<!--android:defaultValue="Updates"-->
+<!--android:persistent="true"-->
+</PreferenceScreen>

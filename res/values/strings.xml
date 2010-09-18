@@ -46,9 +46,11 @@
 <string name="update_review">Update review</string>
 <string name="review_updated">Review updated.</string>
 <string name="my_rating">My rating: </string>
-<string name="num_of_updates">Number of updates to show:</string>
+<string name="num_of_updates">Number of updates</string>
+<string name="num_of_updates_to_show">Number of updates to show:</string>
 <string name="preferences">Preferences</string>
 <string name="rate_this_book">Rate this book:</string>
 <string name="edit_review">Create or amend your review</string>
 <string name="see_book_details">See book details</string>
+<string name="start_which_activity">Select startup page:</string>
 </resources>

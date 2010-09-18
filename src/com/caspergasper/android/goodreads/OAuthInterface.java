@@ -34,7 +34,7 @@ public class OAuthInterface {
 	static final String BOOKPAGE_SEARCH = "m/book?search_type=books&search%5Bquery%5D=";
 	static final String SHELF_URL_PATH = "review/list/";
 	static final String SHELVES_URL_PATH ="shelf/list?format=xml";
-	static final String UPDATES_URL_PATH = "updates/friends.xml?max_updates=5";
+	static final String UPDATES_URL_PATH = "updates/friends.xml";
 	static final String	BOOKS_ISBN_PATH = "book/isbn";
 	static final String ADD_BOOK_PATH = "shelf/add_to_shelf.xml";
 	static final String ADD_UPDATE_PATH = "user_status.xml";
@@ -162,6 +162,9 @@ public class OAuthInterface {
     		break;
     	case GET_FRIEND_UPDATES:
     		url_string = URL_ADDRESS + UPDATES_URL_PATH;
+    		if(myApp.numberOfUpdates.compareToIgnoreCase("All") != 0) {
+    			url_string += "?max_updates=" + myApp.numberOfUpdates;
+    		}
     		break;
     	case GET_BOOKS_BY_ISBN:
     		url_string = URL_ADDRESS + BOOKS_ISBN_PATH + "?isbn=" + myApp.userData.isbnScan + 

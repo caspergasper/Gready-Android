@@ -10,6 +10,8 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,13 +24,17 @@ public class GoodReadsApp extends Application {
 	String accessTokenSecret;
 	String errMessage;
 	int userID;
+	String numberOfUpdates;
 	SharedPreferences settings;
+	SharedPreferences global_settings;
 	UserData userData;
 	public static final String TAG = "Goodreads";
 	public static final String GOODREADS_PREFS = "GoodreadsPrefs";
 	static final String ACCESS_TOKEN = "access_token";
 	static final String ACCESS_TOKEN_SECRET = "access_token_secret";
 	static final String USER_ID = "user_id"; 
+	static final String PREF_NUM_OF_UPDATES = "PREF_NUM_OF_UPDATES";
+	static final String PREF_STARTUP_SHELF = "PREF_STARTUP_SHELF";
 	Activity goodreads_activity;
 	volatile boolean threadLock = false;
 	volatile boolean getImageThreadRunning;
@@ -52,6 +58,10 @@ public class GoodReadsApp extends Application {
 		accessTokenSecret = settings.getString(ACCESS_TOKEN_SECRET, null);
 		userID = settings.getInt(USER_ID, 0);
 		
+		global_settings = PreferenceManager.getDefaultSharedPreferences(this);
+		numberOfUpdates = global_settings.getString(PREF_NUM_OF_UPDATES, "All");
+		userData.shelfToGet = global_settings.getString(PREF_STARTUP_SHELF, "Updates");
+//		Log.d(TAG, "num of updates: " + numberOfUpdates);
 		oauth.updateTokens();
 	}
 	
