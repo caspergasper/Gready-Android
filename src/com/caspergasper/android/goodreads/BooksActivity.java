@@ -278,9 +278,10 @@ OnScrollListener {
 		case OAuthInterface.GET_SHELVES:
     		// We need to cater for users with > 100 bookshelves like Cait :-)
     		if(ud.endShelf < ud.totalShelves) {
-    			Log.d(TAG, "Getting extra shelf for some user that reads too much...");
+    			Log.d(TAG, "Getting extra shelf -- total shelves: " + ud.totalShelves);
     			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
     		} else {
+    			myApp.oauth.goodreads_url = OAuthInterface.GET_SHELF;
     			getImages();
     		}
     	break;

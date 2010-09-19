@@ -13,8 +13,6 @@ import android.preference.PreferenceManager;
 public class Preferences extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 
 	private GoodReadsApp myApp;
-//	private Spinner updatesSpinner;
-//	private Spinner startupSpinner;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,9 +21,6 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
         
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(myApp);
         prefs.registerOnSharedPreferenceChangeListener(this);
-        
-        
-        
 	}
 	
 	@Override 
