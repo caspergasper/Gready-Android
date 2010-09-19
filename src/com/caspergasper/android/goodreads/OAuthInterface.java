@@ -147,6 +147,9 @@ public class OAuthInterface {
     		url_string = URL_ADDRESS + SHELF_URL_PATH + myApp.userID + 
     		".xml?v=2&per_page=" + ITEMS_TO_DOWNLOAD + 
     		"&shelf=" + myApp.userData.shelfToGet + "&page=" + xmlPage; 
+    		if(myApp.orderShelfBy != 0) {
+    			url_string += myApp.orderShelfbyArray[myApp.orderShelfBy];
+    		}
     		break;
     	case GET_SHELVES:
     		url_string = URL_ADDRESS + SHELVES_URL_PATH + "&user_id=" + myApp.userID + 
@@ -185,7 +188,7 @@ public class OAuthInterface {
         	new MyAsyncTask().execute(request);
 		    
         } catch(OAuthException e) {
-        	Log.e(TAG, e.toString());
+        	Log.e(TAG, "OAuthInterface.getXMLFile: " + e.toString());
         	myApp.errMessage = e.toString();
         	throw new RuntimeException(e.toString());
         } 

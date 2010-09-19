@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,6 +23,8 @@ public class GoodReadsApp extends Application {
 	String accessToken;
 	String accessTokenSecret;
 	String errMessage;
+	int orderShelfBy = 0;
+	String[] orderShelfbyArray;
 	int userID;
 	String numberOfUpdates;
 	SharedPreferences settings;
@@ -61,7 +63,8 @@ public class GoodReadsApp extends Application {
 		global_settings = PreferenceManager.getDefaultSharedPreferences(this);
 		numberOfUpdates = global_settings.getString(PREF_NUM_OF_UPDATES, "All");
 		userData.shelfToGet = global_settings.getString(PREF_STARTUP_SHELF, "Updates");
-//		Log.d(TAG, "num of updates: " + numberOfUpdates);
+		Resources myResources = getResources();
+		orderShelfbyArray = myResources.getStringArray(R.array.sort_by_values);
 		oauth.updateTokens();
 	}
 	

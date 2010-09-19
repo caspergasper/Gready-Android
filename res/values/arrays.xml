@@ -7,4 +7,28 @@
 <item>20</item>
 <item>All</item>
 </string-array>
+<string-array name="sort_by">
+<item>default</item>
+<item>date added</item>
+<item>date updated</item>
+<item>rating (High-Low)</item>
+<item>rating (Low-High)</item>
+<item>avg rating</item>
+<item>title (a-z)</item>
+<item>title (z-a)</item>
+<item>author (a-z)</item>
+<item>author (z-a)</item>
+</string-array>
+<string-array name="sort_by_values">
+<item>default</item>
+<item>&amp;sort=date_added</item>
+<item>&amp;sort=date_updated</item>
+<item>&amp;sort=rating&amp;order=d</item>
+<item>&amp;sort=rating&amp;order=a</item>
+<item>&amp;sort=avg_rating</item>
+<item>&amp;sort=title&amp;order=a</item>
+<item>&amp;sort=title&amp;order=d</item>
+<item>&amp;sort=author&amp;order=a</item>
+<item>>&amp;sort=author&amp;order=d</item>
+</string-array>
 </resources>

@@ -27,21 +27,24 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 
 public class BooksActivity extends Activity implements OnItemClickListener, OnItemLongClickListener, 
-OnScrollListener {
+OnScrollListener, OnItemSelectedListener {
 	
 	private GoodReadsApp myApp;
 	private static final int SUBMENU_GROUPID = 1;
@@ -100,10 +103,6 @@ OnScrollListener {
 		}
 	}
 	
-	public void onPause() {
-		super.onPause();
-	}
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         try{
@@ -111,12 +110,25 @@ OnScrollListener {
 	        setContentView(R.layout.bookslist);
 	        myApp = GoodReadsApp.getInstance();
 	        updatesListView = (ListView) findViewById(R.id.updates_listview);
+	        myApp.threadLock = true;
+	        populateSpinner();
+	        myApp.threadLock = false;
 	        newQuery();  // For when activity has been cleared from memory but app hasn't
 	        
     	} catch(Exception e) {
 			myApp.errMessage = "BooksActivity onCreate " + e.toString();
 			myApp.showErrorDialog(this);
 		}
+    }
+    
+    private void populateSpinner() {
+    	ArrayAdapter<CharSequence> fAdapter;
+    	fAdapter = ArrayAdapter.createFromResource(this, R.array.sort_by, android.R.layout.simple_spinner_item);
+    	int spinner_dd_item = android.R.layout.simple_spinner_dropdown_item;
+    	fAdapter.setDropDownViewResource(spinner_dd_item);
+    	Spinner spinner = ((Spinner)findViewById(R.id.order_spinner)); 
+    	spinner.setAdapter(fAdapter);
+    	spinner.setOnItemSelectedListener(this);
     }
     
     @Override
@@ -235,7 +247,8 @@ OnScrollListener {
     	UserData ud = myApp.userData;
     	
     	if(result == 1) {
-			myApp.showErrorDialog(this);
+			Log.e(TAG, "BooksActivity.updateMainScreenForUser");
+    		myApp.showErrorDialog(this);
 			return;
 		} else if(result == 2) {
 			myApp.showGetAuthorizationDialog(this);
@@ -614,6 +627,7 @@ OnScrollListener {
 				}
 				mHandler.post(doUpdateGUI);
 			} catch (Exception e) {
+				Log.e(TAG, "BooksActivity.backgroundThreadProcessing");
 				myApp.errMessage = e.toString() + " " + e.getStackTrace().toString();
 				myApp.showErrorDialog(this);
 			}
@@ -625,6 +639,28 @@ OnScrollListener {
         // Back in the UI thread -- update UI elements
     	shelfAdapter.notifyDataSetChanged();
     }
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,
+			long id) {
+		if(pos == 0) {
+			myApp.orderShelfBy = 0;
+		} else {
+			//myApp.orderShelfBy = parent.getItemAtPosition(pos).toString();
+			myApp.orderShelfBy = pos;
+		}
+		if(!myApp.threadLock) {
+			showUpdateMessage(R.string.getBooks);
+			newQuery();
+			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
+		}
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
 

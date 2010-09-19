@@ -75,6 +75,7 @@ class UserData {
 				Log.e(TAG, books.get(books.size() - 1).title);
 			}
 		} catch (Exception e) {
+			Log.e(TAG, e.getStackTrace().toString());
 			throw new RuntimeException(e);
 		}
             return;
