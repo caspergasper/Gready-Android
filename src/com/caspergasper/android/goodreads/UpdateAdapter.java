@@ -15,7 +15,7 @@ public class UpdateAdapter extends ArrayAdapter<Update> {
 	int resource;
 	LayoutInflater vi;
 	
-	static class ViewHolder {
+	class ViewHolder {
 		TextView text;
 		ImageView image;
 	}

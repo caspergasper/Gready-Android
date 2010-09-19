@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/layout_updates"
-              android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:padding="2dp"
@@ -18,6 +17,14 @@
                android:src="@drawable/icon"
                />
 <TextView android:layout_height="wrap_content" android:layout_width="wrap_content"
-android:id="@+id/booklist_textview" android:padding="3dp">
-</TextView>
-</LinearLayout>
+android:id="@+id/booklist_textview" android:padding="3dp" 
+android:layout_toRightOf="@id/bookListViewImage"
+/>
+<RatingBar android:id="@+id/rating" android:numStars="5" android:stepSize="1" android:rating="0" 
+      style="?android:attr/ratingBarStyleSmall"  
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content"       
+      android:layout_toRightOf="@id/bookListViewImage"  
+      android:layout_below="@id/booklist_textview"
+      android:layout_marginLeft="4dp"    />
+</RelativeLayout>
