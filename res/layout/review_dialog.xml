@@ -3,13 +3,12 @@
               android:id="@+id/layout_root"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-     
               android:background="#ffffff"
               android:textColor="#000000"
               android:orientation="vertical" >
     <EditText android:id="@+id/statusbox"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
+              android:layout_width="285dp"
+              android:layout_height="260dp"
               android:layout_weight="1"
               android:inputType="textMultiLine"
               android:singleLine="false"
@@ -23,8 +22,9 @@ android:layout_width="fill_parent"
       android:layout_width="wrap_content" android:max="5" android:isIndicator="false"
               android:layout_height="wrap_content"  android:stepSize="1"
               android:paddingLeft="0dp" android:paddingRight="0dp" 
-               style="@style/bookRatingBar" android:layout_gravity="center_horizontal"
+                android:layout_gravity="center_horizontal"
                android:layout_marginBottom="20dp" />
+<!--               style="@style/bookRatingBar"-->
       <Button android:id="@+id/updatebutton"
   android:text="@string/update_review"
   android:layout_width="wrap_content" android:layout_height="wrap_content" 
