@@ -259,7 +259,7 @@ OnScrollListener, OnItemSelectedListener {
 		case OAuthInterface.SEARCH_SHELVES:
 		case OAuthInterface.GET_BOOKS_BY_ISBN:
 		case OAuthInterface.GET_SHELF:
-			if(ud.books.size() == 0) {					
+			if(ud.books != null && ud.books.size() == 0) {					
 				shelfAdapter = new 
 				ShelfAdapter(this, R.layout.booklistitem, ud.books);
 				updatesListView.setAdapter(shelfAdapter);
@@ -502,7 +502,7 @@ OnScrollListener, OnItemSelectedListener {
 			((TextView) d.findViewById(R.id.shelves)).setText("Shelves: " + b.getShelves());
 		}
 		((TextView) d.findViewById(R.id.description)).setText(Html.fromHtml(b.description));
-		if(b.review.length() > 0) {
+		if(b.review != null && b.review.length() > 0) {
 			d.findViewById(R.id.my_review_label).setVisibility(View.VISIBLE);
 			((TextView) d.findViewById(R.id.my_review)).setText(Html.fromHtml(b.review));
 		} else {
