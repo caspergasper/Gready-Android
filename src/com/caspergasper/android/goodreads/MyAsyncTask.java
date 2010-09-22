@@ -63,7 +63,7 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    	break;
 	    } 
 	    } catch(Exception e) { 
-	    	Log.e(TAG, "ERROR! " + e.toString());
+	    	Log.e(TAG, "ERROR! " + "MyAsyncTask.doInBackground: " + e.toString());
 	    	myApp.errMessage = e.toString();
 	    	return 1;
 	    }

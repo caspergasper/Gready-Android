@@ -20,9 +20,7 @@ public class Book {
 	String author = "";
 	String review;
 
-	Book(String str) {
-		title = str;
-	}
+	Book() {	}
 	
 	Book(int _id) {
 		reviewId = _id;

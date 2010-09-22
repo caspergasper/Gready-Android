@@ -45,7 +45,8 @@ class ISBNBooksSaxHandler extends DefaultHandler {
     	super.endElement(uri, localName, name);	
     	if(localName.equalsIgnoreCase(ID)) {
     		if(userdata.tempBooks.size() == 0) {
-    			userdata.tempBooks.add(new Book(Integer.parseInt(builder.toString().trim())));
+    			userdata.tempBooks.add(new Book());
+    			userdata.tempBooks.get(lastBookPos).id = Integer.parseInt(builder.toString().trim());
     		}
     	} else if(localName.equalsIgnoreCase(TITLE)) {
         	userdata.tempBooks.get(lastBookPos).title = builder.toString().trim();

@@ -538,7 +538,10 @@ OnScrollListener, OnItemSelectedListener {
 			xmlPage += PAGES_TO_MOVE_BY;
 		}
 		goingForward = true;
-		myApp.oauth.getXMLFile(xmlPage, myApp.oauth.goodreads_url);
+		if(!myApp.threadLock) {
+			Log.d(TAG, "onLastListItemDisplayed, getting books");
+			myApp.oauth.getXMLFile(xmlPage, myApp.oauth.goodreads_url);
+		}
 	}
 
 	private void onFirstListItemDisplayed() {
