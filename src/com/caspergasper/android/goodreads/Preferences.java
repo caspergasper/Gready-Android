@@ -19,6 +19,7 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
         addPreferencesFromResource(R.xml.userpreferences);  
         myApp = GoodReadsApp.getInstance();
         
+        populateStartupListPreference();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(myApp);
         prefs.registerOnSharedPreferenceChangeListener(this);
 	}
@@ -26,18 +27,23 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
 	@Override 
 	protected void onResume() {
 		super.onResume();
-		populateStartupListPreference();
 	}
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+		ListPreference listPref;
 		if(key.compareToIgnoreCase(GoodReadsApp.PREF_NUM_OF_UPDATES) == 0) {
 			myApp.numberOfUpdates = myApp.global_settings.getString(GoodReadsApp.PREF_NUM_OF_UPDATES, "All");
+			listPref = (ListPreference) findPreference(GoodReadsApp.PREF_NUM_OF_UPDATES);
+			listPref.setSummary(myApp.numberOfUpdates);
+		} else if(key.compareToIgnoreCase(GoodReadsApp.PREF_STARTUP_SHELF) == 0) {
+			listPref = (ListPreference) findPreference(GoodReadsApp.PREF_STARTUP_SHELF);
+			listPref.setSummary(myApp.global_settings.getString(GoodReadsApp.PREF_STARTUP_SHELF, "Updates"));
 		}
 	}
 
 	private void populateStartupListPreference() {
-		ListPreference startupView = (ListPreference) findPreference(GoodReadsApp.PREF_STARTUP_SHELF);
+		ListPreference listPref = (ListPreference) findPreference(GoodReadsApp.PREF_STARTUP_SHELF);
 		List<CharSequence> startupArray = new ArrayList<CharSequence>();
 		startupArray.add("Updates");
 		for(Shelf shelf : myApp.userData.shelves) {
@@ -45,8 +51,11 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
 		}
 
 		CharSequence[] chars = startupArray.toArray(new CharSequence[startupArray.size()]);
-		startupView.setEntries(chars);
-		startupView.setEntryValues(chars);
+		listPref.setEntries(chars);
+		listPref.setEntryValues(chars);
+		listPref.setSummary(myApp.global_settings.getString(GoodReadsApp.PREF_STARTUP_SHELF, "Updates"));
+		listPref = (ListPreference) findPreference(GoodReadsApp.PREF_NUM_OF_UPDATES);
+		listPref.setSummary(myApp.numberOfUpdates);
 	}	
 	
 }

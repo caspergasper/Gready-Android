@@ -1,5 +1,7 @@
 package com.caspergasper.android.goodreads;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -12,7 +14,9 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -44,6 +48,7 @@ public class GoodReadsApp extends Application {
 	static final int GOODREADS_IMG_URL_LENGTH = GOODREADS_IMG_URL.length();
 	MenuItem menuItem = null;
 	static final String TO_READ = "to-read";
+	static final int SUBMENU_GROUPID = 1;
 	
 	public static GoodReadsApp getInstance() {
 		return singleton;
@@ -168,6 +173,23 @@ public class GoodReadsApp extends Application {
 		}
 		d.setContentView(layoutId);
 		return d;
+	}
+	
+	void createShelvesMenu(List<Shelf> tempShelves, SubMenu sub) {
+    	int shelf_length = tempShelves.size();
+    	int totalBooks = 0;
+    	int currentShelfBooks = 0;
+    	int i;
+    	for(i=0; i<shelf_length && tempShelves.get(i) != null; i++) {
+    		currentShelfBooks = tempShelves.get(i).total;
+    		sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
+    	     "(" + currentShelfBooks + ") " + tempShelves.get(i).title);
+    		if(tempShelves.get(i).exclusive) {
+    			totalBooks += currentShelfBooks;
+    		}
+    	}
+    	sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
+       	     "(" + totalBooks + ") All books");
 	}
 }
 

@@ -38,8 +38,6 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 public class UpdatesActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
 	
 	private GoodReadsApp myApp;
-	private static final int SUBMENU_GROUPID = 1;
-	
 	private int xmlPage = 1;
 	private ListView updatesListView;
 	private static final String M_USER = "m/user/";
@@ -121,18 +119,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
         	toastMe(R.string.build_menu);
 			return false;
         } else {
-        	int shelf_length = tempShelves.size();
-        	int totalBooks = 0;
-        	int currentShelfBooks = 0;
-        	int i;
-        	for(i=0; i<shelf_length && tempShelves.get(i) != null; i++) {
-        		currentShelfBooks = tempShelves.get(i).total;
-        		sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
-        	     "(" + currentShelfBooks + ") " + tempShelves.get(i).title);
-        		totalBooks += currentShelfBooks;
-        	}
-        	sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
-           	     "(" + totalBooks + ") All books");
+        	myApp.createShelvesMenu(tempShelves, sub);
         }
         return true;
     }
@@ -143,7 +130,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		if(myApp.threadLock) {
 			return false;
 		}
-		if(item.getGroupId() == SUBMENU_GROUPID) {
+		if(item.getGroupId() == GoodReadsApp.SUBMENU_GROUPID) {
 			if(item.getItemId() == myApp.userData.shelves.size()) {
 				myApp.userData.shelfToGet = "all";
 			} else {

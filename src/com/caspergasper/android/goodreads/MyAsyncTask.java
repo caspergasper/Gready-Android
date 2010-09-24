@@ -17,7 +17,6 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	@Override
 	protected Integer doInBackground(HttpGet... request) {	
 		myApp = GoodReadsApp.getInstance();
-		myApp.threadLock = true;
 	    try {
 	    Log.d(TAG, request[0].getRequestLine().toString());
 	    // send the request

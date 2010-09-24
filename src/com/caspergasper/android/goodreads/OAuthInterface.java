@@ -135,6 +135,10 @@ public class OAuthInterface {
 	
 	
 	void getXMLFile(int xmlPage, int url) {
+		if(myApp.threadLock) {
+			return;
+		}
+		myApp.threadLock = true;
 		// create an HTTP request to a protected resource
         String url_string;
 		goodreads_url = url;
