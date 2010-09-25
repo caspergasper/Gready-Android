@@ -57,7 +57,6 @@ OnScrollListener, OnItemSelectedListener {
 	private boolean goingForward = true;
 	private boolean deleteAllBooks = false;
 	private int booksToDelete;
-	private int xmlPage = 1;
 	private ListView updatesListView;
 	private ShelfAdapter shelfAdapter;
 	private boolean booksRemovedFromFront = false;
@@ -80,7 +79,7 @@ OnScrollListener, OnItemSelectedListener {
 	        	return;
 	        } 
 			if(myApp.userID == 0  && !myApp.threadLock) {
-				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_USER_ID);
+				myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_USER_ID);
 				return;     
 			} else {
 				if(myApp.menuItem != null) {
@@ -92,8 +91,8 @@ OnScrollListener, OnItemSelectedListener {
 						myApp.userData.shelfToGet != null) {
 					// Got valid tokens and a userid, let's go get some data...
 					Log.d(TAG, "Getting books now...");
-					xmlPage = 1;
-					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
+					myApp.xmlPage = 1;
+					myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_SHELF);
 				} 
 			}
 		} catch(Exception e) {
@@ -142,15 +141,15 @@ OnScrollListener, OnItemSelectedListener {
 		super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.startmenu, menu);
-        SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, R.string.bookshelves_label);
-    	sub.setHeaderIcon(android.R.drawable.ic_menu_view);
-    	sub.setIcon(android.R.drawable.ic_menu_view);
+        myApp.sub = menu.addSubMenu(0, 0, Menu.NONE, R.string.bookshelves_label);
+        myApp.sub.setHeaderIcon(android.R.drawable.ic_menu_view);
+        myApp.sub.setIcon(android.R.drawable.ic_menu_view);
     	List<Shelf> tempShelves = myApp.userData.shelves;
         if(tempShelves.size() == 0 || myApp.userData.endShelf < myApp.userData.totalShelves) {
         	toastMe(R.string.build_menu);
 			return false;
         } else {
-        	myApp.createShelvesMenu(tempShelves, sub);
+        	myApp.createShelvesMenu(tempShelves);
         }
         return true;
     }
@@ -161,29 +160,27 @@ OnScrollListener, OnItemSelectedListener {
 		if(myApp.threadLock) {
 			return false;
 		}
+		int itemId = item.getItemId();
 		if(item.getGroupId() == GoodReadsApp.SUBMENU_GROUPID) {
-			if(item.getItemId() == myApp.userData.shelves.size()) {
-				myApp.userData.shelfToGet = "all";
-			} else {
-				myApp.userData.shelfToGet = myApp.userData.shelves.get(item.getItemId()).title;
+			if(myApp.handleBookshelfSelection(this, itemId)) {
+				showUpdateMessage(R.string.getBooks);
+				newQuery();
+				Log.d(TAG, "Getting shelf onItemSelected");
+				myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_SHELF);
 			}
-			showUpdateMessage(R.string.getBooks);
-			newQuery();
-			Log.d(TAG, "Getting shelf onItemSelected");
-			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF);
 			return true;
-		} else if(item.getItemId() == R.id.updates) {
+		} else if(itemId == R.id.updates) {
 			myApp.userData.shelfToGet = "Updates";
 			startActivity(new Intent(BooksActivity.this, UpdatesActivity.class));	
 			finish();
 			return true;
-		} else if(item.getItemId() == R.id.scanbook) {
+		} else if(itemId == R.id.scanbook) {
 			IntentIntegrator.initiateScan(BooksActivity.this,IntentIntegrator.DEFAULT_TITLE,IntentIntegrator.DEFAULT_MESSAGE,IntentIntegrator.DEFAULT_YES,IntentIntegrator.DEFAULT_NO,IntentIntegrator.PRODUCT_CODE_TYPES);
 			return true;
-		} else if(item.getItemId() == R.id.search) {
+		} else if(itemId == R.id.search) {
 			showSearchDialog();
 			return true;
-		} else if(item.getItemId() == R.id.preferences) {
+		} else if(itemId == R.id.preferences) {
 			startActivity(new Intent(BooksActivity.this, Preferences.class));
 			return true;
 		}
@@ -217,7 +214,7 @@ OnScrollListener, OnItemSelectedListener {
 					myApp.userData.shelfToGet = d.getContext().getString(R.string.searchResults); 
 					newQuery();
 					showUpdateMessage(R.string.getSearch);
-					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.SEARCH_SHELVES);
+					myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.SEARCH_SHELVES);
 				}
 				d.hide();
 			}
@@ -228,7 +225,7 @@ OnScrollListener, OnItemSelectedListener {
 	private void newQuery() {
 		deleteAllBooks = true;
 		booksRemovedFromFront = false;
-		xmlPage = 1;
+		myApp.xmlPage = 1;
 	}
 	
     void updateMainScreenForUser(int result) {
@@ -273,9 +270,9 @@ OnScrollListener, OnItemSelectedListener {
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			ud.updates.clear();
 			if(myApp.userData.shelves.size() == 0) {
-				xmlPage = 1;
+				myApp.xmlPage = 1;
 				Log.d(TAG, "BooksActivity.updateMainScrenForUser getting shelf");
-				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);
+				myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_SHELVES);
 			} else {
 				// Load images in background
 				getImages();
@@ -285,7 +282,9 @@ OnScrollListener, OnItemSelectedListener {
     		// We need to cater for users with > 100 bookshelves like Cait :-)
     		if(ud.endShelf < ud.totalShelves) {
     			Log.d(TAG, "Getting extra shelf -- total shelves: " + ud.totalShelves);
-    			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
+    			myApp.oauth.getXMLFile(++myApp.xmlPage, OAuthInterface.GET_SHELVES);
+    		} else if(myApp.gettingShelves) {
+				myApp.createShelvesMenu(myApp.userData.shelves);
     		} else {
     			myApp.oauth.goodreads_url = OAuthInterface.GET_SHELF;
     			getImages();
@@ -410,7 +409,7 @@ OnScrollListener, OnItemSelectedListener {
 			for(i = OAuthInterface.ITEMS_TO_DOWNLOAD - 1; i >= 0; i--) {
 				shelfAdapter.insert(ud.tempBooks.get(i), 0);
 			}
-			if(xmlPage == 1) {
+			if(myApp.xmlPage == 1) {
 				booksRemovedFromFront = false;
 			}
 		}
@@ -527,14 +526,14 @@ OnScrollListener, OnItemSelectedListener {
 	private void onLastListItemDisplayed() {
 		showUpdateMessage(R.string.getBooks);
 		if(goingForward) {
-			xmlPage++;
+			myApp.xmlPage++;
 		} else {
-			xmlPage += PAGES_TO_MOVE_BY;
+			myApp.xmlPage += PAGES_TO_MOVE_BY;
 		}
 		goingForward = true;
 		if(!myApp.threadLock) {
 			Log.d(TAG, "onLastListItemDisplayed, getting books");
-			myApp.oauth.getXMLFile(xmlPage, myApp.oauth.goodreads_url);
+			myApp.oauth.getXMLFile(myApp.xmlPage, myApp.oauth.goodreads_url);
 		}
 	}
 
@@ -545,17 +544,17 @@ OnScrollListener, OnItemSelectedListener {
 			// how many books did you get going forward last time?
 			booksToDelete = OAuthInterface.ITEMS_TO_DOWNLOAD - 
 			(myApp.userData.endBook - myApp.userData.startBook + 1);
-			xmlPage -= PAGES_TO_MOVE_BY;
+			myApp.xmlPage -= PAGES_TO_MOVE_BY;
 		} else {
 			// Went backward last time
 			booksToDelete = 0;
-			xmlPage--;
+			myApp.xmlPage--;
 		}
 		
 		goingForward = false;
-		Log.d(TAG, "Getting page " + xmlPage + " booksToDelete " + booksToDelete);
+		Log.d(TAG, "Getting page " + myApp.xmlPage + " booksToDelete " + booksToDelete);
 		showUpdateMessage(R.string.getBooks);
-		myApp.oauth.getXMLFile(xmlPage, myApp.oauth.goodreads_url);
+		myApp.oauth.getXMLFile(myApp.xmlPage, myApp.oauth.goodreads_url);
 	}
 	
 	@Override
@@ -577,7 +576,7 @@ OnScrollListener, OnItemSelectedListener {
 			myApp.userData.isbnScan = isbn;
 			showUpdateMessage(R.string.getBookByISBN);
 			newQuery();
-			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_BOOKS_BY_ISBN);
+			myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_BOOKS_BY_ISBN);
 		}				    
 	}
 	
@@ -650,7 +649,7 @@ OnScrollListener, OnItemSelectedListener {
 			showUpdateMessage(R.string.getBooks);
 			newQuery();
 			Log.d(TAG, "Getting re-ordered shelf");
-			myApp.oauth.getXMLFile(xmlPage, myApp.oauth.goodreads_url);
+			myApp.oauth.getXMLFile(myApp.xmlPage, myApp.oauth.goodreads_url);
 		}
 	}
 

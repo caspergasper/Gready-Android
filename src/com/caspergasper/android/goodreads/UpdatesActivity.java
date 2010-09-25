@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -38,7 +37,6 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 public class UpdatesActivity extends Activity implements OnItemClickListener, OnItemLongClickListener {
 	
 	private GoodReadsApp myApp;
-	private int xmlPage = 1;
 	private ListView updatesListView;
 	private static final String M_USER = "m/user/";
 	private static final String REVIEWS = "/reviews";
@@ -60,14 +58,14 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 	        	return;
 	        } 
 			if(myApp.userID == 0  && !myApp.threadLock) {
-				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_USER_ID);
+				myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_USER_ID);
 				return;     
 			} else {
 				if(myApp.userData.updates.size() == 0 && !myApp.threadLock) {
 					// Got valid tokens and a userid, let's go get some data...
 					Log.d(TAG, "Getting updates now...");
-					xmlPage = 1;
-					myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
+					myApp.xmlPage = 1;
+					myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 				} 
 			}
 		} catch(Exception e) {
@@ -111,15 +109,15 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.updates_menu, menu);
-        SubMenu sub = menu.addSubMenu(0, 0, Menu.NONE, R.string.bookshelves_label);
-    	sub.setHeaderIcon(android.R.drawable.ic_menu_view);
-    	sub.setIcon(android.R.drawable.ic_menu_view);
+        myApp.sub = menu.addSubMenu(0, 0, Menu.NONE, R.string.bookshelves_label);
+        myApp.sub.setHeaderIcon(android.R.drawable.ic_menu_view);
+        myApp.sub.setIcon(android.R.drawable.ic_menu_view);
     	List<Shelf> tempShelves = myApp.userData.shelves;
         if(tempShelves.size() == 0 || myApp.userData.endShelf < myApp.userData.totalShelves) {
         	toastMe(R.string.build_menu);
 			return false;
         } else {
-        	myApp.createShelvesMenu(tempShelves, sub);
+        	myApp.createShelvesMenu(tempShelves);
         }
         return true;
     }
@@ -130,32 +128,30 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		if(myApp.threadLock) {
 			return false;
 		}
+		int itemId = item.getItemId();
 		if(item.getGroupId() == GoodReadsApp.SUBMENU_GROUPID) {
-			if(item.getItemId() == myApp.userData.shelves.size()) {
-				myApp.userData.shelfToGet = "all";
-			} else {
-				myApp.userData.shelfToGet = myApp.userData.shelves.get(item.getItemId()).title;
+			if(myApp.handleBookshelfSelection(this, itemId)) {
+				startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
+				finish();
 			}
-			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
-			finish();
 			return true;
-		} else if(item.getItemId() == R.id.updates) {
+		} else if(itemId == R.id.updates) {
 				showUpdateMessage(R.string.getUpdates);
-				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
+				myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 				return true;
-		} else if(item.getItemId() == R.id.update_status) {
+		} else if(itemId == R.id.update_status) {
 			showUpdateDialog();
 			myApp.userData.shelfToGet = CURRENTLY_READING;
-			xmlPage = 1;
-			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELF_FOR_UPDATE);
+			myApp.xmlPage = 1;
+			myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_SHELF_FOR_UPDATE);
 			return true;
-		} else if(item.getItemId() == R.id.search || item.getItemId() == R.id.scanbook) {
+		} else if(itemId == R.id.search || itemId == R.id.scanbook) {
 			myApp.menuItem = item;
 			myApp.getImageThreadRunning = false;	// Shouldn't be needed
 			startActivity(new Intent(UpdatesActivity.this, BooksActivity.class));
 			finish();
 			return true;
-		} else if(item.getItemId() == R.id.preferences) {
+		} else if(itemId == R.id.preferences) {
 			startActivity(new Intent(UpdatesActivity.this, Preferences.class));
 			return true;
 		}
@@ -282,7 +278,7 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 	}
 	
 	private void newQuery() {
-		xmlPage = 1;
+		myApp.xmlPage = 1;
 	}
 	
     void updateMainScreenForUser(int result) {
@@ -320,9 +316,9 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
 			((TextView) findViewById(R.id.updates_label)).setText(R.string.updates_label);
 			if(myApp.userData.shelves.size() == 0) {
-				xmlPage = 1;
-				myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);
-			} else {
+				myApp.xmlPage = 1;
+				myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_SHELVES);
+			} else if(!myApp.gettingShelves) {
 				getImages();
 			}
 			ud.books.clear();
@@ -330,13 +326,15 @@ public class UpdatesActivity extends Activity implements OnItemClickListener, On
 		case OAuthInterface.GET_USER_ID:
 			Log.d(TAG, "Getting friend updates for first time");
 			ud.updates.clear();
-			myApp.oauth.getXMLFile(xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
+			myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_FRIEND_UPDATES);
 		break;
     	case OAuthInterface.GET_SHELVES:
     		// We need to cater for users with > 100 bookshelves like Cait :-)
     		if(ud.endShelf < ud.totalShelves) {
     			Log.d(TAG, "Getting extra shelf -- total shelves: " + ud.totalShelves);
-    			myApp.oauth.getXMLFile(++xmlPage, OAuthInterface.GET_SHELVES);
+    			myApp.oauth.getXMLFile(++myApp.xmlPage, OAuthInterface.GET_SHELVES);
+    		} else if(myApp.gettingShelves) {
+    			myApp.createShelvesMenu(myApp.userData.shelves);
     		} else {
     			getImages();
     		}

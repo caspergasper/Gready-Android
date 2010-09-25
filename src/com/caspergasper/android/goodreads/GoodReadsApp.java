@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,11 +46,15 @@ public class GoodReadsApp extends Application {
 	Activity goodreads_activity;
 	volatile boolean threadLock = false;
 	volatile boolean getImageThreadRunning;
+	volatile boolean gettingShelves = false;
 	static final String GOODREADS_IMG_URL = "http://photo.goodreads.com/";
 	static final int GOODREADS_IMG_URL_LENGTH = GOODREADS_IMG_URL.length();
 	MenuItem menuItem = null;
 	static final String TO_READ = "to-read";
 	static final int SUBMENU_GROUPID = 1;
+	int xmlPage = 1;
+	SubMenu sub;
+	ProgressDialog progressDialog;
 	
 	public static GoodReadsApp getInstance() {
 		return singleton;
@@ -175,21 +181,45 @@ public class GoodReadsApp extends Application {
 		return d;
 	}
 	
-	void createShelvesMenu(List<Shelf> tempShelves, SubMenu sub) {
+	void createShelvesMenu(List<Shelf> tempShelves) {
     	int shelf_length = tempShelves.size();
     	int totalBooks = 0;
     	int currentShelfBooks = 0;
     	int i;
+    	sub.removeGroup(SUBMENU_GROUPID);  // Delete all first
+    	sub.add(SUBMENU_GROUPID, 0, Menu.NONE,  
+       	     R.string.refresh_shelf_list);
     	for(i=0; i<shelf_length && tempShelves.get(i) != null; i++) {
     		currentShelfBooks = tempShelves.get(i).total;
-    		sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
+    		sub.add(SUBMENU_GROUPID, i+1, Menu.NONE,  
     	     "(" + currentShelfBooks + ") " + tempShelves.get(i).title);
     		if(tempShelves.get(i).exclusive) {
     			totalBooks += currentShelfBooks;
     		}
     	}
-    	sub.add(SUBMENU_GROUPID, i, Menu.NONE,  
+    	sub.add(SUBMENU_GROUPID, i+1, Menu.NONE,  
        	     "(" + totalBooks + ") All books");
+    	gettingShelves = false;
+    	if(progressDialog != null) {
+    		progressDialog.dismiss();
+    	}
+	}
+	
+	boolean handleBookshelfSelection(Context context, int itemId) {
+		if(itemId == 0) {
+			gettingShelves = true;
+			progressDialog = ProgressDialog.show(context, "Getting shelves", "Please be patient...");
+			// Refresh shelf list
+			userData.shelves.clear();
+			xmlPage = 1;
+			oauth.getXMLFile(xmlPage, OAuthInterface.GET_SHELVES);
+			return false;
+		} else if(itemId - 1 == userData.shelves.size()) {
+			userData.shelfToGet = "all";
+		} else {
+			userData.shelfToGet = userData.shelves.get(itemId - 1).title;
+		}
+		return true;
 	}
 }
 

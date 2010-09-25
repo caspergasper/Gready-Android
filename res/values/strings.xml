@@ -54,4 +54,6 @@
 <string name="start_which_activity">Select startup page:</string>
 <string name="my_review">My Review</string>
 <string name="order_by_prompt">Order by:</string>
+<string name="refresh_shelf_list">(Reload my shelf list)</string>
+<string name="getting_shelves">Getting bookshelves, please wait...</string>
 </resources>
