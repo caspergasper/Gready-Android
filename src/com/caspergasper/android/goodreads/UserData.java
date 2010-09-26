@@ -30,6 +30,7 @@ class UserData {
 	List <Shelf> shelves;
 	List <Book> books;
 	List <Book> tempBooks;
+	List <Review> reviews;
 	String shelfToGet;
 	private SAXParserFactory factory;
 	private SAXParser parser;
@@ -41,6 +42,7 @@ class UserData {
 		shelves = new ArrayList<Shelf>();
 		books = new ArrayList<Book>();
 		tempBooks = new ArrayList<Book>();
+		reviews = new ArrayList<Review>();
 		factory = SAXParserFactory.newInstance();
         try {
             parser = factory.newSAXParser();
@@ -62,6 +64,8 @@ class UserData {
 			source = new InputSource(reader);
 			if(goodreadsUrl == OAuthInterface.GET_BOOKS_BY_ISBN) {
 				handler = new ISBNBooksSaxHandler(this);
+			} else if(goodreadsUrl == OAuthInterface.GET_REVIEWS) {
+				handler = new ReviewsSaxHandler(this);
 			} else {
 				handler = new BooksSaxHandler(this);
 			}

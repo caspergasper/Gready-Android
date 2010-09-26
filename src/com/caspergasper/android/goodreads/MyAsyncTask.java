@@ -58,6 +58,7 @@ class MyAsyncTask extends AsyncTask<HttpGet, Void, Integer> {
 	    case OAuthInterface.GET_BOOKS_BY_ISBN:
 	    case OAuthInterface.GET_SHELF:
 	    case OAuthInterface.GET_SHELF_FOR_UPDATE:
+	    case OAuthInterface.GET_REVIEWS:
 	    	myApp.userData.getSAXBooks(is, myApp.oauth.goodreads_url);
 	    	break;
 	    } 

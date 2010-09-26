@@ -1,7 +1,6 @@
 package com.caspergasper.android.goodreads;
 
 import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -16,11 +15,19 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class GoodReadsApp extends Application {
 	
@@ -55,6 +62,9 @@ public class GoodReadsApp extends Application {
 	int xmlPage = 1;
 	SubMenu sub;
 	ProgressDialog progressDialog;
+	private static final int MAX_UPDATE_SIZE = 420;
+	Dialog updateDialog = null;
+	static final String CURRENTLY_READING = "currently-reading";
 	
 	public static GoodReadsApp getInstance() {
 		return singleton;
@@ -221,5 +231,77 @@ public class GoodReadsApp extends Application {
 		}
 		return true;
 	}
+	
+	void showUpdateDialog(final Activity activity) {
+		final String CHARS_LEFT = " left";
+		updateDialog = createDialogBox(activity, R.layout.updatestatus_dialog, true);
+		final Button b = (Button) updateDialog.findViewById(R.id.updatebutton);
+		final RadioGroup group = (RadioGroup) updateDialog.findViewById(R.id.RadioGroup);
+		final EditText et = (EditText) updateDialog.findViewById(R.id.statusbox);
+		final TextView charsLeft = (TextView) updateDialog.findViewById(R.id.char_count_label);
+		final EditText pageCountEdit = (EditText) updateDialog.findViewById(R.id.pagestatusbox);
+		
+		// Show characters remaining
+		et.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				charsLeft.setText(Integer.toString(MAX_UPDATE_SIZE - arg0.length()) + CHARS_LEFT);
+			}
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {				}
+			@Override
+			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
+					int arg3) {			}
+		});
+			
+		b.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				int pageNum = 0;
+				int bookId = 0;
+				
+				String text = et.getText().toString().trim(); 
+				int textLength = text.length(); 
+				if(textLength > MAX_UPDATE_SIZE) {
+					if(activity instanceof UpdatesActivity) {
+						((UpdatesActivity)activity).toastMe(R.string.update_too_long);
+					} else {
+						((BooksActivity)activity).toastMe(R.string.update_too_long);
+					}
+					return;
+				}
+				
+				if(pageCountEdit.getText().toString().length() > 0) {
+					pageNum = Integer.parseInt(pageCountEdit.getText().toString());
+				}
+				
+				if(pageNum != 0 || textLength > 0) {
+					int checkedId = group.getCheckedRadioButtonId();
+					if(checkedId != R.id.RadioButtonGeneralUpdate) {
+						bookId = checkedId;
+					}
+					oauth.postUpdateToStatus(bookId, pageNum, text);
+				}
+				updateDialog.hide();
+			}
+		});
+		
+		
+		
+		group.setOnCheckedChangeListener(new OnCheckedChangeListener() {	
+			@Override
+			public void onCheckedChanged(RadioGroup arg0, int arg1) {
+				if(arg1 == R.id.RadioButtonGeneralUpdate) {
+					updateDialog.findViewById(R.id.page_num_label).setVisibility(View.INVISIBLE);
+					updateDialog.findViewById(R.id.pagestatusbox).setVisibility(View.INVISIBLE);
+				} else {
+					updateDialog.findViewById(R.id.page_num_label).setVisibility(View.VISIBLE);
+					updateDialog.findViewById(R.id.pagestatusbox).setVisibility(View.VISIBLE);
+				}
+			}
+		});
+		updateDialog.show();
+	}
+	
 }
 

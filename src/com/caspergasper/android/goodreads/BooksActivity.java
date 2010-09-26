@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.Spinner;
@@ -174,6 +175,12 @@ OnScrollListener, OnItemSelectedListener {
 			startActivity(new Intent(BooksActivity.this, UpdatesActivity.class));	
 			finish();
 			return true;
+		} else if(itemId == R.id.update_status) {
+			myApp.showUpdateDialog(this);
+			myApp.userData.shelfToGet = GoodReadsApp.CURRENTLY_READING;
+			myApp.xmlPage = 1;
+			myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_SHELF_FOR_UPDATE);
+			return true;
 		} else if(itemId == R.id.scanbook) {
 			IntentIntegrator.initiateScan(BooksActivity.this,IntentIntegrator.DEFAULT_TITLE,IntentIntegrator.DEFAULT_MESSAGE,IntentIntegrator.DEFAULT_YES,IntentIntegrator.DEFAULT_NO,IntentIntegrator.PRODUCT_CODE_TYPES);
 			return true;
@@ -290,6 +297,14 @@ OnScrollListener, OnItemSelectedListener {
     			getImages();
     		}
     	break;
+		case OAuthInterface.GET_SHELF_FOR_UPDATE:
+    		updateDialogRadioGroup();
+    	break;
+		case OAuthInterface.GET_REVIEWS:
+			findViewById(R.id.status_label).setVisibility(View.INVISIBLE);
+			myApp.oauth.goodreads_url = OAuthInterface.GET_SHELF;
+			startActivity(new Intent(BooksActivity.this, ReviewsActivity.class));	
+		break;
     	}
     	} catch(Exception e) {
 			Log.e(TAG, "BooksActivity updateMainScreenForUser " + e.getStackTrace().toString());
@@ -307,6 +322,7 @@ OnScrollListener, OnItemSelectedListener {
     	menu.add(0, Menu.FIRST, Menu.NONE, R.string.goto_mobilesite);
     	menu.add(0, 2, Menu.NONE, R.string.rate_review);
     	menu.add(0, 3, Menu.NONE, R.string.see_book_details);
+    	menu.add(0, 4, Menu.NONE, R.string.see_book_reviews);
     	SubMenu sub = menu.addSubMenu(R.string.change_shelves);
     	List<Shelf> tempShelves = myApp.userData.shelves;
     	// Copied text
@@ -324,7 +340,7 @@ OnScrollListener, OnItemSelectedListener {
     		}
     		for(String shelfTitle : currentBook.shelves) {
     			if(shelfTitle.compareTo(shelf.title) == 0) {
-    				sub.getItem(i).setChecked(true).setEnabled(false);
+    				sub.getItem(i).setChecked(true);
     				break;
     			}
     		}
@@ -351,9 +367,18 @@ OnScrollListener, OnItemSelectedListener {
     		showReviewDialog();	
     	} else if(groupId == 0 && itemId == 3) {
     		showBookDetail(currentBook);
-    	} else if(groupId == GoodReadsApp.SUBMENU_GROUPID || groupId == SUBMENU_GROUPID_RADIO) {
+    	} else if(groupId == 0 && itemId == 4) {
+    		Log.d(TAG, "Getting book reviews");
+    		showUpdateMessage(R.string.reviews_label);
+    		myApp.xmlPage = 1;
+    		myApp.userData.reviews.clear(); 
+			myApp.oauth.getXMLFile(myApp.xmlPage, OAuthInterface.GET_REVIEWS);
+    	} else if(groupId == GoodReadsApp.SUBMENU_GROUPID) {
     		Log.d(TAG, "add book to shelf " + item.getTitle().toString());
-    		myApp.oauth.postBookToShelf(currentBook.id, item.getTitle().toString());
+    		myApp.oauth.postBookToShelf(currentBook.id, item.getTitle().toString(), item.isChecked());
+    	} else if(groupId == SUBMENU_GROUPID_RADIO && !item.isChecked()) {
+    		Log.d(TAG, "add book to shelf " + item.getTitle().toString());
+    		myApp.oauth.postBookToShelf(currentBook.id, item.getTitle().toString(), false);
     	}
     	return true;
     }
@@ -458,7 +483,7 @@ OnScrollListener, OnItemSelectedListener {
 		ad.setMessage(R.string.addToShelfQ);
 		ad.setPositiveButton("Yes", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int arg1) {
-				myApp.oauth.postBookToShelf(b.id, GoodReadsApp.TO_READ);
+				myApp.oauth.postBookToShelf(b.id, GoodReadsApp.TO_READ, false);
 			}
 		});
 		ad.setNegativeButton("No", new OnClickListener() {
@@ -655,6 +680,22 @@ OnScrollListener, OnItemSelectedListener {
 
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {	}
+	
+	private void updateDialogRadioGroup() {
+		// Callback from getting the currently-reading shelf.
+		// book ids are stored as the radiobutton ids.
+		// For some reason moving this away from the activity failed.
+		Log.d(TAG, "in updateDialogRadioGroup");
+		RadioGroup group = (RadioGroup) myApp.updateDialog.findViewById(R.id.RadioGroup);
+		
+		for(Book b : myApp.userData.tempBooks){
+			RadioButton button = new RadioButton(this);
+			button.setId(b.id);
+			button.setText(b.title);
+			group.addView(button);	
+		}
+		myApp.userData.tempBooks.clear();
+	}
 
 }
 

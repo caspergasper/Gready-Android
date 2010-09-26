@@ -3,7 +3,7 @@
     <string name="bookshelves_label">bookshelves</string>
     <string name="updates_label">Updates</string>
     <string name="books_label">Books</string>
-    <string name="reviews_label">reviews</string>
+    <string name="reviews_label">Getting reviews...</string>
     <string name="friends_label">friends</string>
     <string name="getBooks">Getting shelf...</string>
     <string name="getUpdates">Getting latest updates...</string>
@@ -33,6 +33,7 @@
 <string name="addToShelf">Add to shelf</string>
 <string name="addToShelfQ">Do you want to add this book to your to-read shelf?</string>
 <string name="bookAddedToShelf">Added book to shelf.</string>
+<string name="bookRemovedFromShelf">Removed book from shelf.</string>
 <string name="page_num_label">page</string>
 <string name="statusUpdated">Status updated.</string>
 <string name="read">read</string>
@@ -56,4 +57,5 @@
 <string name="order_by_prompt">Order by:</string>
 <string name="refresh_shelf_list">(Reload my shelf list)</string>
 <string name="getting_shelves">Getting bookshelves, please wait...</string>
+<string name="see_book_reviews">See book reviews</string>
 </resources>

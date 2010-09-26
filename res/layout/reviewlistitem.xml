@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_updates"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="2dp"
+              android:background="#ffffff"
+              android:textColor="#000000"
+              >
+<TextView android:layout_height="wrap_content" android:layout_width="wrap_content"
+android:id="@+id/reviewlist_username" android:padding="3dp" 
+android:textStyle="bold"/>
+<RatingBar android:id="@+id/rating" android:numStars="5" android:stepSize="1" android:rating="0" 
+      style="?android:attr/ratingBarStyleSmall"  
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content"       
+      android:layout_toRightOf="@id/reviewlist_username"  
+      android:layout_marginLeft="4dp"   
+      android:layout_marginTop="5dp" />
+<TextView android:layout_height="wrap_content" android:layout_width="wrap_content"
+android:id="@+id/reviewlist_textview" android:padding="3dp" 
+android:layout_below="@id/reviewlist_username"
+/>
+</RelativeLayout>

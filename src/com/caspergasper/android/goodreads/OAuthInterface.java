@@ -9,7 +9,6 @@ import oauth.signpost.OAuthProvider;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 import oauth.signpost.exception.OAuthException;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -18,7 +17,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-
 import android.util.Log;
 
 public class OAuthInterface {
@@ -41,6 +39,7 @@ public class OAuthInterface {
 	static final String CALLBACK_URL = "goodreadsactivity://token";
 	static final String OAUTH_VERIFIER = "oauth_token";
 	static final String REVIEW_PATH = "review/";
+	static final String SHOW_REVIEWS_PATH = "book/show/";
 	
 	// Eventually I'd like to do something clever like detect if the user is on wifi
 	// or 3G and download more/less items appropriately.
@@ -55,6 +54,7 @@ public class OAuthInterface {
 	public static final int GET_BOOKS_BY_ISBN = 5;
 	public static final int SEARCH_SHELVES = 6;
 	public static final int GET_SHELF_FOR_UPDATE = 7;
+	public static final int GET_REVIEWS = 8;
 	
 	int goodreads_url;
 	private OAuthConsumer consumer;
@@ -67,6 +67,7 @@ public class OAuthInterface {
 	private int page;
 	private String body;
 	private int rating = 0;
+	private boolean removeBookFromShelf;
 	
 	OAuthInterface() {
 		// create a consumer object and configure it with the access
@@ -177,6 +178,10 @@ public class OAuthInterface {
     		url_string = URL_ADDRESS + BOOKS_ISBN_PATH + "?isbn=" + myApp.userData.isbnScan + 
     		"&format=xml";
     		break;
+    	case GET_REVIEWS:
+    		url_string = URL_ADDRESS + SHOW_REVIEWS_PATH + BooksActivity.currentBook.id + "?format=xml&key=" +
+    		DeveloperKeys.CONSUMER_KEY;
+    		break;
     	default: 
     		url_string = "";
     	}
@@ -185,7 +190,9 @@ public class OAuthInterface {
         	HttpGet request = new HttpGet(url_string);
         	
     		// sign the request
-        	consumer.sign(request);
+        	if(goodreads_url != GET_REVIEWS){
+        		consumer.sign(request);
+        	}
         	
         	// Create background thread to download and render XML
     		myApp.getImageThreadRunning = false;
@@ -198,10 +205,11 @@ public class OAuthInterface {
         } 
 	}
 	
-	void postBookToShelf(int _bookId, String _shelf) {
+	void postBookToShelf(int _bookId, String _shelf, boolean _remove) {
 		 // Fire off a thread to do some work that we shouldn't do directly in the UI thread
         bookId = _bookId;
         shelfTitle = _shelf;
+        removeBookFromShelf = _remove;
         Thread t = new Thread(null, doPostBook, "addBook");
         t.start();
 	}
@@ -289,15 +297,21 @@ public class OAuthInterface {
 	    }
 	    
 	    private void postBook() {
-	    	Log.d(TAG, "Adding book id " + bookId + " to " + shelfTitle);     	
-        	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();
+	    	LinkedList<BasicNameValuePair> out = new LinkedList<BasicNameValuePair>();
+	    	if(removeBookFromShelf) {
+	    		Log.d(TAG, "Remvoe book id " + bookId + " from " + shelfTitle);
+	    		out.add(new BasicNameValuePair("a", "remove"));
+	    	} else {
+	    		Log.d(TAG, "Adding book id " + bookId + " to " + shelfTitle);
+	    	}
         	out.add(new BasicNameValuePair("book_id", Integer.toString(bookId)));
         	out.add(new BasicNameValuePair("name", shelfTitle));
+        	
         	postUpdateOrBook(out, OAuthInterface.ADD_BOOK_PATH);
 	    }
 	    
 	    private void postUpdateOrBook(LinkedList<BasicNameValuePair> postData, String URL) {
-	        try {
+	    	try {
 	        	HttpClient httpClient = new DefaultHttpClient();
 	        	HttpPost post = new HttpPost(OAuthInterface.URL_ADDRESS + URL);
 	        	post.setEntity(new UrlEncodedFormEntity(postData, HTTP.UTF_8));
@@ -308,8 +322,12 @@ public class OAuthInterface {
 	    		if(responseCode == 201 || responseCode == 200){
 	    			if(URL == OAuthInterface.ADD_BOOK_PATH) { 
 	    				((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostBookUpdateGUI);
-	    			} else if(URL == OAuthInterface.ADD_UPDATE_PATH) { 
-	    				((UpdatesActivity) myApp.goodreads_activity).mHandler.post(doPostUpdateStatusGUI);
+	    			} else if(URL == OAuthInterface.ADD_UPDATE_PATH) {
+	    				if(myApp.goodreads_activity instanceof UpdatesActivity) {
+	    					((UpdatesActivity) myApp.goodreads_activity).mHandler.post(doPostUpdateStatusGUI);
+	    				} else {
+	    					((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostUpdateStatusGUI);
+	    				}
 	    			} else {
 	    				((BooksActivity) myApp.goodreads_activity).mHandler.post(doPostReviewUpdateGUI);
 	    			}
@@ -328,7 +346,23 @@ public class OAuthInterface {
 	        }
 	    }
 	    
+	    private void removeShelf() {
+	    	((BooksActivity) myApp.goodreads_activity).toastMe(R.string.bookRemovedFromShelf);
+	    	// remove the old shelf from the list
+			for(String stringShelf : BooksActivity.currentBook.shelves) {
+				if(stringShelf.compareTo(shelfTitle) == 0) {
+					BooksActivity.currentBook.shelves.remove(stringShelf);
+					return;
+				}
+			}	
+	    }
+	    
 	    private void postBookUpdateResults() {
+	    	if(removeBookFromShelf) {
+	    		removeShelf();
+	    		return;
+	    	}
+	    	
 	    	((BooksActivity) myApp.goodreads_activity).toastMe(R.string.bookAddedToShelf);
 	    	// if currentShelf and new shelf are exclusive,
 	    	// hide -- else add to shelf.
@@ -373,7 +407,11 @@ public class OAuthInterface {
 	    }
 	    
 	    private void postUpdateStatusResults() {
-	    	((UpdatesActivity) myApp.goodreads_activity).toastMe(R.string.statusUpdated);
+	    	if(myApp.goodreads_activity instanceof UpdatesActivity) {
+	    		((UpdatesActivity) myApp.goodreads_activity).toastMe(R.string.statusUpdated);
+	    	} else {
+	    		((BooksActivity) myApp.goodreads_activity).toastMe(R.string.statusUpdated);
+	    	}
 	    }
 	    
 	    private void postReviewUpdateResults() {

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu  xmlns:android="http://schemas.android.com/apk/res/android">
-<!--<item android:icon="@android:drawable/ic_menu_preferences" android:id="@+id/identifyuser" -->
-<!--android:titleCondensed="@string/usersettings" android:title="@string/usersettings"></item>-->
 <item android:titleCondensed="@string/updates_label" android:title="@string/updates_label" 
 android:id="@+id/updates" android:icon="@android:drawable/ic_menu_info_details"></item>
-<!--<item android:titleCondensed="@string/bookshelves_label" android:title="@string/bookshelves_label" -->
-<!--android:id="@+id/booklist" android:icon="@android:drawable/ic_menu_view"></item>-->
+<item android:titleCondensed="@string/update_status" android:title="@string/update_status" 
+android:id="@+id/update_status" android:icon="@android:drawable/ic_menu_edit"></item>
 <item android:titleCondensed="@string/search" android:title="@string/search" 
 android:id="@+id/search" android:icon="@android:drawable/ic_menu_search"></item>
 <item android:titleCondensed="@string/scanbook_label" android:title="@string/scanbook_label" 

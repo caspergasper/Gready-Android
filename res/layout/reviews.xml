@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    style="@style/goodreads" 
+    android:orientation="vertical" >
+<ImageView android:layout_width="fill_parent" android:layout_height="wrap_content" 
+android:id="@+id/gr_bookshelf" android:src="@drawable/gr_bookshelf">
+</ImageView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" 
+ android:id="@+id/updates_label" 
+android:text="@string/reviews_label"  
+android:textStyle="bold">
+</TextView>
+<View    android:id="@+id/blank_line"
+		 android:layout_width="fill_parent"
+         android:layout_height="1dip"
+         android:background="#40909090" />
+<ListView android:id="@+id/reviews_listview" android:layout_width="fill_parent"  
+android:isScrollContainer="true" android:smoothScrollbar="true" 
+android:layout_height="wrap_content" android:scrollbars="vertical" 
+android:visibility="invisible" android:choiceMode="singleChoice">
+</ListView>
+</LinearLayout>
+
